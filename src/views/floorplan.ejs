@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title><%= __('title') %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+
+        <div class="col-sm-12">
+            <div class="well">
+                <h1>Upload a floorplan</h1>
+                <form method="post" id="fileinfo" name="fileinfo" onsubmit="return submitForm();">
+                    <label>Select a file: </label><input type="file" name="floorplan" required />
+                    <label>Name: </label><input type="text" name="name" required />
+                    <label>Scale (cm/px): </label><input type="number" name="scale" required />
+                    <label>X offset (px): </label><input type="number" name="xoffset" required />
+                    <label>Y offset (px): </label><input type="number" name="yoffset" required />
+                    <input type="submit" value="Upload" />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well text-center ownborder">
+                <div id="floorplan"></div>
+            </div>		
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function submitForm() {
+        console.log("submit event");
+        var fd = new FormData(document.getElementById("fileinfo"));
+        fd.append("label", "WEBUPLOAD");
+        $.ajax({
+            url: "./api/fp",
+            type: "POST",
+            data: fd,
+            processData: false,  // tell jQuery not to process the data
+            contentType: false,   // tell jQuery not to set contentType
+            enctype: 'multipart/form-data'
+        }).done(function( data ) {
+            console.log("Output:");
+            console.log( data );
+            loadImage(data.imgurl, 0 , 0, '#floorplan');
+        }).fail(function(xhr, status, err){
+            alert(xhr.responseText);
+        });
+            return false;
+    }
+    function loadImage(path, width, height, target) { 	
+        $( target ).empty();;
+        $('<img src="'+ path +'">').load(function() {
+            //$(this).width(width).height(height).appendTo(target);
+            $(this).appendTo(target);
+        });
+    }
+//    $( document ).ready(function() {
+//       loadImage('img/fp.png', 0 , 0, '#floorplan');
+//     });
+</script>
+</body>
+</html>
+ 

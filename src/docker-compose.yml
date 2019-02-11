@@ -1,0 +1,32 @@
+version: "3"
+services:
+  mongodb:
+    image: mongo:3.6
+    restart: always
+    volumes:
+      - ./mongo/data:/data/db
+      #WINDOWS
+      #- mongo_db:/data/db:Z
+  mongo-seed:
+    build: ./mongo
+    links:
+      - mongodb
+  app:
+    container_name: hminode
+    restart: always
+    build: .
+    volumes:
+      - ./public/uploads:/usr/src/app/public/uploads
+      #WINDOWS
+      #- node_dir:/usr/src/app/public/uploads:Z                
+    ports:
+      - "8081:8081"
+    links:
+      - mongodb
+
+#WINDOWS
+#volumes:
+#    mongo_db: 
+#        external: true
+#    node_dir: 
+#        external: true

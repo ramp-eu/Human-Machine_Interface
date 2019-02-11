@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title><%= __("title") %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            <div class="well">
+                <h1></span> <%= __("logging") %></h1>
+
+                <% if (message.length > 0) { %>
+                    <div class="alert alert-danger"><%= message %></div>
+                <% } else if (messagepos.length > 0) { %>
+                    <div class="alert alert-success"><%= messagepos %></div>
+                <% } %>
+
+                <form action="/login" method="post">
+                    <div class="form-group">
+                        <label><%= __("userid") %></label>
+                        <input type="text" class="form-control" name="userid">
+                    </div>
+                    <div class="form-group">
+                        <label><%= __("pwd") %></label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg"><%= __("login") %></button>
+                </form>
+
+                <hr>
+
+                <!--<p><%= __("Need an account?") %> <a href="/signup"><%= __("signup") %></a></p>-->
+                <p><%= __("Forgot your password?") %> <a href="/change"><%= __("chgpwd") %></a></p>
+                <!--<p><%= __("Or go") %> <a href="/"><%= __("home") %></a>.</p>-->
+
+                <!--
+                <div class="text-center">
+                    <a href="/login?lang=<%= __("lnghref") %>"><%= __("lng") %></a>
+                </div>
+				-->
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
