@@ -1,0 +1,32 @@
+function submitSettings() {
+	$.ajax({
+		url: "./api/config",
+		type: "POST",
+		data: $("#systemSettings").serialize()
+	}).done(function(data) {
+		// delete old configs
+		$.ajax({
+			type: "GET",
+			url: "./api/config",
+			dataType: "json",
+			success: function (data2) {					
+				$(data2).each(function(i, item) {
+					if (item._id != data._id) {
+						$.ajax({
+							url: "./api/config/" + item._id,
+							type: 'DELETE',
+							success: function(result) {}
+						});
+					}
+				})
+
+			}
+		});			
+		showAndDismissAlert("success", "Settings saved succesfully!", "settingsAlert");
+		console.log("Output:");
+		console.log(data);
+	}).fail(function(xhr, status, err){
+		alert(xhr.responseText);
+	});
+	return false;					
+}

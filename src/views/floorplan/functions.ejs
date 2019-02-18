@@ -1,0 +1,90 @@
+var currentFloorplanImage = null;
+var currentFloorplanId = null;
+var currentFloorplanName = null;
+var currentFloorplanScale = null;
+var currentFloorplanXoffset = null;
+var currentFloorplanYoffset = null;
+
+function submitForm() {
+	console.log("submit event");
+	var fd = new FormData(document.getElementById("fileinfo"));
+	fd.append("label", "WEBUPLOAD");
+	$.ajax({
+		url: "./api/fp",
+		type: "POST",
+		data: fd,
+		processData: false,  // tell jQuery not to process the data
+		contentType: false,   // tell jQuery not to set contentType
+		enctype: 'multipart/form-data'
+	}).done(function( data ) {
+		console.log("Output:");
+		console.log( data );
+		$("#fileinfo").find("input[type=text], input[type=file], input[type=number], textarea").val("");							
+		loadImage(data.imgurl, data._id, data.name, data.scale, data.xoffset, data.yoffset, "#floorplan");
+	}).fail(function(xhr, status, err){
+		alert(xhr.responseText);
+	});
+		return false;
+}
+
+function loadImage(path, id, name, scale, xoffset, yoffset, target) { 
+	var image = new Image();
+	image.onload = function() {
+		currentFloorplanImage = image;
+		currentFloorplanId = id;				
+		currentFloorplanName = name;
+		currentFloorplanScale = scale;
+		currentFloorplanXoffset = xoffset;
+		currentFloorplanYoffset = yoffset;			
+		drawFloorplan(target);
+		$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + scale + " cm/px, <strong>x-offset:</strong> " + xoffset + " px, <strong>y-offset:</strong> " + yoffset + " px</p>");
+	};
+	image.src = path;	
+}
+
+function drawFloorplan(target) {
+
+	if (currentFloorplanImage != null && currentFloorplanName != null && currentFloorplanScale != null && currentFloorplanXoffset != null && currentFloorplanYoffset != null) {
+		var canvas = $(target)[0];
+		var context = canvas.getContext("2d");
+		context.clearRect(0, 0, canvas.width, canvas.height);
+
+		var parentWidth = $(target).parent().outerWidth();
+		$(target).attr('width', parentWidth);
+		//var parentHeight = $(target).parent().outerHeight();
+		//$(target).attr('height', parentHeight);			
+		$(target).attr('height', 640);				
+
+		var scale = Math.min(canvas.width / currentFloorplanImage.width, canvas.height / currentFloorplanImage.height);
+		// get the top left position of the image
+		var x = (canvas.width / 2) - (currentFloorplanImage.width / 2) * scale;
+		//var y = (canvas.height / 2) - (currentFloorplanImage.height / 2) * scale;			
+		var y = 0; // no need to center the floor plan vertically
+		$(target).attr('height', currentFloorplanImage.height * scale);  // resize the canvas smaller if the image is also smaller
+		context.drawImage(currentFloorplanImage, x, y, currentFloorplanImage.width * scale, currentFloorplanImage.height * scale);
+		
+		var mouseMoveFunction = function (e) {
+		
+			var scale = Math.min(canvas.width / currentFloorplanImage.width, canvas.height / currentFloorplanImage.height);
+			// get the top left position of the image
+			var x = (canvas.width / 2) - (currentFloorplanImage.width / 2) * scale;
+			//var y = (canvas.height / 2) - (currentFloorplanImage.height / 2) * scale;			
+			var y = 0; // no need to center the floor plan vertically
+			$(target).attr('height', currentFloorplanImage.height * scale);  // resize the canvas smaller if the image is also smaller
+			context.drawImage(currentFloorplanImage, x, y, currentFloorplanImage.width * scale, currentFloorplanImage.height * scale);				
+			/*
+			var x = e.pageX - canvas.offsetLeft;
+			var y = e.pageY - canvas.offsetTop;
+			var str = 'X : ' + x + ', ' + 'Y :' + y;
+			context.fillStyle = '#222';
+			context.fillRect(x + 10, y + 10, 80, 25);
+			context.fillStyle = '#0099f9';
+			context.font = 'bold 20px verdana';
+			context.fillText(str, x + 20, y + 30, 60);
+			*/
+		}
+
+		canvas.removeEventListener('mousemove', mouseMoveFunction);
+		canvas.addEventListener('mousemove', mouseMoveFunction, 0);
+	}
+}

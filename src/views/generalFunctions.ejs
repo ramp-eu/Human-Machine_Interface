@@ -1,0 +1,7 @@
+function showAndDismissAlert(type, message, id) {
+	var htmlAlert = '<div class="alert alert-' + type + '">' + message + '</div>';
+	$("#" + id).prepend(htmlAlert);
+	$("#" + id + " .alert").hide().fadeIn(600).delay(2000).fadeOut(1000, function() {
+		$(this).remove();
+	});
+}	

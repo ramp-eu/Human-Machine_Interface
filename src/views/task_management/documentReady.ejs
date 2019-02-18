@@ -1,0 +1,17 @@
+$('#taskManagementTable').on('click', '.clickable-row', function(event) {
+	if($(this).hasClass('bg-info')){
+		$(this).removeClass('bg-info'); 
+	} else {
+		$(this).addClass('bg-info').siblings().removeClass('bg-info');
+	}
+});
+
+/*
+$("#cancelTask").click(function() {
+	alert("Canceling task " + $(".bg-info").find("td:first").text() + " (NOT YET IMPLEMENTED)");
+});			
+*/
+
+$("#createTask").click(function() {
+	alert("Creating new task (NOT YET IMPLEMENTED)");
+});

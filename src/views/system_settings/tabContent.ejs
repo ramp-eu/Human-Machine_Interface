@@ -1,0 +1,24 @@
+<div id="settingsAlert"></div>
+<form method="post" id="systemSettings" name="systemSettings" onsubmit="return submitSettings();">
+	<div class="form-group">
+		<label for="ocb_host">OCB Host</label>
+		<input type="text" class="form-control" id="ocb_host" name="ocb_host" aria-describedby="ocb_hostHelp" placeholder="Enter OCB host name">
+		<small id="ocb_hostHelp" class="form-text text-muted">Please, enter the host name / ip address of the Orion Context Broker.</small>
+	</div>					
+	<div class="form-group">
+		<label for="ocb_port">OCB Port</label>
+		<input type="text" class="form-control" id="ocb_port" name="ocb_port" aria-describedby="ocb_portHelp" placeholder="Enter OCB port number">
+		<small id="ocb_portHelp" class="form-text text-muted">Please, enter the port number of the Orion Context Broker.</small>
+	</div>
+	<div class="form-group">
+		<label for="ngsi_proxy_host">NGSI Proxy Host</label>
+		<input type="text" class="form-control" id="ngsi_proxy_host" name="ngsi_proxy_host" aria-describedby="ngsi_proxy_hostHelp" placeholder="Enter NGSI Proxy host name">
+		<small id="ngsi_proxy_hostHelp" class="form-text text-muted">Please, enter the host name / ip address of the NGSI Proxy.</small>
+	</div>					
+	<div class="form-group">
+		<label for="ngsi_proxy_port">NGSI Proxy Port</label>
+		<input type="text" class="form-control" id="ngsi_proxy_port" name="ngsi_proxy_port" aria-describedby="ngsi_proxy_portHelp" placeholder="Enter NGSI Proxy port number">
+		<small id="ngsi_proxy_portHelp" class="form-text text-muted">Please, enter the port number of the NGSI Proxy.</small>
+	</div>							
+	<button type="submit" class="btn btn-primary">Save</button>
+</form>

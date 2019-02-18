@@ -1,0 +1,48 @@
+<div id="usersAlert"></div>				
+<div class="well">
+	<h3>Add new user</h3>
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">User id</th>
+				<th scope="col">Role</th>
+				<th scope="col">Name</th>	
+				<th scope="col">New Password</th>
+				<th scope="col">New Password again</th>
+				<th scope="col">&nbsp;</th>
+				<th scope="col">&nbsp;</th>						  
+			</tr>
+		</thead>							
+		<tbody>
+			<form method="post" id="newUser" name="newUser" onsubmit="return addNewUser();">							
+				<input type="hidden" name="ocb_host" id="newUserOCBHost" value=""><input type="hidden" name="ocb_port" id="newUserOCBPort" value="">
+				<tr>
+					<td><input id="newUserUserId" class="form-control" type="text" name="userid" required /></td>
+					<td><select class="form-control" name="role"><option value="admin">Admin</option><option value="user" selected>User</option></select></td>
+					<td><input id="newUserName" class="form-control" type="text" name="name" required /></td>
+					<td><input id="newUserPassword" class="form-control" type="password" name="password" required /></td>
+					<td><input id="newUserConfirmPw" class="form-control" type="password" name="confirm_pw" id="confirm_pw" required /></td>
+					<td><button type="submit" class="btn btn-primary btn-block">Add</button>
+					<td>&nbsp;</td>						  
+				</tr>
+			</form>
+		</tbody>
+	</table>			
+</div>					
+<div class="well">
+	<h3>Existing users</h3>
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">User id</th>
+				<th scope="col">Role</th>
+				<th scope="col">Name</th>	
+				<th scope="col">New Password</th>
+				<th scope="col">New Password again</th>
+				<th scope="col">&nbsp;</th>
+				<th scope="col">&nbsp;</th>						  
+			</tr>
+		</thead>
+		<tbody id="usersTable"></tbody>
+	</table>			
+</div>

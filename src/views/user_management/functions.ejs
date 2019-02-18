@@ -1,0 +1,87 @@
+function addNewUser() {
+	if ($("#newUserUserId").val() == "" || $("#newUserName").val() == "" || $("#newUserPassword").val() == "" || $("#newUserConfirmPw").val() == "") {
+		showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
+	} else if ($("#newUserPassword").val() != $("#newUserConfirmPw").val()) {
+		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
+	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
+		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");				
+	} else {				
+		$("#newUserOCBHost").val($("#ocb_host").val());
+		$("#newUserOCBPort").val($("#ocb_port").val());
+		$.ajax({
+			url: "./api/user",
+			type: "POST",
+			data: $("#newUser").serialize()
+		}).done(function(data) {				
+			$.ajax({
+				type: "GET",
+				url: "./api/user",
+				dataType: "json",
+				success: function (data2) {		
+					$("#usersTable").empty();
+					$(data2).each(function(i, item) {
+						if (item.role == "admin" || item.role == "user") {
+							var userHTML = getUserHTML(item._id, item.userid, item.role, item.name);
+							$("#usersTable").append(userHTML);						
+						}
+					})
+					showAndDismissAlert("success", "New user added!", "usersAlert");
+				}
+			});						
+		}).fail(function(xhr, status, err) {
+			showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
+		});				
+	}
+	return false;
+}
+
+function deleteUser(id) {			
+	bootbox.confirm("Are you sure you want to delete the user?", function(result) {
+		if (result == true) {
+			if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
+				showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");				
+			} else {							
+				$.ajax({
+					url: "./api/user/" + id + "/" + $("#ocb_host").val() + "/" + $("#ocb_port").val(),
+					type: 'DELETE',
+					success: function(result) {
+						$("#" + id).remove();
+						showAndDismissAlert("success", "User deleted succesfully!", "usersAlert");
+					},
+					error: function(xhr, status, error) {
+						var err = eval("(" + xhr.responseText + ")");
+						showAndDismissAlert("danger", err.Message, "usersAlert");	
+					}
+				});
+			}
+		}
+	});
+	return false;			
+}
+
+function getUserHTML(id, userid, role, name) {
+	var userHTML = "<tr id=\"" + id + "\">" +
+		"<td><input type=\"text\" class=\"form-control\" value=\"" + userid + "\"/></td>" +
+		"<td><select class=\"form-control\"><option value=\"admin\"";
+	if (role == "admin") {
+		userHTML += " selected";
+	}
+	userHTML += ">Admin</option><option value=\"user\"";
+	if (role == "user") {
+		userHTML += " selected";
+	}						
+	userHTML += ">User</option></select></td>" +													
+		"<td><input type=\"text\" class=\"form-control\"  value=\"" + name + "\"/></td>" +
+		"<td><input type=\"password\" class=\"form-control\" value=\"\"/></td>" +
+		"<td><input type=\"password\" class=\"form-control\" value=\"\"/></td>" +
+		"<td><button class=\"btn btn-primary btn-block\"";
+	//if (role == "admin") {  // TODO: make updating users work and enable button
+		userHTML += " disabled";
+	//}
+	userHTML += " title=\"Not yet implemented\">Update</button></td><td><button class=\"btn btn-primary btn-block\" onClick=\"deleteUser(\'" + id + "\')\"";
+	if (role == "admin") { 
+		//userHTML += " disabled";  // SHOULD DELETING ADMINS BE DISABLED?
+	}														
+	userHTML += ">Delete</button></td></tr>";
+	return userHTML;
+}

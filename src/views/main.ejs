@@ -20,505 +20,48 @@
  
 		<script>
 		
-		var currentFloorplanImage = null;
-		var currentFloorplanId = null;
-		var currentFloorplanName = null;
-		var currentFloorplanScale = null;
-		var currentFloorplanXoffset = null;
-		var currentFloorplanYoffset = null;
-		
-		$(document ).ready(function() {
-		
-			var csCanvas = document.getElementById("csChart");
-									
-			var csInputData = {
-				//labels: ["2018-12-03 19:39", "2018-12-03 19:40", "2018-12-03 19:41", "2018-12-03 19:42", "2018-12-03 19:43", "2018-12-03 19:44", "2018-12-03 19:45", "2018-12-03 19:46", "2018-12-03 19:47", "2018-12-03 19:48"],
-				labels: [],
-				datasets: [{
-					//data: [23, 21, 24, 15, 16, 17, 20, 15, 16, 18],
-					data: [],
-					steppedLine: false,
-					fill: false,
-					borderColor: "#0000ff",
-					pointBorderColor: "#0000ff",	
-					pointBackgroundColor: "#ffffff",	
-				}]
-			};
- 
-			var csChartOptions = {
-				legend: {
-					display: false,
-				},
-				scales: {
-					yAxes: [{
-						ticks: {
-						stepSize: 5
-						}
-					}],
-					xAxes: [{
-						type: 'time',
-						time: {
-							unit: 'minute',
-							unitStepSize: 1,				
-							displayFormats: {
-								'minute': 'HH:mm'		                    
-							}
-						}
-					}]
-				}  
-			};
+			var ngsiConnection = null;
+			var ocbEntities = null;
 			
-			var csChart = new Chart(csCanvas, {
-				type: 'line',
-				data: csInputData,
-				options: csChartOptions
-			});		
-		
-			var ssCanvas = document.getElementById("ssChart");
-									
-			var ssInputData = {
-				//labels: ["2018-12-03 19:39", "2018-12-03 19:40", "2018-12-03 19:41", "2018-12-03 19:42", "2018-12-03 19:43", "2018-12-03 19:44", "2018-12-03 19:45", "2018-12-03 19:46", "2018-12-03 19:47", "2018-12-03 19:48"],
-				labels: [],
-				datasets: [{
-					//data: [0, 1, 0, 2, 1, 1, 2, 1, 0, 2],
-					data: [],
-					steppedLine: true,
-					fill: false,
-					borderColor: "#0000ff",
-					pointBorderColor: "#0000ff",	
-					pointBackgroundColor: "#ffffff",	
-				}]
-			};
+			$(document).ready(function() {
 			
-			var ssChartOptions = {
-				legend: {
-					display: false,
-				},
-				scales: {
-					yAxes: [{
-						ticks: {
-						stepSize: 1
-						}
-					}],
-					xAxes: [{
-						type: 'time',
-						time: {
-							unit: 'minute',
-							unitStepSize: 1,				
-							displayFormats: {
-								'minute': 'HH:mm'		                    
-							}
-						}
-					}]
-				}  
-			};
-			
-			var ssChart = new Chart(ssCanvas, {
-				type: 'line',
-				data: ssInputData,
-				options: ssChartOptions
-			});
-		
-			$('#taskManagementTable').on('click', '.clickable-row', function(event) {
-			  if($(this).hasClass('bg-info')){
-				$(this).removeClass('bg-info'); 
-			  } else {
-				$(this).addClass('bg-info').siblings().removeClass('bg-info');
-			  }
-			});
+				ngsiConnection = new NGSI.Connection("http://13.79.17.152:1026", {
+					ngsi_proxy_url: "http://13.79.17.152:3000"
+				});
+				
+				ngsiConnection.v2.listEntities().then((response) => {
+					ocbEntities = response.results;
+					//console.log(JSON.stringify(ocbEntities));
+				});
 
-			$("#createTask").click(function() {
-				alert("NOT YET IMPLEMENTED (should open a task specification text editor where one can input and send a task description)");
+				<% include ./overview/documentReady.ejs %>		
+				<% include ./floorplan/documentReady.ejs %>		
+				<% include ./task_management/documentReady.ejs %>
+				<% include ./human_agents/documentReady.ejs %>
+				<% include ./robots/documentReady.ejs %>
+				<% include ./sensor_data/documentReady.ejs %>		
+				<% if (user && user.role == "admin") { %>
+					<% include ./system_settings/documentReady.ejs %>		
+					<% include ./user_management/documentReady.ejs %>
+				<% } %>		
 			});	
-			
-			/*
-			$("#cancelTask").click(function() {
-				alert("Canceling task " + $(".bg-info").find("td:first").text() + " (NOT YET IMPLEMENTED)");
-			});			
-			*/
 
-			$("#createTask").click(function() {
-				alert("Creating new task (NOT YET IMPLEMENTED)");
-			});
-			
-			var connection = new NGSI.Connection("http://13.79.17.152:1026", {
-				ngsi_proxy_url: "http://13.79.17.152:3000"
-			});
-						
-			connection.v2.createSubscription({
-			   "description": "Update sensor data",
-			   "subject": {
-				   "entities": [
-					   {
-						   "id": "SAN_demo",
-						   "type": "SensorAgent"
-					   }
-				   ],
-				   "condition": {
-					   "attrs": [
-						   "sensorData"
-					   ]
-				   }		   
-			   },
-			   "notification": {
-				   "callback": function (notification) {
-					   console.log("Received notification: " + JSON.stringify(notification));
-					   $.each(notification.data, function () {
-							$.each(this.sensorData.value, function () {							
-								//console.log(this.sensorId.value);							
-							    if (this.sensorId.value == "CS_1") {
-									$.each(this.readings.value, function () {
-										//console.log(this.reading.value);									
-										//console.log(this.modifiedTime.value);
-										// FOR TESTING (remove all elements when test data starts from the beginning) -->
-										if (csChart.data.labels.length > 0 && (this.modifiedTime.value < csChart.data.labels[csChart.data.labels.length-1])) {
-											csChart.data.labels = [];
-											csChart.data.datasets.forEach((dataset) => {
-												dataset.data = [];
-											});
-										}
-										// <-- FOR TESTING
-										csChart.data.labels.push(this.modifiedTime.value);
-										csChart.data.datasets.forEach((dataset) => {
-											dataset.data.push(this.reading.value); // add new value
-										});
-										csChart.update();											
-									});
-								} else if (this.sensorId.value == "SS_1") {
-									$.each(this.readings.value, function () {
-										//console.log(this.reading.value);									
-										//console.log(this.modifiedTime.value);
-										// FOR TESTING (remove all elements when test data starts from the beginning) -->
-										if (ssChart.data.labels.length > 0 && (this.modifiedTime.value < ssChart.data.labels[ssChart.data.labels.length-1])) {
-											ssChart.data.labels = [];
-											ssChart.data.datasets.forEach((dataset) => {
-												dataset.data = [];
-											});
-										}
-										// <-- FOR TESTING
-										ssChart.data.labels.push(this.modifiedTime.value);
-										ssChart.data.datasets.forEach((dataset) => {
-											dataset.data.push(this.reading.value); // add new value
-										});
-										ssChart.update();											
-									});
-								}
-							});
-						});
-				   },
-				   "attrs": [
-					   "sensorData"
-				   ]
-			   },
-			   "expires": "2040-04-05T14:00:00.00Z",
-			   "throttling": 5
-			}).then(
-				(response) => {
-					// subscription created successfully
-					console.log("Created subscription: " + JSON.stringify(response));
-				}, (error) => {
-					// error creating the subscription
-					console.log(error);
-				}
-			);		
-						
-			$.ajax({
-                type: "GET",
-                url: "./api/fp",
-                dataType: "json",
-                success: function (data) {					
-					var created = "";
-					var id = "";
-					var imgURL = "";
-					var name = "";
-					var scale = "";
-					var xoffset = "";
-					var yoffset = "";
-					$(data).each(function(i, item) {						
-						if (item.created > created) {						
-							created = item.created;
-							var id = item._id;
-							imgURL = item.imgurl;
-							name = item.name;
-							scale = item.scale;
-							xoffset = item.xoffset;
-							yoffset = item.yoffset;
-						}						
-					})
-					if (imgURL != "") {
-						loadImage(imgURL, id, name, scale, xoffset, yoffset, '#floorplan');
-					}
-                }
-			});
-
-			var resizeDelay = 200;
-			var doResize = true;
-			var resizer = function () {
-				if (doResize) {
-					drawFloorplan("#floorplan");
-					doResize = false;
-				}
-			};
-			var resizerInterval = setInterval(resizer, resizeDelay);
-			resizer();
-			
-			$(window).resize(function() {
-				doResize = true;
-			});		
-			
-			<% if (user && user.role == "admin") { %>  				
-			$.ajax({
-                type: "GET",
-                url: "./api/user",
-                dataType: "json",
-                success: function (data) {					
-					$(data).each(function(i, item) {
-						if (item.role == "admin" || item.role == "user") {
-							var usersHTML = getUserHTML(item._id, item.userid, item.role, item.name);
-							$("#usersTable").append(usersHTML);						
-						}
-					})
-                }
-			});			
-			$.ajax({
-                type: "GET",
-                url: "./api/config",
-                dataType: "json",
-                success: function (data) {					
-					$(data).each(function(i, item){
-						$("#ocb_host").val(item.ocb_host);	
-						$("#ocb_port").val(item.ocb_port);	
-						$("#ngsi_proxy_host").val(item.ngsi_proxy_host);	
-						$("#ngsi_proxy_port").val(item.ngsi_proxy_port);							
-					})
-                }
-			});
+			<% include ./generalFunctions.ejs %>			
+			<% include ./overview/functions.ejs %>		
+			<% include ./floorplan/functions.ejs %>		
+			<% include ./task_management/functions.ejs %>
+			<% include ./human_agents/functions.ejs %>
+			<% include ./robots/functions.ejs %>
+			<% include ./sensor_data/functions.ejs %>		
+			<% if (user && user.role == "admin") { %>
+				<% include ./system_settings/functions.ejs %>		
+				<% include ./user_management/functions.ejs %>
 			<% } %>		
-		});
-		
-		function submitForm() {
-			console.log("submit event");
-			var fd = new FormData(document.getElementById("fileinfo"));
-			fd.append("label", "WEBUPLOAD");
-			$.ajax({
-				url: "./api/fp",
-				type: "POST",
-				data: fd,
-				processData: false,  // tell jQuery not to process the data
-				contentType: false,   // tell jQuery not to set contentType
-				enctype: 'multipart/form-data'
-			}).done(function( data ) {
-				console.log("Output:");
-				console.log( data );
-				$("#fileinfo").find("input[type=text], input[type=file], input[type=number], textarea").val("");							
-				loadImage(data.imgurl, data._id, data.name, data.scale, data.xoffset, data.yoffset, "#floorplan");
-			}).fail(function(xhr, status, err){
-				alert(xhr.responseText);
-			});
-				return false;
-		}
-
-		function loadImage(path, id, name, scale, xoffset, yoffset, target) { 
-			var image = new Image();
-			image.onload = function() {
-				currentFloorplanImage = image;
-				currentFloorplanId = id;				
-				currentFloorplanName = name;
-				currentFloorplanScale = scale;
-				currentFloorplanXoffset = xoffset;
-				currentFloorplanYoffset = yoffset;			
-				drawFloorplan(target);
-				$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + scale + " cm/px, <strong>x-offset:</strong> " + xoffset + " px, <strong>y-offset:</strong> " + yoffset + " px</p>");
-			};
-			image.src = path;	
-		}
-		
-		function drawFloorplan(target) {
-
-			if (currentFloorplanImage != null && currentFloorplanName != null && currentFloorplanScale != null && currentFloorplanXoffset != null && currentFloorplanYoffset != null) {
-				var canvas = $(target)[0];
-				var context = canvas.getContext("2d");
-				context.clearRect(0, 0, canvas.width, canvas.height);
-
-				var parentWidth = $(target).parent().outerWidth();
-				$(target).attr('width', parentWidth);
-				//var parentHeight = $(target).parent().outerHeight();
-				//$(target).attr('height', parentHeight);			
-				$(target).attr('height', 640);				
-
-				var scale = Math.min(canvas.width / currentFloorplanImage.width, canvas.height / currentFloorplanImage.height);
-				// get the top left position of the image
-				var x = (canvas.width / 2) - (currentFloorplanImage.width / 2) * scale;
-				//var y = (canvas.height / 2) - (currentFloorplanImage.height / 2) * scale;			
-				var y = 0; // no need to center the floor plan vertically
-				$(target).attr('height', currentFloorplanImage.height * scale);  // resize the canvas smaller if the image is also smaller
-				context.drawImage(currentFloorplanImage, x, y, currentFloorplanImage.width * scale, currentFloorplanImage.height * scale);
-				
-				var mouseMoveFunction = function (e) {
-				
-					var scale = Math.min(canvas.width / currentFloorplanImage.width, canvas.height / currentFloorplanImage.height);
-					// get the top left position of the image
-					var x = (canvas.width / 2) - (currentFloorplanImage.width / 2) * scale;
-					//var y = (canvas.height / 2) - (currentFloorplanImage.height / 2) * scale;			
-					var y = 0; // no need to center the floor plan vertically
-					$(target).attr('height', currentFloorplanImage.height * scale);  // resize the canvas smaller if the image is also smaller
-					context.drawImage(currentFloorplanImage, x, y, currentFloorplanImage.width * scale, currentFloorplanImage.height * scale);				
-					/*
-					var x = e.pageX - canvas.offsetLeft;
-					var y = e.pageY - canvas.offsetTop;
-					var str = 'X : ' + x + ', ' + 'Y :' + y;
-					context.fillStyle = '#222';
-					context.fillRect(x + 10, y + 10, 80, 25);
-					context.fillStyle = '#0099f9';
-					context.font = 'bold 20px verdana';
-					context.fillText(str, x + 20, y + 30, 60);
-					*/
-				}
-
-				canvas.removeEventListener('mousemove', mouseMoveFunction);
-				canvas.addEventListener('mousemove', mouseMoveFunction, 0);
-			}
-		}
-
-		<% if (user && user.role == "admin") { %>  
-		
-		function addNewUser() {
-			if ($("#newUserUserId").val() == "" || $("#newUserName").val() == "" || $("#newUserPassword").val() == "" || $("#newUserConfirmPw").val() == "") {
-				showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
-			} else if ($("#newUserPassword").val() != $("#newUserConfirmPw").val()) {
-				showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
-			} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-				showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");				
-			} else {				
-				$("#newUserOCBHost").val($("#ocb_host").val());
-				$("#newUserOCBPort").val($("#ocb_port").val());
-				$.ajax({
-					url: "./api/user",
-					type: "POST",
-					data: $("#newUser").serialize()
-				}).done(function(data) {				
-					$.ajax({
-						type: "GET",
-						url: "./api/user",
-						dataType: "json",
-						success: function (data2) {		
-							$("#usersTable").empty();
-							$(data2).each(function(i, item) {
-								if (item.role == "admin" || item.role == "user") {
-									var userHTML = getUserHTML(item._id, item.userid, item.role, item.name);
-									$("#usersTable").append(userHTML);						
-								}
-							})
-							showAndDismissAlert("success", "New user added!", "usersAlert");
-						}
-					});						
-				}).fail(function(xhr, status, err) {
-					showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-				});				
-			}
-			return false;
-		}
-		
-		function deleteUser(id) {			
-			bootbox.confirm("Are you sure you want to delete the user?", function(result) {
-				if (result == true) {
-					if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-						showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");				
-					} else {							
-						$.ajax({
-							url: "./api/user/" + id + "/" + $("#ocb_host").val() + "/" + $("#ocb_port").val(),
-							type: 'DELETE',
-							success: function(result) {
-								$("#" + id).remove();
-								showAndDismissAlert("success", "User deleted succesfully!", "usersAlert");
-							},
-							error: function(xhr, status, error) {
-								var err = eval("(" + xhr.responseText + ")");
-								showAndDismissAlert("danger", err.Message, "usersAlert");	
-							}
-						});
-					}
-				}
-			});
-			return false;			
-		}
-		
-		function submitSettings() {
-
-			$.ajax({
-				url: "./api/config",
-				type: "POST",
-				data: $("#systemSettings").serialize()
-			}).done(function(data) {
-				// delete old configs
-				$.ajax({
-					type: "GET",
-					url: "./api/config",
-					dataType: "json",
-					success: function (data2) {					
-						$(data2).each(function(i, item) {
-							if (item._id != data._id) {
-								$.ajax({
-									url: "./api/config/" + item._id,
-									type: 'DELETE',
-									success: function(result) {}
-								});
-							}
-						})
-
-					}
-				});			
-				showAndDismissAlert("success", "Settings saved succesfully!", "settingsAlert");
-				console.log("Output:");
-				console.log(data);
-			}).fail(function(xhr, status, err){
-				alert(xhr.responseText);
-			});
-			return false;					
-		}
-        <% } %>		
-
-		function showAndDismissAlert(type, message, id) {
-			var htmlAlert = '<div class="alert alert-' + type + '">' + message + '</div>';
-			$("#" + id).prepend(htmlAlert);
-			$("#" + id + " .alert").hide().fadeIn(600).delay(2000).fadeOut(1000, function() {
-				$(this).remove();
-			});
-		}		
-
-		function getUserHTML(id, userid, role, name) {
-			var userHTML = "<tr id=\"" + id + "\">" +
-				"<td><input type=\"text\" class=\"form-control\" value=\"" + userid + "\"/></td>" +
-				"<td><select class=\"form-control\"><option value=\"admin\"";
-			if (role == "admin") {
-				userHTML += " selected";
-			}
-			userHTML += ">Admin</option><option value=\"user\"";
-			if (role == "user") {
-				userHTML += " selected";
-			}						
-			userHTML += ">User</option></select></td>" +													
-				"<td><input type=\"text\" class=\"form-control\"  value=\"" + name + "\"/></td>" +
-				"<td><input type=\"password\" class=\"form-control\" value=\"\"/></td>" +
-				"<td><input type=\"password\" class=\"form-control\" value=\"\"/></td>" +
-				"<td><button class=\"btn btn-primary btn-block\"";
-			//if (role == "admin") {  // TODO: make updating users work and enable button
-				userHTML += " disabled";
-			//}
-			userHTML += " title=\"Not yet implemented\">Update</button></td><td><button class=\"btn btn-primary btn-block\" onClick=\"deleteUser(\'" + id + "\')\"";
-			if (role == "admin") { 
-				//userHTML += " disabled";  // SHOULD DELETING ADMINS BE DISABLED?
-			}														
-			userHTML += ">Delete</button></td></tr>";
-			return userHTML;
-		}
-
 		</script>
 	
 	</head>
 
 	<body>
-	
 		<div class="container">
 		    <div class="pull-right" >
 				<form action="/logout" method="post">
@@ -526,346 +69,46 @@
                 </form>
 			</div>
 			<ul class="nav nav-tabs" style=" margin-top:10px;" role="tablist">
-				<!--
 				<li class="active"><a href="#overviewTab" role="tab" data-toggle="tab">Overview</a></li>
+				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan</a></li>	
+				<li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>						
 				<li><a href="#humanAgentsTab" role="tab" data-toggle="tab">Human Agents</a></li>
 				<li><a href="#robotsTab" role="tab" data-toggle="tab">Robots</a></li>
 				<li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>
-				-->
-				<li class="active"><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan</a></li>				
-				<li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>				
-				<li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>
 				<% if (user && user.role == "admin") { %>  
-				<li><a href="#usersTab" role="tab" data-toggle="tab">Users</a></li>					
-				<li><a href="#settingsTab" role="tab" data-toggle="tab">Settings</a></li>				
+				<li><a href="#usersTab" role="tab" data-toggle="tab">User Management</a></li>					
+				<li><a href="#settingsTab" role="tab" data-toggle="tab">System Settings</a></li>				
 				<% } %>
 			</ul>
 			<div class="tab-content">
-				<div class="tab-pane active" id="floorplansTab" style="margin-top:1.25rem;">
-					
-					<!-- TODO:
-					- Uploading a layout (PNG)
-					- Entering the scale (cm/px) for transformation, x-y-offset 
-					- (orientation will be done by SystemIntegrator) 
-
-					- Adding Sensors to the layout, including mapping-name to sensor id, appearance type (button, occupancy, ...), position, ...
-
-					- Displaying a layout     
-					- Displaying objects (agvs, sensors)
-					- Displaying the current position (x,y,theta) of the AGV in the HMI
-					- Displaying locations (palette position, charging, ...) (static)
-					- Displaying x-y-coordinates of objects(agvs, sensors)
-
-					- storing/retrieving of layout, scale and x-y-offset, configurations inside a database
-				 
-					- task specification text editor (first draft for copy/paste)
-				  
-					- custom user interface for engino use case will have individual Sensor Buttons to send the San entity (create/update needed)
-					  -- entities provided by SAN
-					-->					
-					
-					<div id="newFloorPlan" class="well ownborder">					
-						<div class="row">
-							<form method="post" class="form-horizontal" id="fileinfo" name="fileinfo" onsubmit="return submitForm();">
-
-								<div class="form-group col-sm-3" style="margin-left:5px; margin-right:5px;">
-									<label for="floorplan" class="control-label">Upload new floor plan</label>
-									<input type="file" class="form-control" name="floorplan" required />
-								</div>
-								<div class="form-group col-sm-2" style="margin-right:5px;">
-									<label for="name" class="control-label">Floor plan name</label>
-									<input type="text" class="form-control" name="name" required />
-								</div>
-								<div class="form-group col-sm-2" style="margin-right:5px;">
-									<label for="scale" class="control-label">Scale (cm/px)</label>
-									<input type="number" class="form-control" name="scale" required />
-								</div>
-								<div class="form-group col-sm-2" style="margin-right:5px;">
-									<label for="xoffset" class="control-label">X-offset (px)</label>
-									<input type="number" class="form-control" name="xoffset" required />
-								</div>
-								<div class="form-group col-sm-2" style="margin-right:5px;">
-									<label for="yoffset" class="control-label">Y-offset (px)</label>
-									<input type="number" class="form-control" name="yoffset" required />
-								</div>	
-								<div class="form-group col-sm-1">
-									<label>&nbsp;</label>							
-									<input type="submit" style="margin-top:5px;" value="Upload" />
-								</div>
-							</form>
-						</div>
-					</div>
-						
-					<div class="row">
-						<div class="col-sm-12">					
-							<canvas id="floorplan" style="width: 100%; height: auto">
-								Sorry, your browser doesn't support the &lt;canvas&gt; element.
-							</canvas>										
-							<div id="floorplanInfo" class="text-center"></div>
-						</div>
-					</div>
-				</div>
-				<!--
 				<div class="tab-pane active" id="overviewTab" style="margin-top:1.25rem;">
-					<h3>System messages</h3>
-					<table id="overviewTable" class="table table-responsive">
-					  <thead>
-						<tr>
-						  <th scope="col">ID</th>
-						  <th scope="col">Message</th>					 
-						</tr>
-					  </thead>
-					  <tbody>
-						<tr>
-						  <td>AGV 2345</td>
-						  <td>Battery low</td>					  
-						</tr>
-						<tr>
-						  <td>Kalle</td>
-						  <td>Started lunch</td>						  
-						</tr>
-						<tr>
-						  <td>AGV 2224</td>
-						  <td>Charging complete</td>
-						</tr>						
-					  </tbody>
-					</table>				
+					<% include ./overview/tabContent.ejs %>					
 				</div>
-				-->
+				<div class="tab-pane" id="floorplansTab" style="margin-top:1.25rem;">
+					<% include ./floorplan/tabContent.ejs %>
+				</div>
 				<div class="tab-pane" id="taskManagementTab" style="margin-top:1.25rem;">
-					<!--
-					<table id="taskManagementTable" class="table table-responsive">
-					  <thead>
-						<tr>
-						  <th scope="col">Task</th>
-						  <th scope="col">Status</th>
-						  <th scope="col">Task Description</th>						 
-						</tr>
-					  </thead>
-					  <tbody>
-						<tr class="clickable-row">
-						  <td>1234</td>
-						  <td>Running</td>
-						  <td>Load AGV X</td>						 
-						</tr>
-						<tr class="clickable-row">
-						  <td>2345</td>
-						  <td>Running</td>
-						  <td>Load AGV X</td>						 
-						</tr>
-						<tr class="clickable-row">
-						  <td>6666</td>
-						  <td>Running</td>
-						  <td>Unload AGV X</td>						 
-						</tr>
-					  </tbody>
-					</table>
-					-->
-					
-					<form>
-						<div class="form-group">
-							<label for="taskDescriptionTextArea">Task description</label>
-							<textarea class="form-control" id="taskDescriptionTextArea" rows="8"></textarea>
-						</div>
-						<div class="form-group">						
-							<button class="btn btn-primary" title="Not yet implemented" id="createTask" disabled>Create task</button>
-						</div>
-					</form>						
-					<!--<div><button id="cancelTask" style="margin-right:20px;">Cancel selected task</button><button id="cancelTask">Cancel task</button></div>-->
-				</div>
-				<!--				
+					<% include ./task_management/tabContent.ejs %>				
+
+				</div>			
 				<div class="tab-pane" id="humanAgentsTab" style="margin-top:1.25rem;">
-					<table id="humanAgentsTable" class="table table-responsive">
-					  <thead>
-						<tr>
-						  <th scope="col">Human Agent</th>
-						  <th scope="col">Status</th>
-						  <th scope="col">Task</th>						  
-						  <th scope="col">Task Description</th>						 
-						</tr>
-					  </thead>
-					  <tbody>
-						<tr>
-						  <td>Kalle</td>
-						  <td>Working</td>
-						  <td>0008</td>		
-                          <td>Load AGV X</td>						  
-						</tr>
-						<tr>
-						  <td>Pekka</td>
-						  <td>Working</td>
-						  <td>0345</td>						 
-                          <td>Load AGV X</td>						  
-						</tr>
-						<tr>
-						  <td>Iida</td>
-						  <td>Waiting</td>
-						  <td>1345</td>						
-						  <td>Unload AGV X</td>
-						</tr>
-						<tr>
-						  <td>Petri</td>
-						  <td>Idle</td>
-						  <td>0</td>						
-						  <td>Waiting for task</td>
-						</tr>
-						<tr>
-						  <td>Emilia</td>
-						  <td>Lunch</td>
-						  <td>1</td>						
-						  <td>&nbsp;</td>
-						</tr>
-						<tr>
-						  <td>Jussi</td>
-						  <td>Working</td>
-						  <td>5643</td>						
-						  <td>Unload AGV X</td>
-						</tr>						
-					  </tbody>
-					</table>				
+					<% include ./human_agents/tabContent.ejs %>									
 				</div>
 				<div class="tab-pane" id="robotsTab" style="margin-top:1.25rem;">
-					<table id="robotsTable" class="table table-responsive">
-					  <thead>
-						<tr>
-						  <th scope="col">AGV</th>
-						  <th scope="col">Status</th>
-						  <th scope="col">Task</th>						  
-						  <th scope="col">Task Description</th>						 
-						</tr>
-					  </thead>
-					  <tbody>
-						<tr>
-						  <td>17</td>
-						  <td>Running</td>
-						  <td>0008</td>		
-                          <td>Move pallet to x position</td>						  
-						</tr>
-						<tr>
-						  <td>6</td>
-						  <td>Running</td>
-						  <td>0345</td>						 
-                          <td>Move pallet to x position</td>						  
-						</tr>
-						<tr>
-						  <td>13</td>
-						  <td>Waiting</td>
-						  <td>1345</td>						
-						  <td>Move pallet to x position</td>
-						</tr>
-						<tr>
-						  <td>3</td>
-						  <td>Idle</td>
-						  <td>0</td>						
-						  <td>Waiting for task</td>
-						</tr>
-						<tr>
-						  <td>1</td>
-						  <td>Charging</td>
-						  <td>1</td>						
-						  <td>Charging - 8%</td>
-						</tr>
-						<tr>
-						  <td>7</td>
-						  <td>Running</td>
-						  <td>5643</td>						
-						  <td>Move pallet to x position</td>
-						</tr>						
-					  </tbody>
-					</table>								
-				</div>
-				-->
+					<% include ./robots/tabContent.ejs %>			
+				</div>			
 				<div class="tab-pane" id="sensorDataTab" style="margin-top:1.25rem;">
-					<div class="tab-pane" id="sensorData">
-						<div class="panel panel-default">
-							<div class="panel-heading">Sensor Agent Node - Current Sensor</div>
-							<div class="panel-body"><canvas id="csChart" width="400" height="100"></canvas></div>
-						</div>					
-						<div class="panel panel-default">
-							<div class="panel-heading">Sensor Agent Node - Switch Sensor</div>
-							<div class="panel-body"><canvas id="ssChart" width="400" height="100"></canvas></div>
-						</div>
-					</div>
+					<% include ./sensor_data/tabContent.ejs %>
 				</div> 			
 				<% if (user && user.role == "admin") { %>  			
-				<div class="tab-pane" id="usersTab" style="margin-top:1.25rem;">				
-					<div id="usersAlert"></div>				
-					<div class="well">
-						<h3>Add new user</h3>
-						<table class="table">
-							<thead>
-								<tr>
-									<th scope="col">User id</th>
-									<th scope="col">Role</th>
-									<th scope="col">Name</th>	
-									<th scope="col">New Password</th>
-									<th scope="col">New Password again</th>
-									<th scope="col">&nbsp;</th>
-									<th scope="col">&nbsp;</th>						  
-								</tr>
-							</thead>							
-							<tbody>
-								<form method="post" id="newUser" name="newUser" onsubmit="return addNewUser();">							
-								    <input type="hidden" name="ocb_host" id="newUserOCBHost" value=""><input type="hidden" name="ocb_port" id="newUserOCBPort" value="">
-									<tr>
-										<td><input id="newUserUserId" class="form-control" type="text" name="userid" required /></td>
-										<td><select class="form-control" name="role"><option value="admin">Admin</option><option value="user" selected>User</option></select></td>
-										<td><input id="newUserName" class="form-control" type="text" name="name" required /></td>
-										<td><input id="newUserPassword" class="form-control" type="password" name="password" required /></td>
-										<td><input id="newUserConfirmPw" class="form-control" type="password" name="confirm_pw" id="confirm_pw" required /></td>
-										<td><button type="submit" class="btn btn-primary btn-block">Add</button>
-										<td>&nbsp;</td>						  
-									</tr>
-								</form>
-							</tbody>
-						</table>			
-					</div>					
-					<div class="well">
-						<h3>Existing users</h3>
-						<table class="table">
-							<thead>
-								<tr>
-									<th scope="col">User id</th>
-									<th scope="col">Role</th>
-									<th scope="col">Name</th>	
-									<th scope="col">New Password</th>
-									<th scope="col">New Password again</th>
-									<th scope="col">&nbsp;</th>
-									<th scope="col">&nbsp;</th>						  
-								</tr>
-							</thead>
-							<tbody id="usersTable"></tbody>
-						</table>			
-					</div>					
-				</div>
-				<div class="tab-pane" id="settingsTab" style="margin-top:1.25rem;">
-					<div id="settingsAlert"></div>
-					<form method="post" id="systemSettings" name="systemSettings" onsubmit="return submitSettings();">
-						<div class="form-group">
-							<label for="ocb_host">OCB Host</label>
-							<input type="text" class="form-control" id="ocb_host" name="ocb_host" aria-describedby="ocb_hostHelp" placeholder="Enter OCB host name">
-							<small id="ocb_hostHelp" class="form-text text-muted">Please, enter the host name / ip address of the Orion Context Broker.</small>
-						</div>					
-						<div class="form-group">
-							<label for="ocb_port">OCB Port</label>
-							<input type="text" class="form-control" id="ocb_port" name="ocb_port" aria-describedby="ocb_portHelp" placeholder="Enter OCB port number">
-							<small id="ocb_portHelp" class="form-text text-muted">Please, enter the port number of the Orion Context Broker.</small>
-						</div>
-						<div class="form-group">
-							<label for="ngsi_proxy_host">NGSI Proxy Host</label>
-							<input type="text" class="form-control" id="ngsi_proxy_host" name="ngsi_proxy_host" aria-describedby="ngsi_proxy_hostHelp" placeholder="Enter NGSI Proxy host name">
-							<small id="ngsi_proxy_hostHelp" class="form-text text-muted">Please, enter the host name / ip address of the NGSI Proxy.</small>
-						</div>					
-						<div class="form-group">
-							<label for="ngsi_proxy_port">NGSI Proxy Port</label>
-							<input type="text" class="form-control" id="ngsi_proxy_port" name="ngsi_proxy_port" aria-describedby="ngsi_proxy_portHelp" placeholder="Enter NGSI Proxy port number">
-							<small id="ngsi_proxy_portHelp" class="form-text text-muted">Please, enter the port number of the NGSI Proxy.</small>
-						</div>							
-						<button type="submit" class="btn btn-primary">Save</button>
-					</form>
-                <% } %>
-				</div>
-			</div>			
+					<div class="tab-pane" id="usersTab" style="margin-top:1.25rem;">
+						<% include ./user_management/tabContent.ejs %>
+					</div>
+					<div class="tab-pane" id="settingsTab" style="margin-top:1.25rem;">
+						<% include ./system_settings/tabContent.ejs %>
+					</div>
+                <% } %>				
+			</div>	
 		</div>
 	</body>
 </html>

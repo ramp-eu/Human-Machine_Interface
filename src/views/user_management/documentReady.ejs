@@ -1,0 +1,13 @@
+$.ajax({
+	type: "GET",
+	url: "./api/user",
+	dataType: "json",
+	success: function (data) {					
+		$(data).each(function(i, item) {
+			if (item.role == "admin" || item.role == "user") {
+				var usersHTML = getUserHTML(item._id, item.userid, item.role, item.name);
+				$("#usersTable").append(usersHTML);						
+			}
+		})
+	}
+});	

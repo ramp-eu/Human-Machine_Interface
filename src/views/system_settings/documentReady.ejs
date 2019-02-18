@@ -1,0 +1,13 @@
+$.ajax({
+	type: "GET",
+	url: "./api/config",
+	dataType: "json",
+	success: function (data) {					
+		$(data).each(function(i, item){
+			$("#ocb_host").val(item.ocb_host);	
+			$("#ocb_port").val(item.ocb_port);	
+			$("#ngsi_proxy_host").val(item.ngsi_proxy_host);	
+			$("#ngsi_proxy_port").val(item.ngsi_proxy_port);							
+		})
+	}
+});

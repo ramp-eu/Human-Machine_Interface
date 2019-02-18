@@ -1,0 +1,43 @@
+$.ajax({
+	type: "GET",
+	url: "./api/fp",
+	dataType: "json",
+	success: function (data) {					
+		var created = "";
+		var id = "";
+		var imgURL = "";
+		var name = "";
+		var scale = "";
+		var xoffset = "";
+		var yoffset = "";
+		$(data).each(function(i, item) {						
+			if (item.created > created) {						
+				created = item.created;
+				var id = item._id;
+				imgURL = item.imgurl;
+				name = item.name;
+				scale = item.scale;
+				xoffset = item.xoffset;
+				yoffset = item.yoffset;
+			}						
+		})
+		if (imgURL != "") {
+			loadImage(imgURL, id, name, scale, xoffset, yoffset, '#floorplan');
+		}
+	}
+});
+
+var resizeDelay = 200;
+var doResize = true;
+var resizer = function () {
+	if (doResize) {
+		drawFloorplan("#floorplan");
+		doResize = false;
+	}
+};
+var resizerInterval = setInterval(resizer, resizeDelay);
+resizer();
+
+$(window).resize(function() {
+	doResize = true;
+});		
