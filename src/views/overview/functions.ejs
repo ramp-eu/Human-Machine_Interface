@@ -1,0 +1,22 @@
+function drawImageOnCanvas(img, targetCanvas) {
+	var canvas = $(targetCanvas)[0];
+	var ctx = canvas.getContext("2d");
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	var parentWidth = $(targetCanvas).parent().outerWidth();
+	$(targetCanvas).attr('width', parentWidth-30);
+	//var parentHeight = $(targetCanvas).parent().outerHeight();
+	//$(targetCanvas).attr('height', parentHeight);			
+	$(targetCanvas).attr('height', 720);				
+
+	//alert("canvas.width: " + canvas.width);
+	//alert("img.width: " + img.width);
+
+	scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+	// get the top left position of the image
+	var x = (canvas.width / 2) - (img.width / 2) * scale;
+	//var y = (canvas.height / 2) - (img.height / 2) * scale;			
+	var y = 0; // no need to center the floor plan vertically
+	$(targetCanvas).attr('height', img.height * scale);  // resize the canvas smaller if the image is also smaller
+	ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+}

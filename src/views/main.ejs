@@ -10,7 +10,8 @@
 
 		<link rel="stylesheet" href="/css/bootstrap.min.css">
 		<!-- Optional theme -->
-        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">		
+        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">	
+        <link rel="stylesheet" href="/css/style.css">			
 
 		<script src="/js/NGSI.js"></script> 
 		<script src="/js/jquery-3.3.1.min.js"></script> 		
@@ -70,7 +71,7 @@
 			</div>
 			<ul class="nav nav-tabs" style=" margin-top:10px;" role="tablist">
 				<li class="active"><a href="#overviewTab" role="tab" data-toggle="tab">Overview</a></li>
-				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan</a></li>	
+				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan Management</a></li>	
 				<li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>						
 				<li><a href="#humanAgentsTab" role="tab" data-toggle="tab">Human Agents</a></li>
 				<li><a href="#robotsTab" role="tab" data-toggle="tab">Robots</a></li>
@@ -112,3 +113,24 @@
 		</div>
 	</body>
 </html>
+
+<!-- TODO:
+- Uploading a layout (PNG)
+- Entering the scale (cm/px) for transformation, x-y-offset 
+- (orientation will be done by SystemIntegrator) 
+
+- Adding Sensors to the layout, including mapping-name to sensor id, appearance type (button, occupancy, ...), position, ...
+
+- Displaying a layout     
+- Displaying objects (agvs, sensors)
+- Displaying the current position (x,y,theta) of the AGV in the HMI
+- Displaying locations (palette position, charging, ...) (static)
+- Displaying x-y-coordinates of objects(agvs, sensors)
+
+- storing/retrieving of layout, scale and x-y-offset, configurations inside a database
+
+- task specification text editor (first draft for copy/paste)
+
+- custom user interface for engino use case will have individual Sensor Buttons to send the San entity (create/update needed)
+  -- entities provided by SAN
+-->	

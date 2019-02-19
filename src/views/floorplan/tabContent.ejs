@@ -1,24 +1,3 @@
-<!-- TODO:
-- Uploading a layout (PNG)
-- Entering the scale (cm/px) for transformation, x-y-offset 
-- (orientation will be done by SystemIntegrator) 
-
-- Adding Sensors to the layout, including mapping-name to sensor id, appearance type (button, occupancy, ...), position, ...
-
-- Displaying a layout     
-- Displaying objects (agvs, sensors)
-- Displaying the current position (x,y,theta) of the AGV in the HMI
-- Displaying locations (palette position, charging, ...) (static)
-- Displaying x-y-coordinates of objects(agvs, sensors)
-
-- storing/retrieving of layout, scale and x-y-offset, configurations inside a database
-
-- task specification text editor (first draft for copy/paste)
-
-- custom user interface for engino use case will have individual Sensor Buttons to send the San entity (create/update needed)
-  -- entities provided by SAN
--->					
-
 <div id="newFloorPlan" class="well ownborder">					
 	<div class="row">
 		<form method="post" class="form-horizontal" id="fileinfo" name="fileinfo" onsubmit="return submitForm();">
@@ -49,12 +28,10 @@
 		</form>
 	</div>
 </div>
-	
-<div class="row">
-	<div class="col-sm-12">					
-		<canvas id="floorplan" style="width: 100%; height: auto">
-			Sorry, your browser doesn't support the &lt;canvas&gt; element.
-		</canvas>										
-		<div id="floorplanInfo" class="text-center"></div>
-	</div>
-</div>
+
+<section style="overflow-x: auto; overflow-y: auto;">
+	<canvas id="floorplan" style="margin-top:20px; <!--width: 100%; height: auto-->">
+		Sorry, your browser doesn't support the &lt;canvas&gt; element.
+	</canvas>
+	<div id="floorplanInfo" class="text-center"></div>
+</section>
