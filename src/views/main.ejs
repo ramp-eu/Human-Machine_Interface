@@ -21,20 +21,8 @@
  
 		<script>
 		
-			var ngsiConnection = null;
-			var ocbEntities = null;
-			
 			$(document).ready(function() {
-			
-				ngsiConnection = new NGSI.Connection("http://13.79.17.152:1026", {
-					ngsi_proxy_url: "http://13.79.17.152:3000"
-				});
-				
-				ngsiConnection.v2.listEntities().then((response) => {
-					ocbEntities = response.results;
-					//console.log(JSON.stringify(ocbEntities));
-				});
-
+							
 				<% include ./overview/documentReady.ejs %>		
 				<% include ./floorplan/documentReady.ejs %>		
 				<% include ./task_management/documentReady.ejs %>

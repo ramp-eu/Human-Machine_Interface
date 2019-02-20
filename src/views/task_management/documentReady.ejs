@@ -1,3 +1,4 @@
+/*
 $('#taskManagementTable').on('click', '.clickable-row', function(event) {
 	if($(this).hasClass('bg-info')){
 		$(this).removeClass('bg-info'); 
@@ -5,13 +6,49 @@ $('#taskManagementTable').on('click', '.clickable-row', function(event) {
 		$(this).addClass('bg-info').siblings().removeClass('bg-info');
 	}
 });
-
+*/
 /*
 $("#cancelTask").click(function() {
 	alert("Canceling task " + $(".bg-info").find("td:first").text() + " (NOT YET IMPLEMENTED)");
 });			
 */
 
-$("#createTask").click(function() {
-	alert("Creating new task (NOT YET IMPLEMENTED)");
+$("#sendTask").click(function() {
+	if ($.trim($("#taskDescriptionTextArea").val()) != "") {
+		$.ajax({
+			type: "GET",
+			url: "./api/config",
+			dataType: "json",
+			success: function (data) {					
+				var ngsiConnection = null;
+				$(data).each(function(i, item) {							
+					ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
+						ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
+					});
+				})
+				if (ngsiConnection != null) {
+					var uniqueId = Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+					ngsiConnection.v2.createEntity({
+						"id": "TaskSpec_" + uniqueId,
+						"type": "TaskSpec",
+						"TaskSpec": {
+							"type": "Text",
+							"value": urlencode($("#taskDescriptionTextArea").val())
+						}
+					}).then(
+						(response) => {
+							// Entity created successfully
+							$("#taskDescriptionTextArea").val("");
+							showAndDismissAlert("success", "Task sent succesfully!", "taskManagementAlert");
+						}, (error) => {
+							console.log(error);
+							// Error creating the entity
+							showAndDismissAlert("error", "There was an error sending the task (" + error + ")!", "taskManagementAlert");
+						}
+					);
+				}
+			}
+		});
+	}
+	return false;
 });
