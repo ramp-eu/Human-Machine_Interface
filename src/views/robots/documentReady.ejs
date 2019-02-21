@@ -1,0 +1,69 @@
+$.ajax({
+	type: "GET",
+	url: "./api/config",
+	dataType: "json",
+	success: function (data) {					
+		var ngsiConnection = null;
+		$(data).each(function(i, item) {
+			ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
+				ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
+			});
+		})
+		if (ngsiConnection != null) {
+			ngsiConnection.v2.listEntities().then((response) => {
+				var entities = response.results;
+				$("#robotsTab").append("<table id=\"robotsTable\" class=\"table table-responsive table-striped\"><thead><tr><th scope=\"col\">ID</th><th scope=\"col\">Pos X</th><th scope=\"col\">Pos Y</th><th scope=\"col\">Theta</th></tr></thead><tbody id=\"robotsTbody\">");
+				$.each(entities, function(i, entity) {
+					if (entity.type == "ROBOT") {
+                                                $("#robotsTbody").append("<tr id=\"robottr" + entity.id + "\"class=\"clickable-row\"></tr>");
+						ngsiConnection.v2.createSubscription({
+						   "description": "ROBOT subscription",
+						   "subject": {
+							   "entities": [
+								   {
+									   "id": entity.id,
+									   "type": entity.type
+								   }
+							   ],
+							   "condition": {
+								   "attrs": [
+									   "status_channel"
+								   ]
+							   }		   
+						   },
+						   "notification": {
+							   "callback": function (notification) {
+								   //console.log("Received Robot notif: " + JSON.stringify(notification));					   
+								   $.each(notification.data, function () {
+                                                                        var d = decodeURIComponent(this.status_channel.value);
+                                                                        var dObj = JSON.parse(d.replace(/\'/g, "\""));
+                                                                        //console.log("id: " + this.id);
+                                                                        //console.log("X: " + dObj.current_position.x);
+                                                                        //console.log("Y: " + dObj.current_position.y);
+                                                                        //console.log("Theta: " + dObj.current_position.theta);
+                                                                        $("#robottr"+this.id).empty();
+                                                                        $("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + dObj.current_position.x + "</td><td>" + dObj.current_position.y + "</td><td>" + dObj.current_position.theta + "</td>");
+                                                                });						
+							   },
+							   "attrs": [
+								   "status_channel"
+							   ]
+						   },
+						   "expires": "2040-04-05T14:00:00.00Z",
+						   "throttling": 5
+						}).then(
+							(response) => {
+								//console.log("Created subscription: " + JSON.stringify(response));
+							}, (error) => {
+								//console.log(error);
+							}
+						);				
+						
+						
+					}	
+				});
+				$("#robotsTab").append("</tbody></table>");
+			});
+		}
+	}
+});
