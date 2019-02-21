@@ -13,6 +13,73 @@ $("#cancelTask").click(function() {
 });			
 */
 
+$.ajax({
+	type: "GET",
+	url: "./api/config",
+	dataType: "json",
+	success: function (data) {					
+		var ngsiConnection = null;
+		$(data).each(function(i, item) {
+			ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
+				ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
+			});
+		})
+		if (ngsiConnection != null) {
+			ngsiConnection.v2.listEntities({type: "TaskSpec"}).then((response) => {
+				var entities = response.results;
+				$.each(entities, function(i, entity) {
+					var taskId = entity.id;
+					var task = urldecode(entity.TaskSpec.value);
+					ngsiConnection.v2.listEntities({type: "TaskSpecState"}).then((response2) => {
+						var entities2 = response2.results;
+						$.each(entities2, function(i, entity2) {
+							if (entity2.refId.value == taskId) {
+								var taskStatus = entity2.Status.value;
+								var taskMessage = entity2.Message.value;
+								var taskHTML = getTaskHTML(taskId, taskStatus, taskMessage, task);		
+								$("#currentTasks").append(taskHTML);
+							}
+						});
+					});
+				});
+			});					
+			
+			ngsiConnection.v2.createSubscription({
+			   "description": "Updating tasks",
+			   "subject": {
+				   "entities": [
+					   {
+						   "idPattern": ".*",
+						   "type": "TaskSpecState"
+					   }
+				   ]		   
+			   },
+			   "notification": {
+				   "callback": function (notification) {				   
+						$.each(notification.data, function () {		
+							var taskId = this.refId.value
+							var taskStatus = this.Status.value;
+							var taskMessage = this.Message.value;	
+							if ($("#currentTask_" + taskId).length) {
+								$("#Status_" + taskId).html(taskStatus);
+								$("#Message_" + taskId).html(taskMessage);
+							}							
+						});
+				   }
+			   },
+			   //"expires": "2040-04-05T14:00:00.00Z",
+			   "throttling": 5
+			}).then(
+				(response) => {
+					//console.log("Created subscription: " + JSON.stringify(response));
+				}, (error) => {
+					//console.log(error);
+				}
+			);
+		}
+	}
+});
+
 $("#sendTask").click(function() {
 	if ($.trim($("#taskDescriptionTextArea").val()) != "") {
 		$.ajax({
@@ -27,9 +94,9 @@ $("#sendTask").click(function() {
 					});
 				})
 				if (ngsiConnection != null) {
-					var uniqueId = Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+					var taskId = "TaskSpec_" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
 					ngsiConnection.v2.createEntity({
-						"id": "TaskSpec_" + uniqueId,
+						"id": taskId,
 						"type": "TaskSpec",
 						"TaskSpec": {
 							"type": "Text",
@@ -38,7 +105,9 @@ $("#sendTask").click(function() {
 					}).then(
 						(response) => {
 							// Entity created successfully
-							$("#taskDescriptionTextArea").val("");
+							var newTaskHTML = getTaskHTML(taskId, "&nbsp;", "&nbsp;", $("#taskDescriptionTextArea").val());
+							$("#currentTasks").append(newTaskHTML);
+							$("#taskDescriptionTextArea").val("");							
 							showAndDismissAlert("success", "Task sent succesfully!", "taskManagementAlert");
 						}, (error) => {
 							console.log(error);
@@ -52,3 +121,4 @@ $("#sendTask").click(function() {
 	}
 	return false;
 });
+

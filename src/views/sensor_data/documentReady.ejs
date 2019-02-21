@@ -12,6 +12,7 @@ $.ajax({
 			});
 		})
 		if (ngsiConnection != null) {
+						
 			ngsiConnection.v2.listEntities().then((response) => {
 				var entities = response.results;
 				$.each(entities, function(i, entity) {
@@ -30,66 +31,77 @@ $.ajax({
 							var chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
 							sensorDataCharts.set(sensor.sensorId.value, chart);
 						});
-						
-						ngsiConnection.v2.createSubscription({
-						   "description": "Updating sensor data",
-						   "subject": {
-							   "entities": [
-								   {
-									   "id": entity.id,
-									   "type": entity.type
-								   }
-							   ],
-							   "condition": {
-								   "attrs": [
-									   "sensorData"
-								   ]
-							   }		   
-						   },
-						   "notification": {
-							   "callback": function (notification) {
-								   console.log("Received notification: " + JSON.stringify(notification));					   
-								   $.each(notification.data, function () {
-										$.each(this.sensorData.value, function () {							
-											if (sensorDataCharts.has(this.sensorId.value)) {
-												var chart = sensorDataCharts.get(this.sensorId.value);
-												$.each(this.readings.value, function () {
-													// FOR TESTING (remove all elements when test data starts from the beginning) -->
-													if (chart.data.labels.length > 0 && (this.modifiedTime.value < chart.data.labels[chart.data.labels.length-1])) {
-														chart.data.labels = [];
-														chart.data.datasets.forEach((dataset) => {
-															dataset.data = [];
-														});
-													}
-													// <-- FOR TESTING
-													chart.data.labels.push(this.modifiedTime.value);
-													chart.data.datasets.forEach((dataset) => {
-														dataset.data.push(this.reading.value); // add new value
-													});
-													chart.update();											
-												});								
-											}
-										});
-									});						
-							   },
-							   "attrs": [
-								   "sensorData"
-							   ]
-						   },
-						   "expires": "2040-04-05T14:00:00.00Z",
-						   "throttling": 5
-						}).then(
-							(response) => {
-								//console.log("Created subscription: " + JSON.stringify(response));
-							}, (error) => {
-								//console.log(error);
-							}
-						);				
-						
-						
-					}	
+					}
 				});
-			});
+			});						
+						
+			ngsiConnection.v2.createSubscription({
+			   "description": "Updating sensor data",
+			   "subject": {
+				   "entities": [
+					   {
+						   "idPattern": ".*",
+						   "type": "SensorAgent"
+					   }
+				   ],
+				   "condition": {
+					   "attrs": [
+						   "sensorData"
+					   ]
+				   }		   
+			   },
+			   "notification": {
+				   "callback": function (notification) {
+					   console.log("Received notification: " + JSON.stringify(notification));					   
+					   $.each(notification.data, function () {
+							$.each(this.sensorData.value, function () {			
+								var chart = sensorDataCharts.get(this.sensorId.value);							
+								if (typeof chart === "undefined") {							
+									var steppedLine = false;
+									$.each(this.readings.value, function() {
+										if (this.reading.type == "Boolean") {
+											steppedLine = true;
+										}
+									});
+									$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + this.sensorType.value + "</div><div class=\"panel-body\"><canvas id=\"" + this.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+									var chartCanvas = document.getElementById(this.sensorId.value + "_Chart");
+									var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
+									var chartOptions = {legend: {display: false},	scales: { yAxes: [{ ticks: { stepSize: 1 }}], xAxes: [{ type: 'time', time: { unit: 'minute', unitStepSize: 1, displayFormats: { 'minute': 'HH:mm' } } }] } };
+									chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
+									sensorDataCharts.set(this.sensorId.value, chart);
+								}
+								$.each(this.readings.value, function () {
+									// FOR TESTING (remove all elements when test data starts from the beginning) -->
+									if (chart.data.labels.length > 0 && (this.modifiedTime.value < chart.data.labels[chart.data.labels.length-1])) {
+										chart.data.labels = [];
+										chart.data.datasets.forEach((dataset) => {
+											dataset.data = [];
+										});
+									}
+									// <-- FOR TESTING
+									chart.data.labels.push(this.modifiedTime.value);
+									chart.data.datasets.forEach((dataset) => {
+										dataset.data.push(this.reading.value); // add new value
+									});
+									chart.update();											
+								});
+							});
+						});						
+				   },
+				   "attrs": [
+					   "sensorData"
+				   ]
+			   },
+			   //"expires": "2040-04-05T14:00:00.00Z",
+			   "throttling": 5
+			}).then(
+				(response) => {
+					//console.log("Created subscription: " + JSON.stringify(response));
+				}, (error) => {
+					//console.log(error);
+				}
+			);										
+		
 		}
 	}
 });

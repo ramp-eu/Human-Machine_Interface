@@ -1,0 +1,50 @@
+function getTaskHTML(taskId, taskStatus, taskMessage, task) {
+	return "<tr id=\"currentTask_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"Status_" + taskId + "\">" + taskStatus + "</td><td id=\"Message_" + taskId + "\">" + taskMessage + "</td><td><textarea id=\"TaskSpec_" + taskId + "\" rows=\"4\" readonly>" + task + "</textarea></td><td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";
+}
+
+function cancelTask(taskId) {
+	bootbox.confirm("Are you sure you want to cancel the task?", function(result) {
+		if (result == true) {
+			$.ajax({
+				type: "GET",
+				url: "./api/config",
+				dataType: "json",
+				success: function (data) {					
+					var ngsiConnection = null;
+					$(data).each(function(i, item) {							
+						ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
+							ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
+						});
+					})
+					if (ngsiConnection != null) {		
+						ngsiConnection.v2.listEntities({type: "TaskSpecState"}).then((response) => {
+							var entities = response.results;
+							$.each(entities, function(i, entity) {
+								if (entity.refId.value == taskId) {									
+									ngsiConnection.v2.deleteEntity(entity.id).then(
+										(response) => {
+									}, (error) => {}
+									);
+								}
+							});
+						});
+						ngsiConnection.v2.deleteEntity(taskId).then(
+							(response) => {
+								$("#currentTask_" + taskId).remove();
+								// Entity deleted successfully
+								// response.correlator transaction id associated with the server response
+								showAndDismissAlert("success", "Task canceled succesfully!", "taskManagementAlert");
+							}, (error) => {
+								// Error deleting the entity
+								// If the error was reported by Orion, error.correlator will be
+								// filled with the associated transaction id
+								showAndDismissAlert("error", "There was an error canceling the task (" + error + ")!", "taskManagementAlert");
+							}
+						);
+					}
+				}
+			});			
+		}
+	});
+	return false;
+}

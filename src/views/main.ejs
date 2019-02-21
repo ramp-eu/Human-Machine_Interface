@@ -52,7 +52,7 @@
 
 	<body>
 		<div class="container">
-		    <div class="pull-right" >
+		    <div class="text-right" >
 				<form action="/logout" method="post">
 					<button class="btn btn-default btn-sm" style=" margin-top:10px;" disabled>Logged in as <%= user.name %>&nbsp;</button>&nbsp;<button type="submit" class="btn btn-default btn-sm" style=" margin-top:10px;"><%= __("logout") %></button>
                 </form>
@@ -70,30 +70,30 @@
 				<% } %>
 			</ul>
 			<div class="tab-content">
-				<div class="tab-pane active" id="overviewTab" style="margin-top:1.25rem;">
+				<div class="tab-pane active" id="overviewTab" style="margin-top:10px;">
 					<% include ./overview/tabContent.ejs %>					
 				</div>
-				<div class="tab-pane" id="floorplansTab" style="margin-top:1.25rem;">
+				<div class="tab-pane" id="floorplansTab" style="margin-top:10px;">
 					<% include ./floorplan/tabContent.ejs %>
 				</div>
-				<div class="tab-pane" id="taskManagementTab" style="margin-top:1.25rem;">
+				<div class="tab-pane" id="taskManagementTab" style="margin-top:0px;">
 					<% include ./task_management/tabContent.ejs %>				
 
 				</div>			
-				<div class="tab-pane" id="humanAgentsTab" style="margin-top:1.25rem;">
+				<div class="tab-pane" id="humanAgentsTab" style="margin-top:10px;">
 					<% include ./human_agents/tabContent.ejs %>									
 				</div>
-				<div class="tab-pane" id="robotsTab" style="margin-top:1.25rem;">
+				<div class="tab-pane" id="robotsTab" style="margin-top:10px;">
 					<% include ./robots/tabContent.ejs %>			
 				</div>			
-				<div class="tab-pane" id="sensorDataTab" style="margin-top:1.25rem;">
+				<div class="tab-pane" id="sensorDataTab" style="margin-top:-20px;">
 					<% include ./sensor_data/tabContent.ejs %>
 				</div> 			
 				<% if (user && user.role == "admin") { %>  			
-					<div class="tab-pane" id="usersTab" style="margin-top:1.25rem;">
+					<div class="tab-pane" id="usersTab" style="margin-top:10px;">
 						<% include ./user_management/tabContent.ejs %>
 					</div>
-					<div class="tab-pane" id="settingsTab" style="margin-top:1.25rem;">
+					<div class="tab-pane" id="settingsTab" style="margin-top:10px;">
 						<% include ./system_settings/tabContent.ejs %>
 					</div>
                 <% } %>				
