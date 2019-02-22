@@ -12,7 +12,7 @@ $.ajax({
 		if (ngsiConnection != null) {
 			ngsiConnection.v2.listEntities().then((response) => {
 				var entities = response.results;
-				$("#robotsTab").append("<table id=\"robotsTable\" class=\"table table-responsive table-striped\"><thead><tr><th scope=\"col\">ID</th><th scope=\"col\">Pos X</th><th scope=\"col\">Pos Y</th><th scope=\"col\">Theta</th></tr></thead><tbody id=\"robotsTbody\">");
+				$("#robotsTab").append("<table id=\"robotsTable\" class=\"table table-responsive table-striped\"><thead><tr><th scope=\"col\">ID</th><th scope=\"col\">RAN status</th><th scope=\"col\">Pos X</th><th scope=\"col\">Pos Y</th><th scope=\"col\">Theta</th></tr></thead><tbody id=\"robotsTbody\">");
 				$.each(entities, function(i, entity) {
 					if (entity.type == "ROBOT") {
                                                 $("#robotsTbody").append("<tr id=\"robottr" + entity.id + "\"class=\"clickable-row\"></tr>");
@@ -37,12 +37,18 @@ $.ajax({
 								   $.each(notification.data, function () {
                                                                         var d = decodeURIComponent(this.status_channel.value);
                                                                         var dObj = JSON.parse(d.replace(/\'/g, "\""));
+                                                                        var ran_status = "unknown";
+                                                                        if (dObj.ran_status == 0) ran_status = "waiting";
+                                                                        else if (dObj.ran_status == 1) ran_status = "moving";
+                                                                        else if (dObj.ran_status == 2) ran_status = "acting";
                                                                         //console.log("id: " + this.id);
                                                                         //console.log("X: " + dObj.current_position.x);
                                                                         //console.log("Y: " + dObj.current_position.y);
                                                                         //console.log("Theta: " + dObj.current_position.theta);
+                                                                        //if ($("#robottr"+this.id).length < 1) 
+                                                                        //    $("#robotsTbody").append("<tr id=\"robottr" + this.id + "\"class=\"clickable-row\"></tr>");
                                                                         $("#robottr"+this.id).empty();
-                                                                        $("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + dObj.current_position.x + "</td><td>" + dObj.current_position.y + "</td><td>" + dObj.current_position.theta + "</td>");
+                                                                        $("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.x + "</td><td>" + dObj.current_position.y + "</td><td>" + dObj.current_position.theta + "</td>");
                                                                 });						
 							   },
 							   "attrs": [
