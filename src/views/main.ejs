@@ -21,95 +21,133 @@
  
 		<script>
 		
+			var floorPlanImage;
+			var floorPlanImageScale = 1;
+			var floorPlanImageToWebPageScale = 1;
+			var floorPlanImageXOffset = 0;
+			var floorPlanImageYOffset = 0;
+		
 			$(document).ready(function() {
 							
 				$.ajax({
 					type: "GET",
 					url: "./api/config",
 					dataType: "json",
-					success: function (data) {					
+					success: function (data) {
 						var ngsiConnection = null;
 						$(data).each(function(i, item) {
+							<% if (user && user.role == "admin") { %>							
 							$("#ocb_host").val(item.ocb_host);	
 							$("#ocb_port").val(item.ocb_port);	
 							$("#ngsi_proxy_host").val(item.ngsi_proxy_host);	
 							$("#ngsi_proxy_port").val(item.ngsi_proxy_port);
+							<% } %>														
 							ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
 								ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
 							});
 						})
-						if (ngsiConnection != null) {
+						$.ajax({
+							type: "GET",
+							url: "./api/fp",
+							dataType: "json",
+							success: function (data) {					
+								var created = "";
+								var imgURL = "";
+								var name = "";
+								var xoffset = "";
+								var yoffset = "";
+								$(data).each(function(i, item) {						
+									if (item.created > created) {						
+										created = item.created;
+										imgURL = item.imgurl;
+										name = item.name;
+										floorPlanImageScale = item.scale;
+										floorPlanImageXOffset = item.xoffset;
+										floorPlanImageYOffset = item.yoffset;
+									}						
+								})
+								if (imgURL != "") {
+									floorPlanImage = new Image();
+									floorPlanImage.onload = function() {		
+										drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+										drawImageOnCanvas(floorPlanImage, "#floorplan");
+										$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + floorPlanImageScale + " cm/px, <strong>x-offset:</strong> " + floorPlanImageXOffset + " px, <strong>y-offset:</strong> " + floorPlanImageYOffset + " px</p>");
+									};
+									floorPlanImage.src = imgURL;	
+								}
+														
+								if (ngsiConnection != null) {
 						
-						    /* INITIALIZATIONS */
-							initFloorplan();
-							initTasks(ngsiConnection);
-							initRobotsOnMap(ngsiConnection);
-						    initRobotsTable(ngsiConnection);
-							initHumanAgents(ngsiConnection);
-							initSensorData(ngsiConnection);		
-							<% if (user && user.role == "admin") { %>
-								initSystemSettings();
-								initUsers();
-							<% } %>
+									/* INITIALIZATIONS */				
+									initTasks(ngsiConnection);						    
+									initRobotsTable(ngsiConnection);							
+									initHumanAgents(ngsiConnection);
+									initSensorData(ngsiConnection);		
+									<% if (user && user.role == "admin") { %>
+										initSystemSettings();
+										initUsers();
+									<% } %>
 
-							/* SUBSCRIPTIONS */
-							ngsiConnection.v2.createSubscription({
-								"description": "Updating tasks",
-								"subject": { "entities": [ { "idPattern": ".*", "type": "TaskSpecState" } ] },
-								"notification": {
-									"callback": function (notification) {				   
-										updateTasks(notification);
-									}
-								},
-								//"expires": "2040-04-05T14:00:00.00Z",
-								"throttling": 5
-							}).then(
-								(response) => {
-									//console.log("Created subscription: " + JSON.stringify(response));
-								}, (error) => {
-									//console.log(error);
+									/* SUBSCRIPTIONS */
+									ngsiConnection.v2.createSubscription({
+										"description": "Updating tasks",
+										"subject": { "entities": [ { "idPattern": ".*", "type": "TaskSpecState" } ] },
+										"notification": {
+											"callback": function (notification) {				   
+												updateTasks(notification);
+											}
+										},
+										//"expires": "2040-04-05T14:00:00.00Z",
+										"throttling": 5
+									}).then(
+										(response) => {
+											//console.log("Created subscription: " + JSON.stringify(response));
+										}, (error) => {
+											//console.log(error);
+										}
+									);							
+									
+									ngsiConnection.v2.createSubscription({
+										"description": "Updating robot data",
+										"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "status_channel" ] } },
+										"notification": {
+											"callback": function (notification) {
+												updateRobotsOnOverview(notification);
+												updateRobotsTable(notification);
+										   },
+										   "attrs": [ "status_channel" ]
+										},
+										//"expires": "2040-04-05T14:00:00.00Z",
+										"throttling": 5
+									}).then(
+										(response) => {
+											//console.log("Created subscription: " + JSON.stringify(response));
+										}, (error) => {
+											//console.log(error);
+										}
+									);
+									
+									ngsiConnection.v2.createSubscription({
+										"description": "Updating sensor data",
+										"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ], "condition": { "attrs": [ "sensorData" ] } },
+										"notification": {
+											"callback": function (notification) {
+												updateSensorData(notification);					
+											},
+											"attrs": [ "sensorData" ]
+										},
+										//"expires": "2040-04-05T14:00:00.00Z",
+										"throttling": 5
+									}).then(
+										(response) => {
+											//console.log("Created subscription: " + JSON.stringify(response));
+										}, (error) => {
+											//console.log(error);
+										}
+									);							
 								}
-							);							
-							
-							ngsiConnection.v2.createSubscription({
-								"description": "Updating robot data",
-								"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "status_channel" ] } },
-								"notification": {
-									"callback": function (notification) {
-										updateRobotsOnMap(notification);
-										updateRobotsTable(notification);
-								   },
-								   "attrs": [ "status_channel" ]
-								},
-								//"expires": "2040-04-05T14:00:00.00Z",
-								"throttling": 5
-							}).then(
-								(response) => {
-									//console.log("Created subscription: " + JSON.stringify(response));
-								}, (error) => {
-									//console.log(error);
-								}
-							);
-							
-							ngsiConnection.v2.createSubscription({
-								"description": "Updating sensor data",
-								"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ], "condition": { "attrs": [ "sensorData" ] } },
-								"notification": {
-									"callback": function (notification) {
-										updateSensorData(notification);					
-									},
-									"attrs": [ "sensorData" ]
-								},
-								//"expires": "2040-04-05T14:00:00.00Z",
-								"throttling": 5
-							}).then(
-								(response) => {
-									//console.log("Created subscription: " + JSON.stringify(response));
-								}, (error) => {
-									//console.log(error);
-								}
-							);							
-						}
+							}
+						});
 					}
 				});
 			

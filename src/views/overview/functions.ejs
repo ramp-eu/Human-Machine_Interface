@@ -1,47 +1,4 @@
-function initFloorplan() {
-	$.ajax({
-		type: "GET",
-		url: "./api/fp",
-		dataType: "json",
-		success: function (data) {					
-			var created = "";
-			var id = "";
-			var imgURL = "";
-			var name = "";
-			var scale = "";
-			var xoffset = "";
-			var yoffset = "";
-			$(data).each(function(i, item) {						
-				if (item.created > created) {						
-					created = item.created;
-					var id = item._id;
-					imgURL = item.imgurl;
-					name = item.name;
-					scale = item.scale;
-					xoffset = item.xoffset;
-					yoffset = item.yoffset;
-				}						
-			})
-			if (imgURL != "") {
-				overviewFloorplanImage = new Image();
-				overviewFloorplanImage.onload = function() {						
-					loadImage(imgURL, id, name, scale, xoffset, yoffset);
-				};				
-				overviewFloorplanImage.src = imgURL;
-			}
-		}
-	});
-}
-
-function loadImage(path, id, name, scale, xoffset, yoffset) { 
-	var floorPlanImage = new Image();
-	floorPlanImage.onload = function() {		
-		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
-		drawImageOnCanvas(floorPlanImage, "#floorplan");
-		$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + scale + " cm/px, <strong>x-offset:</strong> " + xoffset + " px, <strong>y-offset:</strong> " + yoffset + " px</p>");
-	};
-	floorPlanImage.src = path;	
-}
+var robotsOnOverview = new Array();
 
 function drawImageOnCanvas(img, targetCanvas) {
 	var canvas = $(targetCanvas)[0];
@@ -57,15 +14,67 @@ function drawImageOnCanvas(img, targetCanvas) {
 	//alert("canvas.width: " + canvas.width);
 	//alert("img.width: " + img.width);
 
-	scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+	floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
 	// get the top left position of the image
-	var x = (canvas.width / 2) - (img.width / 2) * scale;
-	//var y = (canvas.height / 2) - (img.height / 2) * scale;			
+	var x = (canvas.width / 2) - (img.width / 2) * floorPlanImageToWebPageScale;
+	//var y = (canvas.height / 2) - (img.height / 2) * floorPlanImageToWebPageScale;			
 	var y = 0; // no need to center the floor plan vertically
-	$(targetCanvas).attr('height', img.height * scale);  // resize the canvas smaller if the image is also smaller
-	ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+	$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);  // resize the canvas smaller if the image is also smaller
+	ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);
 }
 
-function initRobotsOnMap(ngsiConnection) {}
+function updateRobotsOnOverview(notification) {
+	
+	if (typeof floorPlanImage !== "undefined") {
 
-function updateRobotsOnMap(notification) {}
+		var temp = 1;
+		$.each(notification.data, function () {
+			var d = decodeURIComponent(this.status_channel.value);
+			var dObj = JSON.parse(d.replace(/\'/g, "\""));
+			var ran_status = "unknown";
+			if (dObj.ran_status == 0) ran_status = "waiting";
+			else if (dObj.ran_status == 1) ran_status = "moving";
+			else if (dObj.ran_status == 2) ran_status = "acting";
+			objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
+			if (objIndex == -1) {
+				robotsOnOverview.push({index: temp, id: this.id, ran_status: ran_status, x: dObj.current_position.x, y: dObj.current_position.y, theta: dObj.current_position.theta});
+			} else {
+				robotsOnOverview[objIndex].index = temp;
+				robotsOnOverview[objIndex].ran_status = ran_status;			
+				robotsOnOverview[objIndex].x = dObj.current_position.x;		
+				robotsOnOverview[objIndex].y = dObj.current_position.y;		
+				robotsOnOverview[objIndex].theta = current_position.theta;						
+			}
+			temp++;
+		});
+
+		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+		$("#robotsOverviewTbody").empty();
+
+		$.each(robotsOnOverview, function(key, value) {		
+			var canvas = $("#overviewFloorplan")[0];
+			var ctx = canvas.getContext("2d");			
+			var pointSize = 10;			
+			ctx.fillStyle = "black";
+			ctx.beginPath();	
+			var x = ((value.x + floorPlanImageXOffset) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+			var y = (((floorPlanImage.height - value.y)+ floorPlanImageYOffset) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+			ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';		
+			ctx.fill();	
+
+			var label = value.index.toString();
+			ctx.font = "12px";
+			ctx.fillStyle = "#ffffff";
+			var xLabelLocation = -3;
+			var yLabelLocation = 3;
+			if (label.length > 1) {
+				xLabelLocation = -6;
+			}			
+			ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);		
+
+			$("#robotsOverviewTbody").append("<tr><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.ran_status + "</td><td>" + value.x + "</td><td>" + value.y + "</td><td>" + value.theta + "</td></tr>");
+		});	
+	}
+	
+}
