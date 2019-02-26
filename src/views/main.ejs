@@ -23,16 +23,100 @@
 		
 			$(document).ready(function() {
 							
-				<% include ./overview/documentReady.ejs %>		
-				<% include ./floorplan/documentReady.ejs %>		
-				<% include ./task_management/documentReady.ejs %>
-				<% include ./human_agents/documentReady.ejs %>
-				<% include ./robots/documentReady.ejs %>
-				<% include ./sensor_data/documentReady.ejs %>		
-				<% if (user && user.role == "admin") { %>
-					<% include ./system_settings/documentReady.ejs %>		
-					<% include ./user_management/documentReady.ejs %>
-				<% } %>		
+				$.ajax({
+					type: "GET",
+					url: "./api/config",
+					dataType: "json",
+					success: function (data) {					
+						var ngsiConnection = null;
+						$(data).each(function(i, item) {
+							$("#ocb_host").val(item.ocb_host);	
+							$("#ocb_port").val(item.ocb_port);	
+							$("#ngsi_proxy_host").val(item.ngsi_proxy_host);	
+							$("#ngsi_proxy_port").val(item.ngsi_proxy_port);
+							ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
+								ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
+							});
+						})
+						if (ngsiConnection != null) {
+						
+						    /* INITIALIZATIONS */
+							initFloorplan();
+							initTasks(ngsiConnection);
+							initRobotsOnMap(ngsiConnection);
+						    initRobotsTable(ngsiConnection);
+							initHumanAgents(ngsiConnection);
+							initSensorData(ngsiConnection);		
+							<% if (user && user.role == "admin") { %>
+								initSystemSettings();
+								initUsers();
+							<% } %>
+
+							/* SUBSCRIPTIONS */
+							ngsiConnection.v2.createSubscription({
+								"description": "Updating tasks",
+								"subject": { "entities": [ { "idPattern": ".*", "type": "TaskSpecState" } ] },
+								"notification": {
+									"callback": function (notification) {				   
+										updateTasks(notification);
+									}
+								},
+								//"expires": "2040-04-05T14:00:00.00Z",
+								"throttling": 5
+							}).then(
+								(response) => {
+									//console.log("Created subscription: " + JSON.stringify(response));
+								}, (error) => {
+									//console.log(error);
+								}
+							);							
+							
+							ngsiConnection.v2.createSubscription({
+								"description": "Updating robot data",
+								"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "status_channel" ] } },
+								"notification": {
+									"callback": function (notification) {
+										updateRobotsOnMap(notification);
+										updateRobotsTable(notification);
+								   },
+								   "attrs": [ "status_channel" ]
+								},
+								//"expires": "2040-04-05T14:00:00.00Z",
+								"throttling": 5
+							}).then(
+								(response) => {
+									//console.log("Created subscription: " + JSON.stringify(response));
+								}, (error) => {
+									//console.log(error);
+								}
+							);
+							
+							ngsiConnection.v2.createSubscription({
+								"description": "Updating sensor data",
+								"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ], "condition": { "attrs": [ "sensorData" ] } },
+								"notification": {
+									"callback": function (notification) {
+										updateSensorData(notification);					
+									},
+									"attrs": [ "sensorData" ]
+								},
+								//"expires": "2040-04-05T14:00:00.00Z",
+								"throttling": 5
+							}).then(
+								(response) => {
+									//console.log("Created subscription: " + JSON.stringify(response));
+								}, (error) => {
+									//console.log(error);
+								}
+							);							
+						}
+					}
+				});
+			
+				$("#sendTask").click(function() {
+					sendTask();
+					return false;
+				});			
 			});	
 
 			<% include ./generalFunctions.ejs %>			
@@ -83,10 +167,10 @@
 				<div class="tab-pane" id="humanAgentsTab" style="margin-top:10px;">
 					<% include ./human_agents/tabContent.ejs %>									
 				</div>
-				<div class="tab-pane" id="robotsTab" style="margin-top:10px;">
+				<div class="tab-pane" id="robotsTab" style="margin-top:-20px;">
 					<% include ./robots/tabContent.ejs %>			
 				</div>			
-				<div class="tab-pane" id="sensorDataTab" style="margin-top:-20px;">
+				<div class="tab-pane" id="sensorDataTab" style="margin-top:10px;">
 					<% include ./sensor_data/tabContent.ejs %>
 				</div> 			
 				<% if (user && user.role == "admin") { %>  			

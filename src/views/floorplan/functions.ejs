@@ -19,13 +19,3 @@ function submitForm() {
 	});
 		return false;
 }
-
-function loadImage(path, id, name, scale, xoffset, yoffset) { 
-	var floorPlanImage = new Image();
-	floorPlanImage.onload = function() {		
-		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
-		drawImageOnCanvas(floorPlanImage, "#floorplan");
-		$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + scale + " cm/px, <strong>x-offset:</strong> " + xoffset + " px, <strong>y-offset:</strong> " + yoffset + " px</p>");
-	};
-	floorPlanImage.src = path;	
-}

@@ -1,3 +1,19 @@
+function initUsers() {
+	$.ajax({
+		type: "GET",
+		url: "./api/user",
+		dataType: "json",
+		success: function (data) {					
+			$(data).each(function(i, item) {
+				if (item.role == "admin" || item.role == "user") {
+					var usersHTML = getUserHTML(item._id, item.userid, item.role, item.name);
+					$("#usersTable").append(usersHTML);						
+				}
+			})
+		}
+	});	
+}
+
 function addNewUser() {
 	if ($("#newUserUserId").val() == "" || $("#newUserName").val() == "" || $("#newUserPassword").val() == "" || $("#newUserConfirmPw").val() == "") {
 		showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");

@@ -1,0 +1,63 @@
+var sensorDataCharts = new Map();
+
+function initSensorData(ngsiConnection) {	
+	ngsiConnection.v2.listEntities().then((response) => {
+		var entities = response.results;
+		$.each(entities, function(i, entity) {
+			if (entity.type == "SensorAgent") {
+				$.each(entity.sensorData.value, function(i, sensor) {
+					var steppedLine = false;
+					$.each(sensor.readings.value, function(i, sensorValue) {
+						if (sensorValue.reading.type == "Boolean") {
+							steppedLine = true;
+						}
+					});
+					$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + sensor.sensorType.value + "</div><div class=\"panel-body\"><canvas id=\"" + sensor.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+					var chartCanvas = document.getElementById(sensor.sensorId.value + "_Chart");
+					var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
+					var chartOptions = {legend: {display: false},	scales: { yAxes: [{ ticks: { stepSize: 1 }}], xAxes: [{ type: 'time', time: { unit: 'minute', unitStepSize: 1, displayFormats: { 'minute': 'HH:mm' } } }] } };
+					var chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
+					sensorDataCharts.set(sensor.sensorId.value, chart);
+				});
+			}
+		});
+	});						
+}
+
+function updateSensorData(notification) {						
+	console.log("Received notification: " + JSON.stringify(notification));					   
+	$.each(notification.data, function () {
+		$.each(this.sensorData.value, function () {			
+			var chart = sensorDataCharts.get(this.sensorId.value);							
+			if (typeof chart === "undefined") {							
+				var steppedLine = false;
+				$.each(this.readings.value, function() {
+					if (this.reading.type == "Boolean") {
+						steppedLine = true;
+					}
+				});
+				$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + this.sensorType.value + "</div><div class=\"panel-body\"><canvas id=\"" + this.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+				var chartCanvas = document.getElementById(this.sensorId.value + "_Chart");
+				var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
+				var chartOptions = {legend: {display: false},	scales: { yAxes: [{ ticks: { stepSize: 1 }}], xAxes: [{ type: 'time', time: { unit: 'minute', unitStepSize: 1, displayFormats: { 'minute': 'HH:mm' } } }] } };
+				chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
+				sensorDataCharts.set(this.sensorId.value, chart);
+			}
+			$.each(this.readings.value, function () {
+				// FOR TESTING (remove all elements when test data starts from the beginning) -->
+				if (chart.data.labels.length > 0 && (this.modifiedTime.value < chart.data.labels[chart.data.labels.length-1])) {
+					chart.data.labels = [];
+					chart.data.datasets.forEach((dataset) => {
+						dataset.data = [];
+					});
+				}
+				// <-- FOR TESTING
+				chart.data.labels.push(this.modifiedTime.value);
+				chart.data.datasets.forEach((dataset) => {
+					dataset.data.push(this.reading.value); // add new value
+				});
+				chart.update();											
+			});
+		});
+	});	
+}

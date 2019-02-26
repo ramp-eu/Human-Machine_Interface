@@ -1,3 +1,48 @@
+function initFloorplan() {
+	$.ajax({
+		type: "GET",
+		url: "./api/fp",
+		dataType: "json",
+		success: function (data) {					
+			var created = "";
+			var id = "";
+			var imgURL = "";
+			var name = "";
+			var scale = "";
+			var xoffset = "";
+			var yoffset = "";
+			$(data).each(function(i, item) {						
+				if (item.created > created) {						
+					created = item.created;
+					var id = item._id;
+					imgURL = item.imgurl;
+					name = item.name;
+					scale = item.scale;
+					xoffset = item.xoffset;
+					yoffset = item.yoffset;
+				}						
+			})
+			if (imgURL != "") {
+				overviewFloorplanImage = new Image();
+				overviewFloorplanImage.onload = function() {						
+					loadImage(imgURL, id, name, scale, xoffset, yoffset);
+				};				
+				overviewFloorplanImage.src = imgURL;
+			}
+		}
+	});
+}
+
+function loadImage(path, id, name, scale, xoffset, yoffset) { 
+	var floorPlanImage = new Image();
+	floorPlanImage.onload = function() {		
+		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+		drawImageOnCanvas(floorPlanImage, "#floorplan");
+		$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + scale + " cm/px, <strong>x-offset:</strong> " + xoffset + " px, <strong>y-offset:</strong> " + yoffset + " px</p>");
+	};
+	floorPlanImage.src = path;	
+}
+
 function drawImageOnCanvas(img, targetCanvas) {
 	var canvas = $(targetCanvas)[0];
 	var ctx = canvas.getContext("2d");
@@ -20,3 +65,7 @@ function drawImageOnCanvas(img, targetCanvas) {
 	$(targetCanvas).attr('height', img.height * scale);  // resize the canvas smaller if the image is also smaller
 	ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
 }
+
+function initRobotsOnMap(ngsiConnection) {}
+
+function updateRobotsOnMap(notification) {}
