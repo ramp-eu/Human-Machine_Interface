@@ -1,5 +1,3 @@
-#Introduction
- 
 ## Install and run dockerized app
 Build images before starting containers:
 
