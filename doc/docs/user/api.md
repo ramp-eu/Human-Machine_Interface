@@ -1,5 +1,3 @@
-#Introduction
- 
 ## REST API
 
 ### Floorplans
