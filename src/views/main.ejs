@@ -81,7 +81,6 @@
 									/* INITIALIZATIONS */				
 									initTasks(ngsiConnection);						    
 									initRobotsTable(ngsiConnection);							
-									initHumanAgents(ngsiConnection);
 									initSensorData(ngsiConnection);		
 									<% if (user && user.role == "admin") { %>
 										initSystemSettings();
@@ -161,7 +160,6 @@
 			<% include ./overview/functions.ejs %>		
 			<% include ./floorplan/functions.ejs %>		
 			<% include ./task_management/functions.ejs %>
-			<% include ./human_agents/functions.ejs %>
 			<% include ./robots/functions.ejs %>
 			<% include ./sensor_data/functions.ejs %>		
 			<% if (user && user.role == "admin") { %>
@@ -183,7 +181,6 @@
 				<li class="active"><a href="#overviewTab" role="tab" data-toggle="tab">Overview</a></li>
 				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan Management</a></li>	
 				<li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>						
-				<li><a href="#humanAgentsTab" role="tab" data-toggle="tab">Human Agents</a></li>
 				<li><a href="#robotsTab" role="tab" data-toggle="tab">Robots</a></li>
 				<li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>
 				<% if (user && user.role == "admin") { %>  
@@ -202,9 +199,6 @@
 					<% include ./task_management/tabContent.ejs %>				
 
 				</div>			
-				<div class="tab-pane" id="humanAgentsTab" style="margin-top:10px;">
-					<% include ./human_agents/tabContent.ejs %>									
-				</div>
 				<div class="tab-pane" id="robotsTab" style="margin-top:-20px;">
 					<% include ./robots/tabContent.ejs %>			
 				</div>			
