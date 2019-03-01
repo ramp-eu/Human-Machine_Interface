@@ -80,7 +80,7 @@
 						
 									/* INITIALIZATIONS */				
 									initTasks(ngsiConnection);						    
-									initRobotsTable(ngsiConnection);							
+									initRobotsTable(ngsiConnection);									
 									initSensorData(ngsiConnection);		
 									<% if (user && user.role == "admin") { %>
 										initSystemSettings();
@@ -131,6 +131,7 @@
 										"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ], "condition": { "attrs": [ "sensorData" ] } },
 										"notification": {
 											"callback": function (notification) {
+												updateSensorsOnOverview(notification);
 												updateSensorData(notification);					
 											},
 											"attrs": [ "sensorData" ]

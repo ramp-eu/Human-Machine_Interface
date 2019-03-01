@@ -1,4 +1,5 @@
 var robotsOnOverview = new Array();
+var sensorsOnOverview = new Array();
 
 function drawImageOnCanvas(img, targetCanvas) {
 	var canvas = $(targetCanvas)[0];
@@ -35,7 +36,7 @@ function updateRobotsOnOverview(notification) {
 			if (dObj.ran_status == 0) ran_status = "waiting";
 			else if (dObj.ran_status == 1) ran_status = "moving";
 			else if (dObj.ran_status == 2) ran_status = "acting";
-			objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
+			var objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
 			if (objIndex == -1) {
 				robotsOnOverview.push({index: temp, id: this.id, ran_status: ran_status, x: dObj.current_position.x, y: dObj.current_position.y, theta: dObj.current_position.theta});
 			} else {
@@ -77,4 +78,31 @@ function updateRobotsOnOverview(notification) {
 		});	
 	}
 	
+}
+
+function updateSensorsOnOverview(notification) {										   
+	
+	if (typeof floorPlanImage !== "undefined") {
+	
+		var temp = 1;
+		$.each(notification.data, function () {
+			$.each(this.sensorData.value, function () {					
+				var objIndex = sensorsOnOverview.findIndex((obj => obj.id == this.sensorId.value));
+				if (objIndex == -1) {
+					sensorsOnOverview.push({index: temp, id: this.sensorId.value, type: this.sensorType.value, x: -1, y: -1});
+				} else {
+					sensorsOnOverview[objIndex].index = temp;
+					sensorsOnOverview[objIndex].id = this.sensorId.value;			
+					sensorsOnOverview[objIndex].type = this.sensorType.value;	
+				}
+				temp++;
+			});
+		});
+		
+		$("#sensorsOverviewTbody").empty();
+		
+		$.each(sensorsOnOverview, function(key, value) {		
+			$("#sensorsOverviewTbody").append("<tr><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.type + "</td><td>" + value.x + "</td><td>" + value.y + "</td><td style=\"text-align:center\"><input type=\"radio\" name=\"sensorLocation\" value=\"selectedSensor_" + value.id + "\"></td></tr>");			
+		});
+	}
 }
