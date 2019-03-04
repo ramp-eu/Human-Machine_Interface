@@ -1,28 +1,44 @@
 <div id="taskManagementAlert"></div>
 
 <div class="well ownborder">
-    <h3>Send new task</h3>
+    <h3>Send new task specification</h3>
 	<form>
 		<div class="form-group">
 			<!--<label for="taskDescriptionTextArea">Task description</label>-->
 			<textarea class="form-control" id="taskDescriptionTextArea" rows="8"></textarea>
 		</div>
 		<div class="form-group">						
-			<button class="btn btn-primary" id="sendTask">Send task</button>
+			<button class="btn btn-primary" id="sendTaskSpecification">Send task specification</button>
 		</div>
 	</form>
 </div>
 
 <div class="well ownborder">
-	<h3>Current tasks</h3>
-	<table id="taskManagementTable" class="table table-responsive">
+	<h3>Sent task specifications</h3>
+	<table class="table table-responsive">
 		<thead>
 			<tr>
-				<th scope="col">Task ID</th>
+				<th scope="col">TaskSpec ID</th>
 				<th scope="col">Status</th>
 				<th scope="col">Message</th>	  
-				<th scope="col">Task Description</th>		
-				<th scope="col">&nbsp;</th>		 	  
+				<th scope="col">Task Specification</th>		
+				<!--<th scope="col">&nbsp;</th>-->
+			</tr>
+		</thead>
+		<tbody id="taskSpecifications"></tbody>
+	</table>
+</div>
+
+<div class="well ownborder">
+	<h3>Current tasks in the system</h3>
+	<table id="currentTasksTable" class="table table-responsive">
+		<thead>
+			<tr>
+				<th scope="col">Task ID</th>				
+				<th scope="col">Task Description</th>	
+				<th scope="col">Status</th>
+				<th scope="col">Time</th>				
+				<!--<th scope="col">&nbsp;</th>-->
 			</tr>
 		</thead>
 		<tbody id="currentTasks"></tbody>

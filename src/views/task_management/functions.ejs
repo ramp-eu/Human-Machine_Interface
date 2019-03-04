@@ -1,17 +1,22 @@
-function initTasks(ngsiConnection) {
+function initTaskSpecifications(ngsiConnection) {
 	ngsiConnection.v2.listEntities({type: "TaskSpec"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 			var taskId = entity.id;
+			console.log("1");
 			var task = urldecode(entity.TaskSpec.value);
 			ngsiConnection.v2.listEntities({type: "TaskSpecState"}).then((response2) => {
 				var entities2 = response2.results;
 				$.each(entities2, function(i, entity2) {
-					if (entity2.refId.value == taskId) {
-						var taskStatus = entity2.Status.value;
-						var taskMessage = entity2.Message.value;
-						var taskHTML = getTaskHTML(taskId, taskStatus, taskMessage, task);		
-						$("#currentTasks").append(taskHTML);
+					console.log("2");					
+					if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == taskId) {
+						console.log("3");						
+						var taskStatus = entity2.state.value;
+						console.log("4");
+						var taskMessage = entity2.message.value;
+						console.log("5");
+						var taskHTML = getTaskSpecificationHTML(taskId, taskStatus, taskMessage, task);		
+						$("#taskSpecifications").append(taskHTML);
 					}
 				});
 			});
@@ -19,24 +24,86 @@ function initTasks(ngsiConnection) {
 	});					
 }
 
+function initCurrentTasks(ngsiConnection) {
+	ngsiConnection.v2.listEntities({type: "Task"}).then((response) => {
+		var entities = response.results;
+		$.each(entities, function(i, entity) {
+			var taskId = entity.id;
+			var taskDescription = entity.taskName.value;
+			var taskStatus = entity.state.value;		
+			var time = entity.time.value;	
+			var taskHTML = getCurrentTaskHTML(taskId, taskDescription, taskStatus, time);
+			$("#currentTasks").append(taskHTML);			
+		});
+	});					
+}
 
-function updateTasks(notification) {							   
+function updateTaskSpecifications(notification) {							   
 	$.each(notification.data, function () {		
-		var taskId = this.refId.value
-		var taskStatus = this.Status.value;
-		var taskMessage = this.Message.value;	
-		if ($("#currentTask_" + taskId).length) {
-			$("#Status_" + taskId).html(taskStatus);
-			$("#Message_" + taskId).html(taskMessage);
-		}							
+		if (this.refId !== undefined && this.state !== undefined && this.message !== undefined) {	
+			var taskId = this.refId.value
+			var taskStatus = this.state.value;
+			var taskMessage = this.message.value;	
+			if ($("#taskSpecification_" + taskId).length) {
+				var taskStatusStr = "";
+				if (taskStatus == 0) {
+					taskStatusStr = "Idle";
+				} else if (taskStatus == 1) {
+					taskStatusStr = "Ok";
+				} else if (taskStatus == -1) {
+					taskStatusStr = "Error";
+				}
+				$("#taskSpecification_status_" + taskId).html(taskStatusStr);
+				$("#Message_" + taskId).html(taskMessage);
+			}		
+		}			
 	});
 }
 
-function getTaskHTML(taskId, taskStatus, taskMessage, task) {
-	return "<tr id=\"currentTask_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"Status_" + taskId + "\">" + taskStatus + "</td><td id=\"Message_" + taskId + "\">" + taskMessage + "</td><td><textarea id=\"TaskSpec_" + taskId + "\" rows=\"4\" readonly>" + task + "</textarea></td><td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";
+function updateCurrentTasks(notification) {							   
+	$.each(notification.data, function () {		
+		var taskId = this.id;
+		var taskStatus = this.state.value;		
+		var taskStatusStr = "";
+		if (taskStatus == 0) {
+			taskStatusStr = "Idle";
+		} else if (taskStatus == 1) {
+			taskStatusStr = "Running";
+		} else if (taskStatus == 2) {
+			taskStatusStr = "Waiting";
+		} else if (taskStatus == 3) {
+			taskStatusStr = "Active";
+		} else if (taskStatus == 4) {
+			taskStatusStr = "Finished";
+		} else if (taskStatus == 5) {
+			taskStatusStr = "Aborted";
+		} else if (taskStatus == 6) {
+			taskStatusStr = "Error";
+		}		
+		var taskDescription = this.taskName.value;			
+		var time = this.time.value;			
+		if ($("#currentTask_" + taskId).length) {
+			$("#currentTask_status_" + taskId).html(taskStatusStr);
+			$("#currentTask_description_" + taskId).html(taskDescription);
+			$("#currentTask_time_" + taskId).html(time);
+		} else {
+			var taskHTML = getCurrentTaskHTML(taskId, taskDescription, taskStatusStr, time);
+			$("#currentTasks").append(taskHTML);			
+		}			
+	});
 }
 
-function sendTask() {
+function getTaskSpecificationHTML(taskId, taskStatus, taskMessage, task) {
+	return "<tr id=\"taskSpecification_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"taskSpecification_status_" + taskId + "\">" + taskStatus + "</td><td id=\"Message_" + taskId + "\">" + taskMessage + "</td><td><textarea id=\"TaskSpec_" + taskId + "\" rows=\"4\" readonly>" + task + "</textarea></td></tr>";
+	/*<td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";*/
+}
+
+function getCurrentTaskHTML(taskId, taskDescription, taskStatus, time) {
+	return "<tr id=\"currentTask_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"currentTask_description_" + taskId + "\">" + taskDescription + "</td><td id=\"currentTask_status_" + taskId + "\">" + taskStatus + "</td><td id=\"currentTask_time_" + taskId + "\">" + time + "</td></tr>";
+	/*<td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";*/
+}
+
+function sendTaskSpecification() {
 	if ($.trim($("#taskDescriptionTextArea").val()) != "") {
 		$.ajax({
 			type: "GET",
@@ -61,8 +128,8 @@ function sendTask() {
 					}).then(
 						(response) => {
 							// Entity created successfully
-							var newTaskHTML = getTaskHTML(taskId, "&nbsp;", "&nbsp;", $("#taskDescriptionTextArea").val());
-							$("#currentTasks").append(newTaskHTML);
+							var newTaskHTML = getTaskSpecificationHTML(taskId, "&nbsp;", "&nbsp;", $("#taskDescriptionTextArea").val());
+							$("#taskSpecifications").append(newTaskHTML);
 							$("#taskDescriptionTextArea").val("");							
 							showAndDismissAlert("success", "Task sent succesfully!", "taskManagementAlert");
 						}, (error) => {
@@ -77,6 +144,7 @@ function sendTask() {
 	}
 }
 
+/*
 function cancelTask(taskId) {
 	bootbox.confirm("Are you sure you want to cancel the task?", function(result) {
 		if (result == true) {
@@ -105,7 +173,7 @@ function cancelTask(taskId) {
 						});
 						ngsiConnection.v2.deleteEntity(taskId).then(
 							(response) => {
-								$("#currentTask_" + taskId).remove();
+								$("#taskSpecification_" + taskId).remove();
 								// Entity deleted successfully
 								// response.correlator transaction id associated with the server response
 								showAndDismissAlert("success", "Task canceled succesfully!", "taskManagementAlert");
@@ -123,3 +191,4 @@ function cancelTask(taskId) {
 	});
 	return false;
 }
+*/
