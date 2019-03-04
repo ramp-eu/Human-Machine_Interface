@@ -3,18 +3,13 @@ function initTaskSpecifications(ngsiConnection) {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 			var taskId = entity.id;
-			console.log("1");
 			var task = urldecode(entity.TaskSpec.value);
 			ngsiConnection.v2.listEntities({type: "TaskSpecState"}).then((response2) => {
 				var entities2 = response2.results;
 				$.each(entities2, function(i, entity2) {
-					console.log("2");					
-					if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == taskId) {
-						console.log("3");						
+					if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == taskId) {		
 						var taskStatus = entity2.state.value;
-						console.log("4");
 						var taskMessage = entity2.message.value;
-						console.log("5");
 						var taskHTML = getTaskSpecificationHTML(taskId, taskStatus, taskMessage, task);		
 						$("#taskSpecifications").append(taskHTML);
 					}
