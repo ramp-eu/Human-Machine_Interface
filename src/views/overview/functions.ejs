@@ -24,6 +24,58 @@ function drawImageOnCanvas(img, targetCanvas) {
 	ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);
 }
 
+function drawRobotsOnCanvas() {
+	$.each(robotsOnOverview, function(key, value) {		
+		var canvas = $("#overviewFloorplan")[0];
+		var ctx = canvas.getContext("2d");			
+		var pointSize = 10;			
+		ctx.fillStyle = "blue";
+		ctx.beginPath();	
+		var x = ((value.x / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
+		var y = (floorPlanImage.height - ((value.y / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;			
+		ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
+		ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';		
+		ctx.fill();	
+
+		var label = value.index.toString();
+		ctx.font = "12px";
+		ctx.fillStyle = "#ffffff";
+		var xLabelLocation = -3;
+		var yLabelLocation = 3;
+		if (label.length > 1) {
+			xLabelLocation = -6;
+		}			
+		ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);		
+	});	
+}
+
+function drawSensorsOnCanvas() {
+	$.each(sensorsOnOverview, function(key, value) {
+		if (value.x > 0 && value.y > 0) {
+			var canvas = $("#overviewFloorplan")[0];
+			var ctx = canvas.getContext("2d");			
+			var pointSize = 10;			
+			ctx.fillStyle = "green";
+			ctx.beginPath();
+			var x = ((value.x / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
+			var y = (floorPlanImage.height - ((value.y / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;			
+			ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
+			ctx.fillStyle = 'rgba(0, 100, 0, 0.5)';		
+			ctx.fill();	
+
+			var label = value.index.toString();
+			ctx.font = "12px";
+			ctx.fillStyle = "#ffffff";
+			var xLabelLocation = -3;
+			var yLabelLocation = 3;
+			if (label.length > 1) {
+				xLabelLocation = -6;
+			}			
+			ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);		
+		}
+	});	
+}
+
 function updateRobotsOnOverview(notification) {
 	
 	if (typeof floorPlanImage !== "undefined") {
@@ -50,30 +102,10 @@ function updateRobotsOnOverview(notification) {
 		});
 
 		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+		drawRobotsOnCanvas();
+		drawSensorsOnCanvas();
 		$("#robotsOverviewTbody").empty();
-
 		$.each(robotsOnOverview, function(key, value) {		
-			var canvas = $("#overviewFloorplan")[0];
-			var ctx = canvas.getContext("2d");			
-			var pointSize = 10;			
-			ctx.fillStyle = "black";
-			ctx.beginPath();	
-			var x = ((value.x / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
-			var y = (floorPlanImage.height - ((value.y / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;			
-			ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';		
-			ctx.fill();	
-
-			var label = value.index.toString();
-			ctx.font = "12px";
-			ctx.fillStyle = "#ffffff";
-			var xLabelLocation = -3;
-			var yLabelLocation = 3;
-			if (label.length > 1) {
-				xLabelLocation = -6;
-			}			
-			ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);		
-
 			$("#robotsOverviewTbody").append("<tr><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.ran_status + "</td><td>" + value.x + "</td><td>" + value.y + "</td><td>" + value.theta + "</td></tr>");
 		});	
 	}
@@ -99,10 +131,37 @@ function updateSensorsOnOverview(notification) {
 			});
 		});
 		
-		$("#sensorsOverviewTbody").empty();
-		
-		$.each(sensorsOnOverview, function(key, value) {		
-			$("#sensorsOverviewTbody").append("<tr><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.type + "</td><td>" + value.x + "</td><td>" + value.y + "</td><td style=\"text-align:center\"><input type=\"radio\" name=\"sensorLocation\" value=\"selectedSensor_" + value.id + "\"></td></tr>");			
-		});
+		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+		drawRobotsOnCanvas();
+		drawSensorsOnCanvas();
+		updateSensorsTable();
 	}
+}
+
+function updateSensorsTable() {
+	$("#sensorsOverviewTbody").empty();
+	$.each(sensorsOnOverview, function(key, value) {		
+		$("#sensorsOverviewTbody").append("<tr><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.type + "</td><td>" + value.x + "</td><td>" + value.y + "</td><td style=\"text-align:center\"><input type=\"radio\" name=\"sensorLocation\" id=\"selectedSensor_" + value.id + "\" value=\"selectedSensor_" + value.id + "\"></td></tr>");			
+	});
+}
+
+function setSensorLocation(event) {	
+	if ($("input[name=\"sensorLocation\"]:checked").val()) {
+		var canvas = $("#overviewFloorplan")[0];
+		var ctx = canvas.getContext("2d");	
+		var rect = canvas.getBoundingClientRect();
+		var sensorId = $("input[type=radio][name=sensorLocation]:checked").attr("id").replace("selectedSensor_", "");	
+		var x = ((event.clientX - rect.left) / floorPlanImageToWebPageScale - floorPlanImageXOffset) * floorPlanImageScale;
+		var y = (floorPlanImageYOffset + floorPlanImage.height - (event.clientY - rect.top) / floorPlanImageToWebPageScale) * floorPlanImageScale;			
+		var objIndex = sensorsOnOverview.findIndex((obj => obj.id == sensorId));
+		if (objIndex != -1) {
+			sensorsOnOverview[objIndex].x = Math.round(x);
+			sensorsOnOverview[objIndex].y = Math.round(y);	
+			drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+			drawRobotsOnCanvas();	
+			drawSensorsOnCanvas();
+			updateSensorsTable();			
+		}
+	}
+		
 }

@@ -1,10 +1,10 @@
 <section style="overflow-x: auto; overflow-y: auto;">
-	<canvas id="overviewFloorplan" style="margin-top:20px; <!--width: 100%; height: auto-->">
+	<canvas id="overviewFloorplan" onmousedown="setSensorLocation(event)" style="margin-top:20px; <!--width: 100%; height: auto-->">
 		Sorry, your browser doesn't support the &lt;canvas&gt; element.
 	</canvas>
 </section>
 
-<h3>Robots:</h3>
+<h3 style="border-bottom: 2px solid blue;">Robots:</h3>
 
 <table id="robotsOverviewTable" class="table table-responsive table-striped" style="width: 90%; margin-top: 20px; margin: 0px auto; float: none;">
 	<thead>
@@ -20,7 +20,7 @@
 	<tbody id="robotsOverviewTbody"></tbody>
 </table>
 
-<h3>Sensors:</h3>
+<h3 style="border-bottom: 2px solid green;">Sensors:</h3>
 
 <table id="sensorsOverviewTable" class="table table-responsive table-striped" style="width: 90%; margin-top: 20px; margin: 0px auto; float: none;">
 	<thead>
