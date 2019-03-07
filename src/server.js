@@ -17,12 +17,15 @@ var session      = require('express-session');
 var configDB = require('./config/database.js');
 var i18n = require('i18n-2');
 //var cors = require('cors')
+var inituser = require('./config/inituser.js');
 
 // configuration ===============================================================
 mongoose.Promise = global.Promise;
 mongoose.connect(configDB.url, { useNewUrlParser: true }); // connect to our database
 
 require('./config/passport')(passport); // pass passport for configuration
+
+inituser.init(process.env.inituser, process.env.initpw);
 
 // set up our express application
 app.use(express.static('public'));
