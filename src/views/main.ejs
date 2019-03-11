@@ -98,7 +98,7 @@
 											}
 										},
 										//"expires": "2040-04-05T14:00:00.00Z",
-										"throttling": 5
+										//"throttling": 5
 									}).then(
 										(response) => {
 											//console.log("Created subscription: " + JSON.stringify(response));
@@ -116,7 +116,7 @@
 											}
 										},
 										//"expires": "2040-04-05T14:00:00.00Z",
-										"throttling": 5
+										//"throttling": 5
 									}).then(
 										(response) => {
 											//console.log("Created subscription: " + JSON.stringify(response));
@@ -136,7 +136,7 @@
 										   "attrs": [ "status_channel" ]
 										},
 										//"expires": "2040-04-05T14:00:00.00Z",
-										"throttling": 5
+										//"throttling": 5
 									}).then(
 										(response) => {
 											//console.log("Created subscription: " + JSON.stringify(response));
@@ -156,7 +156,7 @@
 											"attrs": [ "sensorData" ]
 										},
 										//"expires": "2040-04-05T14:00:00.00Z",
-										"throttling": 5
+										//"throttling": 5
 									}).then(
 										(response) => {
 											//console.log("Created subscription: " + JSON.stringify(response));
@@ -197,6 +197,7 @@
 					<button class="btn btn-default btn-sm" style=" margin-top:10px;" disabled>Logged in as <%= user.name %>&nbsp;</button>&nbsp;<button type="submit" class="btn btn-default btn-sm" style=" margin-top:10px;"><%= __("logout") %></button>
                 </form>
 			</div>
+			<div id="generalAlert"></div>
 			<ul class="nav nav-tabs" style=" margin-top:10px;" role="tablist">
 				<li class="active"><a href="#overviewTab" role="tab" data-toggle="tab">Overview</a></li>
 				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan Management</a></li>	

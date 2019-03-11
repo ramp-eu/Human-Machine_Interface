@@ -1,4 +1,5 @@
 function initTaskSpecifications(ngsiConnection) {
+	/*
 	ngsiConnection.v2.listEntities({type: "TaskSpec"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
@@ -16,7 +17,8 @@ function initTaskSpecifications(ngsiConnection) {
 				});
 			});
 		});
-	});					
+	});		
+    */	
 }
 
 function initCurrentTasks(ngsiConnection) {
@@ -36,10 +38,10 @@ function initCurrentTasks(ngsiConnection) {
 function updateTaskSpecifications(notification) {							   
 	$.each(notification.data, function () {		
 		if (this.refId !== undefined && this.state !== undefined && this.message !== undefined) {	
-			var taskId = this.refId.value
+			var taskSpecId = this.refId.value
 			var taskStatus = this.state.value;
 			var taskMessage = this.message.value;	
-			if ($("#taskSpecification_" + taskId).length) {
+			if ($("#taskSpecification_" + taskSpecId).length) {
 				var taskStatusStr = "";
 				if (taskStatus == 0) {
 					taskStatusStr = "Idle";
@@ -48,9 +50,29 @@ function updateTaskSpecifications(notification) {
 				} else if (taskStatus == -1) {
 					taskStatusStr = "Error";
 				}
-				$("#taskSpecification_status_" + taskId).html(taskStatusStr);
-				$("#Message_" + taskId).html(taskMessage);
-			}		
+				$("#taskSpecification_status_" + taskSpecId).html(taskStatusStr);
+				$("#Message_" + taskSpecId).html(taskMessage);
+			}
+			// delete the TaskSpec entity when the corresponding TaskSpecState entity arrives
+			$.ajax({
+				type: "GET",
+				url: "./api/config",
+				dataType: "json",
+				success: function (data) {					
+					var ngsiConnection = null;
+					$(data).each(function(i, item) {							
+						ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
+							ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
+						});
+					})
+					if (ngsiConnection != null) {			
+						ngsiConnection.v2.deleteEntity(taskSpecId).then(
+							(response) => {
+							}, (error) => {}
+						);
+					}
+				}
+			});
 		}			
 	});
 }

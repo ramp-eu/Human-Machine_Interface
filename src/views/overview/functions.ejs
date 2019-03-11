@@ -119,13 +119,13 @@ function updateSensorsOnOverview(notification) {
 		var temp = 1;
 		$.each(notification.data, function () {
 			$.each(this.sensorData.value, function () {					
-				var objIndex = sensorsOnOverview.findIndex((obj => obj.id == this.sensorId.value));
+				var objIndex = sensorsOnOverview.findIndex((obj => obj.id == this.value.sensorId.value));
 				if (objIndex == -1) {
-					sensorsOnOverview.push({index: temp, id: this.sensorId.value, type: this.sensorType.value, x: -1, y: -1});
+					sensorsOnOverview.push({index: temp, id: this.value.sensorId.value, type: this.value.sensorType.value, x: -1, y: -1});
 				} else {
 					sensorsOnOverview[objIndex].index = temp;
-					sensorsOnOverview[objIndex].id = this.sensorId.value;			
-					sensorsOnOverview[objIndex].type = this.sensorType.value;	
+					sensorsOnOverview[objIndex].id = this.value.sensorId.value;			
+					sensorsOnOverview[objIndex].type = this.value.sensorType.value;	
 				}
 				temp++;
 			});

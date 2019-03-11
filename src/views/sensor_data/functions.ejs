@@ -7,17 +7,17 @@ function initSensorData(ngsiConnection) {
 			if (entity.type == "SensorAgent") {
 				$.each(entity.sensorData.value, function(i, sensor) {
 					var steppedLine = false;
-					$.each(sensor.readings.value, function(i, sensorValue) {
-						if (sensorValue.reading.type == "Boolean") {
+					$.each(sensor.value.readings.value, function(i, sensorValue) {
+						if (sensorValue.value.reading.type == "Boolean") {
 							steppedLine = true;
 						}
 					});
-					$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + sensor.sensorType.value + "</div><div class=\"panel-body\"><canvas id=\"" + sensor.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
-					var chartCanvas = document.getElementById(sensor.sensorId.value + "_Chart");
+					$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + sensor.value.sensorType.value + "</div><div class=\"panel-body\"><canvas id=\"" + sensor.value.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+					var chartCanvas = document.getElementById(sensor.value.sensorId.value + "_Chart");
 					var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
 					var chartOptions = {legend: {display: false},	scales: { yAxes: [{ ticks: { stepSize: 1 }}], xAxes: [{ type: 'time', time: { unit: 'minute', unitStepSize: 1, displayFormats: { 'minute': 'HH:mm' } } }] } };
 					var chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
-					sensorDataCharts.set(sensor.sensorId.value, chart);
+					sensorDataCharts.set(sensor.value.sensorId.value, chart);
 				});
 			}
 		});
@@ -28,33 +28,34 @@ function updateSensorData(notification) {
 	//console.log("Received notification: " + JSON.stringify(notification));					   
 	$.each(notification.data, function () {
 		$.each(this.sensorData.value, function () {			
-			var chart = sensorDataCharts.get(this.sensorId.value);							
+			var chart = sensorDataCharts.get(this.value.sensorId.value);							
 			if (typeof chart === "undefined") {							
 				var steppedLine = false;
-				$.each(this.readings.value, function() {
-					if (this.reading.type == "Boolean") {
+				$.each(this.value.readings.value, function() {
+					if (this.value.reading.type == "Boolean") {
 						steppedLine = true;
 					}
 				});
-				$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + this.sensorType.value + "</div><div class=\"panel-body\"><canvas id=\"" + this.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
-				var chartCanvas = document.getElementById(this.sensorId.value + "_Chart");
+				$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + this.value.sensorType.value + "</div><div class=\"panel-body\"><canvas id=\"" + this.value.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+				var chartCanvas = document.getElementById(this.value.sensorId.value + "_Chart");
 				var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
 				var chartOptions = {legend: {display: false},	scales: { yAxes: [{ ticks: { stepSize: 1 }}], xAxes: [{ type: 'time', time: { unit: 'minute', unitStepSize: 1, displayFormats: { 'minute': 'HH:mm' } } }] } };
 				chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
-				sensorDataCharts.set(this.sensorId.value, chart);
+				sensorDataCharts.set(this.value.sensorId.value, chart);
 			}
-			$.each(this.readings.value, function () {
+			var modifiedTime = this.value.modifiedTime.value;
+			$.each(this.value.readings.value, function () {
 				// FOR TESTING (remove all elements when test data starts from the beginning) -->
-				if (chart.data.labels.length > 0 && (this.modifiedTime.value < chart.data.labels[chart.data.labels.length-1])) {
+				if (chart.data.labels.length > 0 && (modifiedTime < chart.data.labels[chart.data.labels.length-1])) {
 					chart.data.labels = [];
 					chart.data.datasets.forEach((dataset) => {
 						dataset.data = [];
 					});
 				}
 				// <-- FOR TESTING
-				chart.data.labels.push(this.modifiedTime.value);
+				chart.data.labels.push(modifiedTime);
 				chart.data.datasets.forEach((dataset) => {
-					dataset.data.push(this.reading.value); // add new value
+					dataset.data.push(this.value.reading.value); // add new value
 				});
 				chart.update();											
 			});
