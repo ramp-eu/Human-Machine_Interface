@@ -37,10 +37,13 @@ function submitSettings() {
 				})
 
 			}
-		});			
-		showAndDismissAlert("success", "Settings saved succesfully!", "settingsAlert");
+		});
+		$("#generalAlert").html("");
+		showAndDismissAlert("success", "Settings saved!", "generalAlert");
 		console.log("Output:");
 		console.log(data);
+		//location.reload(true);
+		window.setTimeout(function(){window.location.reload(true)}, 3000);		
 	}).fail(function(xhr, status, err){
 		alert(xhr.responseText);
 	});
