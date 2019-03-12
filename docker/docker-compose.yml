@@ -7,14 +7,8 @@ services:
       - ./mongo/data:/data/db
       #WINDOWS
       #- mongo_db:/data/db:Z
-#  mongo-seed:
- #   build: ./mongo
-  #  links:
-   #   - mongodb
   app:
-    container_name: hminode
-    build: .
-    #image: l4ms/mod.sw.hmi:latest
+    image: l4ms/opil.sw.hmi:latest
     environment:
      - inituser=admin
      - initpw=admin
