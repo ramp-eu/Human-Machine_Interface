@@ -37,7 +37,7 @@ app.use(bodyParser.json()); // get information from html forms
 app.use(bodyParser.urlencoded({ extended: true }));
 
 i18n.expressBind(app, {
-	locales: ['en', 'fi'],
+	locales: ['en'],
 	defaultLocale: 'en',
 	extension: '.json',
 	cookieName: 'locale',
