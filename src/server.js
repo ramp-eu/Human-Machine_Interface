@@ -18,6 +18,8 @@ var configDB = require('./config/database.js');
 var i18n = require('i18n-2');
 //var cors = require('cors')
 var inituser = require('./config/inituser.js');
+var cleanup = require('./config/cleanup.js');
+var gracefulShutdown = require('http-graceful-shutdown');
 
 // configuration ===============================================================
 mongoose.Promise = global.Promise;
@@ -70,5 +72,18 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
 // launch ======================================================================
-app.listen(port);
+var server = app.listen(port);
 console.log('Server started at ' + new Date().toISOString() + ' on port ' + port);
+
+// this enables the graceful shutdown with advanced options
+gracefulShutdown(server,
+    {
+        signals: 'SIGINT SIGTERM',
+        timeout: 30000,
+        development: false,
+        onShutdown: cleanup.delTaskSpecs,
+        finally: function() {
+            console.log('Server gracefully shutted down.')
+        }
+    }
+);
