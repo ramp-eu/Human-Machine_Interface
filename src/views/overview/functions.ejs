@@ -77,26 +77,27 @@ function drawSensorsOnCanvas() {
 }
 
 function updateRobotsOnOverview(notification) {
-	
+		
 	if (typeof floorPlanImage !== "undefined") {
 
 		var temp = 1;
 		$.each(notification.data, function () {
 			var d = decodeURIComponent(this.status_channel.value);
 			var dObj = JSON.parse(d.replace(/\'/g, "\""));
+			//console.log(JSON.stringify(dObj));		
 			var ran_status = "unknown";
 			if (dObj.ran_status == 0) ran_status = "waiting";
 			else if (dObj.ran_status == 1) ran_status = "moving";
 			else if (dObj.ran_status == 2) ran_status = "acting";
 			var objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
-			if (objIndex == -1) {
+			if (objIndex == -1) {	
 				robotsOnOverview.push({index: temp, id: this.id, ran_status: ran_status, x: dObj.current_position.x, y: dObj.current_position.y, theta: dObj.current_position.theta});
-			} else {
+			} else {	
 				robotsOnOverview[objIndex].index = temp;
 				robotsOnOverview[objIndex].ran_status = ran_status;			
 				robotsOnOverview[objIndex].x = dObj.current_position.x;		
 				robotsOnOverview[objIndex].y = dObj.current_position.y;		
-				robotsOnOverview[objIndex].theta = current_position.theta;						
+				robotsOnOverview[objIndex].theta = dObj.current_position.theta;						
 			}
 			temp++;
 		});
