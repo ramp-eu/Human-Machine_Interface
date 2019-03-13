@@ -167,13 +167,15 @@ module.exports = function(app, passport) {
             if (err) return next(err);
             if (data.userid) {
                 data.password = null;
-                var ocb_url = 'http://' + req.params.ocb_host + ':' + req.params.ocb_port + '/v2/entities/' + data.userid;
-                request.del(ocb_url, function (err, resp, body) {
-                    if (err) return next(err);
-                    else if (resp.statusCode == 204) {
-                        res.send(data);
-                    } else res.status(resp.statusCode).send(body);
-                });
+                res.send(data);
+//Code block below was for creating HAN entity to Orion Context Broker
+//                 var ocb_url = 'http://' + req.params.ocb_host + ':' + req.params.ocb_port + '/v2/entities/' + data.userid;
+//                 request.del(ocb_url, function (err, resp, body) {
+//                     if (err) return next(err);
+//                     else if (resp.statusCode == 204) {
+//                         res.send(data);
+//                     } else res.status(resp.statusCode).send(body);
+//                 });
             }
             else res.status(404).send({ message: 'User not found.' });
         });
@@ -206,31 +208,46 @@ module.exports = function(app, passport) {
             if (err) return next(err);
             if (user) res.status(409).send({ message: 'This user id is already created.' });
             else {
-                var ocb_url = 'http://' + req.body.ocb_host + ':' + req.body.ocb_port + '/v2/entities';
-                request.post({url:ocb_url,
-                            json : true,
-                            body : {'id':req.body.userid, 'type':'HAN'}},
-                            function(err, resp, body) {
-                                if (err) return next(err);
-                                else if (resp.statusCode == 201) {
-                                    var newUser = new User();
-                                    newUser.userid      = req.body.userid;
-                                    newUser.password    = newUser.generateHash(req.body.password);
-                                    newUser.role        = req.body.role;
-                                    newUser.name        = req.body.name;
+                var newUser = new User();
+                newUser.userid      = req.body.userid;
+                newUser.password    = newUser.generateHash(req.body.password);
+                newUser.role        = req.body.role;
+                newUser.name        = req.body.name;
 
-                                    newUser.save(function(err, data) {
-                                        if (err) return next(err);
-                                        if (data) {
-                                            data.password = null;
-                                            res.send(data);
-                                        }
-                                        else res.status(500).send({ message: 'User create failed.' });
-
-                                    });
-                                } else res.status(resp.statusCode).send(body);
-                            }
-                );
+                newUser.save(function(err, data) {
+                    if (err) return next(err);
+                    if (data) {
+                        data.password = null;
+                        res.send(data);
+                    }
+                    else res.status(500).send({ message: 'User create failed.' });
+                });
+//Code block below was for creating HAN entity to Orion Context Broker
+//                 var ocb_url = 'http://' + req.body.ocb_host + ':' + req.body.ocb_port + '/v2/entities';
+//                 request.post({url:ocb_url,
+//                             json : true,
+//                             body : {'id':req.body.userid, 'type':'HAN'}},
+//                             function(err, resp, body) {
+//                                 if (err) return next(err);
+//                                 else if (resp.statusCode == 201) {
+//                                     var newUser = new User();
+//                                     newUser.userid      = req.body.userid;
+//                                     newUser.password    = newUser.generateHash(req.body.password);
+//                                     newUser.role        = req.body.role;
+//                                     newUser.name        = req.body.name;
+// 
+//                                     newUser.save(function(err, data) {
+//                                         if (err) return next(err);
+//                                         if (data) {
+//                                             data.password = null;
+//                                             res.send(data);
+//                                         }
+//                                         else res.status(500).send({ message: 'User create failed.' });
+// 
+//                                     });
+//                                 } else res.status(resp.statusCode).send(body);
+//                             }
+//                 );
             }
         });
     });
