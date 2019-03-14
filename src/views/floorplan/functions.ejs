@@ -12,8 +12,14 @@ function submitForm() {
 	}).done(function( data ) {
 		console.log("Output:");
 		console.log( data );
-		$("#fileinfo").find("input[type=text], input[type=file], input[type=number], textarea").val("");							
-		loadImage(data.imgurl, data._id, data.name, data.scale, data.xoffset, data.yoffset);				
+		$("#fileinfo").find("input[type=text], input[type=file], input[type=number], textarea").val("");
+		floorPlanImage = new Image();
+		floorPlanImage.onload = function() {		
+			drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+			drawImageOnCanvas(floorPlanImage, "#floorplan");
+			$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + data.name + ", <strong>scale:</strong> " + data.scale + " cm/px, <strong>x-offset:</strong> " + data.xoffset + " px, <strong>y-offset:</strong> " + data.yoffset + " px</p>");
+		};
+		floorPlanImage.src = data.imgurl;					
 	}).fail(function(xhr, status, err){
 		alert(xhr.responseText);
 	});

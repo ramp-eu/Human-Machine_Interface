@@ -1,24 +1,25 @@
-function initTaskSpecifications(ngsiConnection) {
-	/*
+function initTaskSpecifications(ngsiConnection) {	
 	ngsiConnection.v2.listEntities({type: "TaskSpec"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
-			var taskId = entity.id;
-			var task = urldecode(entity.TaskSpec.value);
-			ngsiConnection.v2.listEntities({type: "TaskSpecState"}).then((response2) => {
-				var entities2 = response2.results;
-				$.each(entities2, function(i, entity2) {
-					if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == taskId) {		
-						var taskStatus = entity2.state.value;
-						var taskMessage = entity2.message.value;
-						var taskHTML = getTaskSpecificationHTML(taskId, taskStatus, taskMessage, task);		
-						$("#taskSpecifications").append(taskHTML);
-					}
+			if (entity.id !== undefined && entity.TaskSpec !== undefined) {
+				var taskId = entity.id;
+				var task = urldecode(entity.TaskSpec.value);
+				ngsiConnection.v2.listEntities({type: "TaskSpecState"}).then((response2) => {
+					var entities2 = response2.results;
+					var taskHTML = getTaskSpecificationHTML(taskId, "&nbsp;", "&nbsp;", task);	
+					$.each(entities2, function(i, entity2) {
+						if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == taskId) {		
+							var taskStatus = entity2.state.value;
+							var taskMessage = entity2.message.value;
+							taskHTML = getTaskSpecificationHTML(taskId, taskStatus, taskMessage, task);
+						}
+					});
+					$("#taskSpecifications").append(taskHTML);
 				});
-			});
+			}
 		});
-	});		
-    */	
+	});
 }
 
 function initCurrentTasks(ngsiConnection) {
@@ -53,26 +54,6 @@ function updateTaskSpecifications(notification) {
 				$("#taskSpecification_status_" + taskSpecId).html(taskStatusStr);
 				$("#Message_" + taskSpecId).html(taskMessage);
 			}
-			// delete the TaskSpec entity when the corresponding TaskSpecState entity arrives
-			$.ajax({
-				type: "GET",
-				url: "./api/config",
-				dataType: "json",
-				success: function (data) {					
-					var ngsiConnection = null;
-					$(data).each(function(i, item) {							
-						ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
-							ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
-						});
-					})
-					if (ngsiConnection != null) {			
-						ngsiConnection.v2.deleteEntity(taskSpecId).then(
-							(response) => {
-							}, (error) => {}
-						);
-					}
-				}
-			});
 		}			
 	});
 }
