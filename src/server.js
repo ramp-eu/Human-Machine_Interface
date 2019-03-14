@@ -83,7 +83,7 @@ gracefulShutdown(server,
         development: false,
         onShutdown: cleanup.delTaskSpecs,
         finally: function() {
-            console.log('Server gracefully shutted down.')
+            console.log('Server gracefully shut down at ' + new Date().toISOString());
         }
     }
 );
