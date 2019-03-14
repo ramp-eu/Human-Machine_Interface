@@ -49,12 +49,12 @@ function urlencode(str) {
 
 function urldecode(str) {
   str = (str + '');
-  str = str.replace(/!/g, '%21');
-  str = str.replace(/'/g, '%27');
-  str = str.replace(/\(/g, '%28');
-  str = str.replace(/\)/g, '%29');
-  str = str.replace(/\*/g, '%2A');
-  str = str.replace(/%20/g, '+');
+  str = str.replace(/%21/g, '!');
+  str = str.replace(/%27/g, '\'');
+  str = str.replace(/%28/g, '\(');
+  str = str.replace(/%29/g, '\)');
+  str = str.replace(/%2A/g, '\*');
+  str = str.replace(/\+/g, '%20');
   return decodeURIComponent(str);
 
 }
