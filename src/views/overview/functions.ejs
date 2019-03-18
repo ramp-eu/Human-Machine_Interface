@@ -12,22 +12,61 @@ function drawImageOnCanvas(img, targetCanvas) {
 	//$(targetCanvas).attr('height', parentHeight);			
 	$(targetCanvas).attr('height', 720);				
 
-	//alert("canvas.width: " + canvas.width);
-	//alert("img.width: " + img.width);
+	console.log("canvas.width: " + canvas.width);
+	console.log("img.width: " + img.width);
 
-	floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
+	//floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
+	floorPlanImageToWebPageScale = canvas.width / img.width;	
 	// get the top left position of the image
 	var x = (canvas.width / 2) - (img.width / 2) * floorPlanImageToWebPageScale;
 	//var y = (canvas.height / 2) - (img.height / 2) * floorPlanImageToWebPageScale;			
 	var y = 0; // no need to center the floor plan vertically
 	$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);  // resize the canvas smaller if the image is also smaller
-	ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);
+	ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);	
+	
+    var originScaleCanvas = $("#overviewFloorplanOriginScale")[0];
+	var ctx2 = originScaleCanvas.getContext("2d");
+	$("#overviewFloorplanOriginScale").attr('width', parentWidth-30);		
+	$("#overviewFloorplanOriginScale").attr('height', 12);	
+	var scaleText = "1 m"
+	var scaleDistance = ((100 / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+	var temp = 1;
+	while (scaleDistance < 50) {
+		temp++;
+		scaleText = temp + " m"
+		scaleDistance = ((100*temp / floorPlanImageScale)) * floorPlanImageToWebPageScale;		
+	}
+	while (scaleDistance > 300) {
+		temp = temp/2;
+		scaleText = temp + " m"
+		scaleDistance = ((100*temp / floorPlanImageScale)) * floorPlanImageToWebPageScale;		
+	}	
+		console.log(scaleDistance);
+	
+	ctx2.beginPath();
+	ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 10);
+	ctx2.lineTo(originScaleCanvas.width-20, 10);
+	ctx2.stroke();	
+	ctx2.beginPath();	
+	ctx2.moveTo(originScaleCanvas.width-20, 0);
+	ctx2.lineTo(originScaleCanvas.width-20, 10);
+	ctx2.stroke();	
+	ctx2.beginPath();	
+	ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 0);
+	ctx2.lineTo(originScaleCanvas.width-20-scaleDistance, 10);
+	ctx2.stroke();	
+	ctx2.font = "12px";
+	ctx2.fillStyle = "#000000";			
+	ctx2.fillText(scaleText, originScaleCanvas.width-20-scaleDistance-20, 10);	
+	ctx2.font = "12px";
+	ctx2.fillStyle = "#000000";			
+	ctx2.fillText("(0, 0)", 0, 10);		
 }
 
 function drawRobotsOnCanvas() {
-	$.each(robotsOnOverview, function(key, value) {		
-		var canvas = $("#overviewFloorplan")[0];
-		var ctx = canvas.getContext("2d");			
+	var canvas = $("#overviewFloorplan")[0];
+	var ctx = canvas.getContext("2d");	
+	$.each(robotsOnOverview, function(key, value) {					
 		var pointSize = 10;			
 		ctx.fillStyle = "blue";
 		ctx.beginPath();	
@@ -50,10 +89,11 @@ function drawRobotsOnCanvas() {
 }
 
 function drawSensorsOnCanvas() {
+	var canvas = $("#overviewFloorplan")[0];
+	var ctx = canvas.getContext("2d");	
 	$.each(sensorsOnOverview, function(key, value) {
 		if (value.x > 0 && value.y > 0) {
-			var canvas = $("#overviewFloorplan")[0];
-			var ctx = canvas.getContext("2d");			
+		
 			var pointSize = 10;			
 			ctx.fillStyle = "green";
 			ctx.beginPath();
@@ -73,7 +113,7 @@ function drawSensorsOnCanvas() {
 			}			
 			ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);		
 		}
-	});	
+	});
 }
 
 function updateRobotsOnOverview(notification) {
@@ -153,7 +193,7 @@ function setSensorLocation(event) {
 		var rect = canvas.getBoundingClientRect();
 		var sensorId = $("input[type=radio][name=sensorLocation]:checked").attr("id").replace("selectedSensor_", "");	
 		var x = ((event.clientX - rect.left) / floorPlanImageToWebPageScale - floorPlanImageXOffset) * floorPlanImageScale;
-		var y = (floorPlanImageYOffset + floorPlanImage.height - (event.clientY - rect.top) / floorPlanImageToWebPageScale) * floorPlanImageScale;			
+		var y = (floorPlanImageYOffset + floorPlanImage.height - (event.clientY - rect.top) / floorPlanImageToWebPageScale) * floorPlanImageScale;
 		var objIndex = sensorsOnOverview.findIndex((obj => obj.id == sensorId));
 		if (objIndex != -1) {
 			sensorsOnOverview[objIndex].x = Math.round(x);
