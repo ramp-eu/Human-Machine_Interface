@@ -12,9 +12,6 @@ function drawImageOnCanvas(img, targetCanvas) {
 	//$(targetCanvas).attr('height', parentHeight);			
 	$(targetCanvas).attr('height', 720);				
 
-	console.log("canvas.width: " + canvas.width);
-	console.log("img.width: " + img.width);
-
 	//floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
 	floorPlanImageToWebPageScale = canvas.width / img.width;	
 	// get the top left position of the image
@@ -41,8 +38,7 @@ function drawImageOnCanvas(img, targetCanvas) {
 		scaleText = temp + " m"
 		scaleDistance = ((100*temp / floorPlanImageScale)) * floorPlanImageToWebPageScale;		
 	}	
-		console.log(scaleDistance);
-	
+
 	ctx2.beginPath();
 	ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 10);
 	ctx2.lineTo(originScaleCanvas.width-20, 10);
@@ -121,23 +117,21 @@ function updateRobotsOnOverview(notification) {
 	if (typeof floorPlanImage !== "undefined") {
 
 		var temp = 1;
-		$.each(notification.data, function () {
-			var d = decodeURIComponent(this.status_channel.value);
-			var dObj = JSON.parse(d.replace(/\'/g, "\""));
-			//console.log(JSON.stringify(dObj));		
+		$.each(notification.data, function () {		
+			var dObj = this.status_channel.value;		
 			var ran_status = "unknown";
-			if (dObj.ran_status == 0) ran_status = "waiting";
-			else if (dObj.ran_status == 1) ran_status = "moving";
-			else if (dObj.ran_status == 2) ran_status = "acting";
+			if (dObj.ran_status.value == 0) ran_status = "waiting";
+			else if (dObj.ran_status.value == 1) ran_status = "moving";
+			else if (dObj.ran_status.value == 2) ran_status = "acting";
 			var objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
 			if (objIndex == -1) {	
-				robotsOnOverview.push({index: temp, id: this.id, ran_status: ran_status, x: dObj.current_position.x, y: dObj.current_position.y, theta: dObj.current_position.theta});
+				robotsOnOverview.push({index: temp, id: this.id, ran_status: ran_status, x: dObj.agv_msg.value.current_position.value.x.value, y: dObj.agv_msg.value.current_position.value.y.value, theta: dObj.agv_msg.value.current_position.value.theta.value});
 			} else {	
 				robotsOnOverview[objIndex].index = temp;
 				robotsOnOverview[objIndex].ran_status = ran_status;			
-				robotsOnOverview[objIndex].x = dObj.current_position.x;		
-				robotsOnOverview[objIndex].y = dObj.current_position.y;		
-				robotsOnOverview[objIndex].theta = dObj.current_position.theta;						
+				robotsOnOverview[objIndex].x = dObj.agv_msg.value.current_position.value.x.value;		
+				robotsOnOverview[objIndex].y = dObj.agv_msg.value.current_position.value.y.value;		
+				robotsOnOverview[objIndex].theta = dObj.agv_msg.value.current_position.value.theta.value;						
 			}
 			temp++;
 		});
