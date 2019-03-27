@@ -66,36 +66,46 @@
         &quot;type&quot;: &quot;String&quot;,&#xd;
         &quot;value&quot;: &quot;2019-02-04T16:26:08.986785&quot;&#xd;
         },&#xd;
-      &quot;sensorData&quot;: {&#xd;
-        &quot;type&quot;: &quot;Array&quot;,&#xd;
+    &quot;sensorData&quot;: {&#xd;
+        &quot;type&quot;: &quot;array&quot;,&#xd;
         &quot;value&quot;: [&#xd;
             {&#xd;
-                &quot;manufacturer&quot;: {&#xd;
-                    &quot;type&quot;: &quot;String&quot;,&#xd;
-                    &quot;value&quot;: &quot;someguy&quot;&#xd;
-                },&#xd;
-                &quot;measurementType&quot;: {&#xd;
-                    &quot;type&quot;: &quot;String&quot;,&#xd;
-                    &quot;value&quot;: &quot;Object Presence&quot;&#xd;
-                },&#xd;
-                &quot;readings&quot;: {&#xd;
-                    &quot;type&quot;: &quot;Array&quot;,&#xd;
-                    &quot;value&quot;: [&#xd;
-                        {&#xd;
-                            &quot;reading&quot;: {&#xd;
-                                &quot;type&quot;: &quot;Boolean&quot;,&#xd;
-                                &quot;value&quot;: false&#xd;
+                &quot;type&quot;: &quot;SensorDataEntry&quot;,&#xd;
+                &quot;value&quot;: {&#xd;
+                    &quot;measurementType&quot;: {&#xd;
+                        &quot;type&quot;: &quot;string&quot;,&#xd;
+                        &quot;value&quot;: &quot;cartesian&quot;&#xd;
+                    },&#xd;
+                    &quot;modifiedTime&quot;: {&#xd;
+                        &quot;type&quot;: &quot;string&quot;,&#xd;
+                        &quot;value&quot;: &quot;2019-03-05T15:40:14.985275&quot;&#xd;
+                    },&#xd;
+                    &quot;readings&quot;: {&#xd;
+                        &quot;type&quot;: &quot;array&quot;,&#xd;
+                        &quot;value&quot;: [&#xd;
+                            {&#xd;
+                                &quot;type&quot;: &quot;SensorReading&quot;,&#xd;
+                                &quot;value&quot;: {&#xd;
+                                    &quot;reading&quot;: {&#xd;
+                                        &quot;type&quot;: &quot;boolean&quot;,&#xd;
+                                        &quot;value&quot;: true&#xd;
+                                    }&#xd;
+                                }&#xd;
                             }&#xd;
-                        }&#xd;
-                    ]&#xd;
-                },&#xd;
-                &quot;sensorId&quot;: {&#xd;
-                    &quot;type&quot;: &quot;String&quot;,&#xd;
-                    &quot;value&quot;: &quot;sim_1&quot;&#xd;
-                },&#xd;
-                &quot;sensorType&quot;: {&#xd;
-                    &quot;type&quot;: &quot;String&quot;,&#xd;
-                    &quot;value&quot;: &quot;Infrared Sensor&quot;&#xd;
+                        ]&#xd;
+                    },&#xd;
+                    &quot;sensorId&quot;: {&#xd;
+                        &quot;type&quot;: &quot;string&quot;,&#xd;
+                        &quot;value&quot;: &quot;sim_3&quot;&#xd;
+                    },&#xd;
+                    &quot;sensorManufacturer&quot;: {&#xd;
+                        &quot;type&quot;: &quot;string&quot;,&#xd;
+                        &quot;value&quot;: &quot;DummyCorp&quot;&#xd;
+                    },&#xd;
+                    &quot;sensorType&quot;: {&#xd;
+                        &quot;type&quot;: &quot;string&quot;,&#xd;
+                        &quot;value&quot;: &quot;mouse&quot;&#xd;
+                    }&#xd;
                 }&#xd;
             }&#xd;
         ]&#xd;
@@ -127,9 +137,9 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">5</stringProp>
+          <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">2</stringProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <longProp name="ThreadGroup.start_time">1550838240000</longProp>
         <longProp name="ThreadGroup.end_time">1550838240000</longProp>
@@ -489,6 +499,48 @@
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="DEL data" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value"></stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DEL data" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${IP_OCB}</stringProp>
+          <stringProp name="HTTPSampler.port">${PORT_OCB}</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/v2/entities/SAN_demo2</stringProp>
+          <stringProp name="HTTPSampler.method">DELETE</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
           <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
           <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
           <stringProp name="HTTPSampler.connect_timeout"></stringProp>
