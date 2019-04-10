@@ -1,0 +1,208 @@
+var ON_OFF_SENSOR = "On/off sensor";
+
+function createNewSensor() {
+	if ($("#new_sensor_agent_id").val() != "") {
+		$.ajax({
+			type: "GET",
+			url: "./api/config",
+			dataType: "json",
+			success: function (data) {					
+				var ngsiConnection = null;
+				$(data).each(function(i, item) {							
+					ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
+						ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
+					});
+				})
+				if (ngsiConnection != null) {
+					ngsiConnection.v2.createEntity({
+						"id": $("#new_sensor_agent_id").val(),
+						"type": "SensorAgent",
+						"sensorData": {
+								"type": "array",
+								"value": [
+									{
+										"type": "SensorDataEntry",
+										"value": {
+											"measurementType": {
+												"type": "string",
+												//"value": $("#new_sensor_measurement_type").val()
+												"value": "-"
+											},
+											"modifiedTime": {
+												"type": "string",
+												"value": new Date().toISOString()
+											},
+											"readings": {
+												"type": "array",
+												"value": [													
+												]
+											},
+											"sensorId": {
+												"type": "string",
+												//"value": $("#new_sensor_id").val()
+												"value": $("#new_sensor_agent_id").val()  // IN ORDER FOR THE SENSOR DATA PAGE TO WORK PROPERLY
+											},
+											"sensorManufacturer": {
+												"type": "string",
+												//"value": $("#new_sensor_manufacturer").val()
+												"value": "-"
+											},
+											"sensorType": {
+												"type": "string",
+												//"value": $("#new_sensor_type").val()
+												"value": ON_OFF_SENSOR
+											}
+										}
+									}
+								]
+							}
+					}).then(
+						(response) => {
+							// Entity created successfully
+							var booleanSensorHTML = "<tr id=\"booleanSensor_" + $("#new_sensor_agent_id").val() + "\">" + getBooleanSensorRowHTML($("#new_sensor_agent_id").val(), "", "", $("#new_sensor_agent_id").val(), ON_OFF_SENSOR, "") + "</tr>";
+							$("#currentBooleanSensors").append(booleanSensorHTML);
+							$("#booleanToggle_" + $("#new_sensor_agent_id").val()).bootstrapToggle();							
+							$("#new_sensor_agent_id").val("");							
+							//$("#new_sensor_measurement_type").val("");
+							//$("#new_sensor_id").val("");
+							//$("#new_sensor_manufacturer").val("");
+							//$("#new_sensor_type").val("");							
+							showAndDismissAlert("success", "New sensor created succesfully!", "sensorsAlert");
+						}, (error) => {
+							console.log(error);
+							// Error creating the entity
+							showAndDismissAlert("danger", "There was an error creating the sensor (" + error + ")!", "sensorsAlert");
+						}
+					);
+				}
+			}
+		});
+	} else {
+		showAndDismissAlert("danger", "Id field is required.", "sensorsAlert");		
+	}
+}
+
+function initSensors(ngsiConnection) {	
+	ngsiConnection.v2.listEntities({type: "SensorAgent"}).then((response) => {
+		var entities = response.results;
+		$.each(entities, function(i, entity) {
+			var sensorAgentId = entity.id;
+			$.each(entity.sensorData.value, function(i, sensor) {				
+				var sensorValue = false;
+				var manufacturer = sensor.value.sensorManufacturer.value;
+				var measurementType = sensor.value.measurementType.value;
+				var sensorId = sensor.value.sensorId.value;
+				var sensorType = sensor.value.sensorType.value;				
+				if (sensorType == ON_OFF_SENSOR) {
+					$.each(sensor.value.readings.value, function(i, sensorValue) {
+						if (sensorValue.value.reading.type == "Boolean" || sensorValue.value.reading.type == "boolean") {
+							sensorValue = sensorValue.value.reading.value;					
+						}
+					});
+					var checked = "";
+					if (sensorValue == true) {
+						checked = "checked";
+					}
+					var booleanSensorHTML = "<tr id=\"booleanSensor_" + sensorAgentId + "\">" + getBooleanSensorRowHTML(sensorAgentId, manufacturer, measurementType, sensorId, sensorType, checked) + "</tr>";
+					$("#currentBooleanSensors").append(booleanSensorHTML);
+					$("#booleanToggle_" + sensorAgentId).bootstrapToggle();					
+				}
+			});
+		});
+	});			
+	$('#currentBooleanSensors').on('change', 'input[type=checkbox]', function(e) {
+        //console.log(this.id.substr("booleanToggle_".length) + " is " + this.checked);		
+		ngsiConnection.v2.replaceEntityAttributeValue({
+			id: this.id.substr("booleanToggle_".length),
+			attribute: "sensorData",
+			value: [
+				{
+					"type": "SensorDataEntry",
+					"value": {
+						"measurementType": {
+							"type": "string",
+							"value": "-"
+						},
+						"modifiedTime": {
+							"type": "string",
+							"value": new Date().toISOString()
+						},
+						"readings": {
+							"type": "array",
+							"value": [
+								{
+									"type": "SensorReading",
+									"value": {
+										"reading": {
+											"type": "boolean",
+											"value": this.checked
+										}
+									}
+								}
+							]
+						},
+						"sensorId": {
+							"type": "string",
+							"value": this.id.substr("booleanToggle_".length)
+						},
+						"sensorManufacturer": {
+							"type": "string",
+							"value": "-"
+						},
+						"sensorType": {
+							"type": "string",
+							"value": ON_OFF_SENSOR
+						}
+					}
+				}
+			]
+		}).then(
+			(response) => {
+				// Entity value replaced successfully
+				// response.value entity value
+				// response.correlator transaction id associated with the server response
+			}, (error) => {
+				// Error replacing attribute value
+				// If the error was reported by Orion, error.correlator will be
+				// filled with the associated transaction id
+			}
+		);
+    });
+}
+
+function updateSensors(notification) {						
+	//console.log("Received notification: " + JSON.stringify(notification));					   
+	$.each(notification.data, function () {
+		var sensorAgentId = this.id;
+		$.each(this.sensorData.value, function () {						
+			var manufacturer = ""; // this.value.sensorManufacturer.value;	
+			var measurementType = ""; // this.value.measurementType.value;	
+			var sensorId = ""; // this.value.sensorId.value;	
+			var sensorType = this.value.sensorType.value;	
+			if (sensorType == ON_OFF_SENSOR) {	
+				var sensorValue = false;	
+				$.each(this.value.readings.value, function() {						
+					if (this.value.reading.type == "Boolean" || this.value.reading.type == "boolean") {				
+						sensorValue = this.value.reading.value;					
+					}
+				});
+				var checked = "";
+				if (sensorValue == true) {
+					checked = "checked";
+				}
+				var booleanSensorHTML = getBooleanSensorRowHTML(sensorAgentId, manufacturer, measurementType, sensorId, sensorType, checked);
+				if ($("#booleanSensor_" + sensorAgentId).length) {
+					$("#booleanSensor_" + sensorAgentId).html(booleanSensorHTML);
+				} else {
+					$("#currentBooleanSensors").append("<tr id=\"booleanSensor_" + sensorAgentId + "\">" + booleanSensorHTML + "</tr>");
+				}
+				$("#booleanToggle_" + sensorAgentId).bootstrapToggle();			
+			}
+		});
+	});	
+}
+
+function getBooleanSensorRowHTML(sensorAgentId, manufacturer, measurementType, sensorId, sensorType, checked) {
+	//return "<td>" + sensorAgentId + "</td><td>" + manufacturer + "</td><td>" + measurementType + "</td><td>" + sensorId + "</td><td>" + sensorType + "</td><td><input id=\"booleanToggle_" + sensorAgentId + "_" + sensorId + "\" class=\"booleanToggle\" type=\"checkbox\" " + checked + "></td>";
+	return "<td>" + sensorAgentId + "</td><td><input id=\"booleanToggle_" + sensorAgentId + "\" class=\"booleanToggle\" type=\"checkbox\" " + checked + "></td>";
+}

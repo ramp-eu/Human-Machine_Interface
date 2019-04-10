@@ -1,0 +1,60 @@
+<% if (user && user.role == "admin") { %> 
+
+<div id="sensorsAlert"></div>
+
+<div class="well ownborder">
+    <h3>Create new on/off sensor</h3>	
+	<form>	
+		<div class="form-group">
+			<label for="new_sensor_name">Sensor Agent Id</label>
+			<input type="text" class="form-control" id="new_sensor_agent_id" name="new_sensor_agent_id" aria-describedby="new_sensor_agent_idHelp" placeholder="Enter sensor agent id for the sensor">
+			<small id="new_sensor_agent_idHelp" class="form-text text-muted">Please, enter the sensor agent id for the sensor.</small>
+		</div>
+		<!--
+		<div class="form-group">
+			<label for="new_sensor_manufacturer">Manufacturer</label>
+			<input type="text" class="form-control" id="new_sensor_manufacturer" name="new_sensor_manufacturer" aria-describedby="new_sensor_manufacturerHelp" placeholder="Enter manufacturer for the sensor">		
+			<small id="new_sensor_manufacturerHelp" class="form-text text-muted">Please, enter the manufacturer for the sensor.</small>
+		</div>
+		<div class="form-group">
+			<label for="new_sensor_measurement_type">Measurement Type</label>
+			<input type="text" class="form-control" id="new_sensor_measurement_type" name="new_sensor_measurement_type" aria-describedby="new_sensor_measurement_typeHelp" placeholder="Enter measurement type for the sensor">		
+			<small id="new_sensor_measurement_typeHelp" class="form-text text-muted">Please, enter the measurement type for the sensor.</small>
+		</div>
+		<div class="form-group">
+			<label for="new_sensor_id">Sensor Id</label>
+			<input type="text" class="form-control" id="new_sensor_id" name="new_sensor_id" aria-describedby="new_sensor_idHelp" placeholder="Enter id for the sensor">		
+			<small id="new_sensor_idHelp" class="form-text text-muted">Please, enter the id for the sensor.</small>
+		</div>
+		<div class="form-group">
+			<label for="new_sensor_type">Sensor Type</label>
+			<input type="text" class="form-control" id="new_sensor_type" name="new_sensor_type" aria-describedby="new_sensor_typeHelp" placeholder="Enter type for the sensor">		
+			<small id="new_sensor_typeHelp" class="form-text text-muted">Please, enter the type of the sensor.</small>
+		</div>		
+		-->
+		<div class="form-group">						
+			<button class="btn btn-primary" id="createNewSensor">Create new sensor</button>
+		</div>		
+	</form>
+</div>
+
+<% } %>
+
+<div class="well ownborder">
+	<h3>Current on/off sensors</h3>
+	<table class="table table-responsive">
+		<thead>
+			<tr>
+				<th scope="col">SensorAgent Id</th>
+				<!--
+				<th scope="col">Manufacturer</th>
+				<th scope="col">Measurement Type</th>
+				<th scope="col">Sensor Id</th>				
+				<th scope="col">Sensor Type</th>
+				-->
+				<th scope="col">&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody id="currentBooleanSensors"></tbody>
+	</table>
+</div>

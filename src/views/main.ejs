@@ -12,12 +12,15 @@
 		<!-- Optional theme -->
         <link rel="stylesheet" href="/css/bootstrap-theme.min.css">	
         <link rel="stylesheet" href="/css/style.css">			
+        <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">			
+
 
 		<script src="/js/NGSI.js"></script> 
 		<script src="/js/jquery-3.3.1.min.js"></script> 		
 		<script src="/js/bootstrap.min.js"></script> 	
 		<script src="/js/bootbox.min.js"></script> 			
 		<script src="/js/Chart.bundle.min.js"></script>
+		<script src="/js/bootstrap-toggle.min.js"></script>
  
 		<script>
 		
@@ -35,6 +38,13 @@
 					sendTaskSpecification();
 					return false;
 				});			
+				
+				<% if (user && user.role == "admin") { %>
+				$("#createNewSensor").click(function() {
+					createNewSensor();
+					return false;
+				});	
+				<% } %>				
 			});	
 			
 			function startSubscriptions() {
@@ -101,6 +111,7 @@
 										initTaskSpecifications(ngsiConnection);						    
 										initCurrentTasks(ngsiConnection);										
 										initRobotsTable(ngsiConnection);									
+										initSensors(ngsiConnection);	
 										initSensorData(ngsiConnection);		
 										<% if (user && user.role == "admin") { %>
 											initSystemSettings();
@@ -170,6 +181,7 @@
 											"notification": {
 												"callback": function (notification) {
 													updateSensorsOnOverview(notification);
+													updateSensors(notification);	
 													updateSensorData(notification);					
 												},
 												"attrs": [ "sensorData" ]
@@ -196,6 +208,7 @@
 			<% include ./floorplan/functions.ejs %>		
 			<% include ./task_management/functions.ejs %>
 			<% include ./robots/functions.ejs %>
+			<% include ./sensors/functions.ejs %>				
 			<% include ./sensor_data/functions.ejs %>		
 			<% if (user && user.role == "admin") { %>
 				<% include ./system_settings/functions.ejs %>		
@@ -218,7 +231,8 @@
 				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan Management</a></li>	
 				<li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>						
 				<li><a href="#robotsTab" role="tab" data-toggle="tab">Robots</a></li>
-				<li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>
+				<li><a href="#sensorsTab" role="tab" data-toggle="tab">Sensors</a></li>				
+				<li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>			
 				<% if (user && user.role == "admin") { %>  
 				<li><a href="#usersTab" role="tab" data-toggle="tab">User Management</a></li>					
 				<li><a href="#settingsTab" role="tab" data-toggle="tab">System Settings</a></li>				
@@ -233,11 +247,13 @@
 				</div>
 				<div class="tab-pane" id="taskManagementTab" style="margin-top:0px;">
 					<% include ./task_management/tabContent.ejs %>				
-
 				</div>			
 				<div class="tab-pane" id="robotsTab" style="margin-top:-10px;">
 					<% include ./robots/tabContent.ejs %>			
-				</div>			
+				</div>						
+				<div class="tab-pane" id="sensorsTab" style="margin-top:10px;">
+					<% include ./sensors/tabContent.ejs %>
+				</div> 					
 				<div class="tab-pane" id="sensorDataTab" style="margin-top:10px;">
 					<% include ./sensor_data/tabContent.ejs %>
 				</div> 			
@@ -253,24 +269,3 @@
 		</div>
 	</body>
 </html>
-
-<!-- TODO:
-- Uploading a layout (PNG)
-- Entering the scale (cm/px) for transformation, x-y-offset 
-- (orientation will be done by SystemIntegrator) 
-
-- Adding Sensors to the layout, including mapping-name to sensor id, appearance type (button, occupancy, ...), position, ...
-
-- Displaying a layout     
-- Displaying objects (agvs, sensors)
-- Displaying the current position (x,y,theta) of the AGV in the HMI
-- Displaying locations (palette position, charging, ...) (static)
-- Displaying x-y-coordinates of objects(agvs, sensors)
-
-- storing/retrieving of layout, scale and x-y-offset, configurations inside a database
-
-- task specification text editor (first draft for copy/paste)
-
-- custom user interface for engino use case will have individual Sensor Buttons to send the San entity (create/update needed)
-  -- entities provided by SAN
--->	
