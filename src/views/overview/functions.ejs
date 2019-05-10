@@ -27,6 +27,7 @@ function drawImageOnCanvas(img, targetCanvas) {
 	$("#overviewFloorplanOriginScale").attr('height', 12);	
 	var scaleText = "1 m"
 	var scaleDistance = ((100 / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+	/*
 	var temp = 1;
 	while (scaleDistance < 50) {
 		temp++;
@@ -37,7 +38,8 @@ function drawImageOnCanvas(img, targetCanvas) {
 		temp = temp/2;
 		scaleText = temp + " m"
 		scaleDistance = ((100*temp / floorPlanImageScale)) * floorPlanImageToWebPageScale;		
-	}	
+	}
+	*/
 
 	ctx2.beginPath();
 	ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 10);
@@ -54,9 +56,13 @@ function drawImageOnCanvas(img, targetCanvas) {
 	ctx2.font = "12px";
 	ctx2.fillStyle = "#000000";			
 	ctx2.fillText(scaleText, originScaleCanvas.width-20-scaleDistance-20, 10);	
-	ctx2.font = "12px";
-	ctx2.fillStyle = "#000000";			
-	ctx2.fillText("(0, 0)", 0, 10);		
+
+	var xOrigin = floorPlanImageXOffset * floorPlanImageToWebPageScale;
+	var yOrigin = floorPlanImage.height - floorPlanImageYOffset * floorPlanImageToWebPageScale;			
+	ctx.font = "14px";	
+	ctx.fillStyle = "blue";	
+	//ctx.fillStyle = "#000000";	
+	ctx.fillText("[0, 0]", xOrigin, yOrigin);		
 }
 
 function drawRobotsOnCanvas() {

@@ -17,7 +17,64 @@ function initSensorData(ngsiConnection) {
 				$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + sensor.value.sensorId.value + " (" + sensor.value.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + sensor.value.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
 				var chartCanvas = document.getElementById(sensor.value.sensorId.value + "_Chart");
 				var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
-				var chartOptions = {legend: {display: false},	scales: { yAxes: [{ ticks: { stepSize: 1 }}], xAxes: [{ type: 'time', time: { unit: 'minute', unitStepSize: 1, displayFormats: { 'minute': 'HH:mm' } } }] } };
+				var chartOptions =
+					{
+						legend: {
+							display: false
+						},
+						scales: {
+							yAxes:
+								[{ 
+									ticks: {
+										stepSize: 1
+									}
+								}],
+							xAxes:
+								[{
+									type: 'realtime',
+									time: {
+										unit: 'minute',
+										unitStepSize: 1,
+										displayFormats: { 'minute': 'HH:mm' }
+									},
+									realtime: {
+										duration: 20000,    // data in the past 20000 ms will be displayed
+										refresh: 1000,      // onRefresh callback will be called every 1000 ms
+										delay: 0,        // delay of 1000 ms, so upcoming values are known before plotting a line
+										pause: false,       // chart is not paused
+										ttl: 60000,     // data will be automatically deleted as it disappears off the chart
+
+										// a callback to update datasets
+										onRefresh: function(chart) {}
+									}
+								}]
+						},
+						plugins: {
+							streaming: {            // per-chart option
+								frameRate: 30       // chart is drawn 30 times every second
+							}
+						},
+						pan: {
+							enabled: true,    // Enable panning
+							mode: 'x',        // Allow panning in the x direction
+							rangeMin: {
+								x: null       // Min value of the delay option
+							},
+							rangeMax: {
+								x: null       // Max value of the delay option
+							}
+						},
+						zoom: {
+							enabled: true,    // Enable zooming
+							mode: 'x',        // Allow zooming in the x direction
+							rangeMin: {
+								x: null       // Min value of the duration option
+							},
+							rangeMax: {
+								x: null       // Max value of the duration option
+							}
+						}
+					};
 				var chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
 				sensorDataCharts.set(sensor.value.sensorId.value, chart);
 			});
@@ -43,7 +100,63 @@ function updateSensorData(notification) {
 				$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + this.value.sensorId.value + " (" + this.value.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + this.value.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
 				var chartCanvas = document.getElementById(this.value.sensorId.value + "_Chart");
 				var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
-				var chartOptions = {legend: {display: false},	scales: { yAxes: [{ ticks: { stepSize: 1 }}], xAxes: [{ type: 'time', time: { unit: 'minute', unitStepSize: 1, displayFormats: { 'minute': 'HH:mm' } } }] } };
+				var chartOptions =
+					{
+						legend: {
+							display: false
+						},
+						scales: {
+							yAxes: [{
+								ticks: {
+									stepSize: 1
+								}}],
+							xAxes: [{
+								type: 'realtime',
+								time: {
+									unit: 'minute',
+									unitStepSize: 1,
+									displayFormats:	{
+										'minute': 'HH:mm'
+									}
+								},
+								realtime: {
+									duration: 20000,    // data in the past 20000 ms will be displayed
+									refresh: 1000,      // onRefresh callback will be called every 1000 ms
+									delay: 0,        // delay of 1000 ms, so upcoming values are known before plotting a line
+									pause: false,       // chart is not paused
+									ttl: 60000,     // data will be automatically deleted as it disappears off the chart
+
+									// a callback to update datasets
+									onRefresh: function(chart) {}
+								}
+							}]
+						},
+						plugins: {
+							streaming: {            // per-chart option
+								frameRate: 30       // chart is drawn 30 times every second
+							}
+						},
+						pan: {
+							enabled: true,    // Enable panning
+							mode: 'x',        // Allow panning in the x direction
+							rangeMin: {
+								x: null       // Min value of the delay option
+							},
+							rangeMax: {
+								x: null       // Max value of the delay option
+							}
+						},
+						zoom: {
+							enabled: true,    // Enable zooming
+							mode: 'x',        // Allow zooming in the x direction
+							rangeMin: {
+								x: null       // Min value of the duration option
+							},
+							rangeMax: {
+								x: null       // Max value of the duration option
+							}
+						}						
+					};
 				chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
 				sensorDataCharts.set(this.value.sensorId.value, chart);
 			}
@@ -63,7 +176,10 @@ function updateSensorData(notification) {
 				chart.data.datasets.forEach((dataset) => {
 					dataset.data.push(this.value.reading.value); // add new value
 				});
-				chart.update();											
+				//chart.update();											
+				chart.update({
+                    preservation: true
+                });
 			});
 		});
 	});	
