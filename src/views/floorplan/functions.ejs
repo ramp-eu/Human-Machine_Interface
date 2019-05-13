@@ -12,6 +12,9 @@ function submitForm() {
 	}).done(function( data ) {
 		console.log("Output:");
 		console.log( data );
+		floorPlanImageScale = $("#floorplanScaleInput").val();
+		floorPlanImageXOffset = $("#floorplanXOffsetInput").val();
+		floorPlanImageYOffset = $("#floorplanYOffsetInput").val();
 		$("#fileinfo").find("input[type=text], input[type=file], input[type=number], textarea").val("");
 		floorPlanImage = new Image();
 		floorPlanImage.onload = function() {		
@@ -19,7 +22,7 @@ function submitForm() {
 			drawImageOnCanvas(floorPlanImage, "#floorplan");
 			$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + data.name + ", <strong>scale:</strong> " + data.scale + " cm/px, <strong>x-offset:</strong> " + data.xoffset + " px, <strong>y-offset:</strong> " + data.yoffset + " px</p>");
 		};
-		floorPlanImage.src = data.imgurl;					
+		floorPlanImage.src = data.imgurl;
 	}).fail(function(xhr, status, err){
 		alert(xhr.responseText);
 	});

@@ -10,15 +10,15 @@ function drawImageOnCanvas(img, targetCanvas) {
 	$(targetCanvas).attr('width', parentWidth-30);
 	//var parentHeight = $(targetCanvas).parent().outerHeight();
 	//$(targetCanvas).attr('height', parentHeight);			
-	$(targetCanvas).attr('height', 720);				
-
+	//$(targetCanvas).attr('height', 720);				
 	//floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
 	floorPlanImageToWebPageScale = canvas.width / img.width;	
+	$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);	
 	// get the top left position of the image
 	var x = (canvas.width / 2) - (img.width / 2) * floorPlanImageToWebPageScale;
 	//var y = (canvas.height / 2) - (img.height / 2) * floorPlanImageToWebPageScale;			
 	var y = 0; // no need to center the floor plan vertically
-	$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);  // resize the canvas smaller if the image is also smaller
+	//$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);  // resize the canvas smaller if the image is also smaller
 	ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);	
 	
     var originScaleCanvas = $("#overviewFloorplanOriginScale")[0];
@@ -58,12 +58,67 @@ function drawImageOnCanvas(img, targetCanvas) {
 	ctx2.fillText(scaleText, originScaleCanvas.width-20-scaleDistance-20, 10);	
 
 	var xOrigin = floorPlanImageXOffset * floorPlanImageToWebPageScale;
-	var yOrigin = (floorPlanImage.height - floorPlanImageYOffset) * floorPlanImageToWebPageScale;			
-	ctx.font = "16px";	
-	ctx.fillStyle = "blue";	
-	//ctx.fillStyle = "#000000";		
-	ctx.fillText(String.fromCharCode(parseInt("0x231E", 16)) + "0,0", xOrigin, yOrigin);		
-}
+	var yOrigin = (img.height - floorPlanImageYOffset) * floorPlanImageToWebPageScale;			
+	
+	if (xOrigin <= canvas.width / 2 && yOrigin <= canvas.height / 2) {  // top left corner -> draw zero point information below on the right side
+		ctx.fillStyle = "blue";	
+		ctx.strokeStyle = "blue";
+		ctx.beginPath();
+		ctx.moveTo(xOrigin+1, yOrigin+1);
+		ctx.lineTo(xOrigin+1, yOrigin+8);
+		ctx.stroke();	
+		ctx.beginPath();
+		ctx.moveTo(xOrigin+1, yOrigin+1);
+		ctx.lineTo(xOrigin+8, yOrigin+1);
+		ctx.stroke();		
+		ctx.font = "12px";	
+		ctx.textBaseline = "top"; 
+		ctx.fillText("0,0", xOrigin+5, yOrigin+5);
+	} else if (xOrigin <= canvas.width / 2 && yOrigin >= canvas.height / 2) {
+		ctx.fillStyle = "blue";	
+		ctx.strokeStyle = "blue";
+		ctx.beginPath();
+		ctx.moveTo(xOrigin+1, yOrigin-1);
+		ctx.lineTo(xOrigin+1, yOrigin-8);
+		ctx.stroke();	
+		ctx.beginPath();
+		ctx.moveTo(xOrigin+1, yOrigin-1);
+		ctx.lineTo(xOrigin+8, yOrigin-1);
+		ctx.stroke();		
+		ctx.font = "12px";
+		ctx.textBaseline = "bottom"; 
+		ctx.fillText("0,0", xOrigin+5, yOrigin-5);
+	} else if (xOrigin >= canvas.width / 2 && yOrigin <= canvas.height / 2) {  // top right corner -> draw zero point information below on the left side
+		ctx.fillStyle = "blue";	
+		ctx.strokeStyle = "blue";
+		ctx.beginPath();
+		ctx.moveTo(xOrigin-1, yOrigin+1);
+		ctx.lineTo(xOrigin-1, yOrigin+8);
+		ctx.stroke();	
+		ctx.beginPath();
+		ctx.moveTo(xOrigin-1, yOrigin+1);
+		ctx.lineTo(xOrigin-8, yOrigin+1);
+		ctx.stroke();		
+		ctx.font = "12px";	
+		ctx.textBaseline = "top"; 
+		ctx.fillText("0,0", xOrigin-20, yOrigin+5);
+	} else if (xOrigin >= canvas.width / 2 && yOrigin >= canvas.height / 2) {
+		ctx.fillStyle = "blue";	
+		ctx.strokeStyle = "blue";
+		ctx.beginPath();
+		ctx.moveTo(xOrigin-1, yOrigin-1);
+		ctx.lineTo(xOrigin-1, yOrigin-8);
+		ctx.stroke();	
+		ctx.beginPath();
+		ctx.moveTo(xOrigin-1, yOrigin-1);
+		ctx.lineTo(xOrigin-8, yOrigin-1);
+		ctx.stroke();		
+		ctx.font = "12px";
+		ctx.textBaseline = "bottom"; 
+		ctx.fillText("0,0", xOrigin-20, yOrigin-5);
+	}	 
+ 
+ }
 
 function drawRobotsOnCanvas() {
 	var canvas = $("#overviewFloorplan")[0];
