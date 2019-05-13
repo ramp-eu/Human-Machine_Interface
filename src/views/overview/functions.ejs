@@ -58,11 +58,11 @@ function drawImageOnCanvas(img, targetCanvas) {
 	ctx2.fillText(scaleText, originScaleCanvas.width-20-scaleDistance-20, 10);	
 
 	var xOrigin = floorPlanImageXOffset * floorPlanImageToWebPageScale;
-	var yOrigin = floorPlanImage.height - floorPlanImageYOffset * floorPlanImageToWebPageScale;			
-	ctx.font = "14px";	
+	var yOrigin = (floorPlanImage.height - floorPlanImageYOffset) * floorPlanImageToWebPageScale;			
+	ctx.font = "16px";	
 	ctx.fillStyle = "blue";	
-	//ctx.fillStyle = "#000000";	
-	ctx.fillText("[0, 0]", xOrigin, yOrigin);		
+	//ctx.fillStyle = "#000000";		
+	ctx.fillText(String.fromCharCode(parseInt("0x231E", 16)) + "0,0", xOrigin, yOrigin);		
 }
 
 function drawRobotsOnCanvas() {
