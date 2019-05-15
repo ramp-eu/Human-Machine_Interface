@@ -1,5 +1,7 @@
 var ON_OFF_SENSOR = "On/off sensor";
 
+var currentlyProcessing = new Array();
+
 function createNewSensor() {
 	if ($("#new_sensor_agent_id").val() != "") {
 		$.ajax({
@@ -59,9 +61,8 @@ function createNewSensor() {
 					}).then(
 						(response) => {
 							// Entity created successfully
-							var booleanSensorHTML = "<tr id=\"booleanSensor_" + $("#new_sensor_agent_id").val() + "\">" + getBooleanSensorRowHTML($("#new_sensor_agent_id").val(), "", "", $("#new_sensor_agent_id").val(), ON_OFF_SENSOR, "") + "</tr>";
-							$("#currentBooleanSensors").append(booleanSensorHTML);
-							$("#booleanToggle_" + $("#new_sensor_agent_id").val()).bootstrapToggle();							
+							var onOffSensorHTML = "<tr id=\"onOffSensor_" + $("#new_sensor_agent_id").val() + "\">" + getOnOffSensorRowHTML($("#new_sensor_agent_id").val(), "", "", $("#new_sensor_agent_id").val(), ON_OFF_SENSOR, "") + "</tr>";
+							$("#currentOnOffSensors").append(onOffSensorHTML);							
 							$("#new_sensor_agent_id").val("");							
 							//$("#new_sensor_measurement_type").val("");
 							//$("#new_sensor_id").val("");
@@ -83,6 +84,7 @@ function createNewSensor() {
 }
 
 function initSensors(ngsiConnection) {	
+
 	ngsiConnection.v2.listEntities({type: "SensorAgent"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
@@ -99,110 +101,182 @@ function initSensors(ngsiConnection) {
 							sensorValue = sensorValue.value.reading.value;					
 						}
 					});
-					var checked = "";
-					if (sensorValue == true) {
-						checked = "checked";
-					}
-					var booleanSensorHTML = "<tr id=\"booleanSensor_" + sensorAgentId + "\">" + getBooleanSensorRowHTML(sensorAgentId, manufacturer, measurementType, sensorId, sensorType, checked) + "</tr>";
-					$("#currentBooleanSensors").append(booleanSensorHTML);
-					$("#booleanToggle_" + sensorAgentId).bootstrapToggle();					
+					var onOffSensorHTML = "<tr id=\"onOffSensor_" + sensorAgentId + "\">" + getOnOffSensorRowHTML(sensorAgentId) + "</tr>";
+					$("#currentOnOffSensors").append(onOffSensorHTML);					
 				}
 			});
 		});
 	});			
-	$('#currentBooleanSensors').on('change', 'input[type=checkbox]', function(e) {
-        //console.log(this.id.substr("booleanToggle_".length) + " is " + this.checked);		
-		ngsiConnection.v2.replaceEntityAttributeValue({
-			id: this.id.substr("booleanToggle_".length),
-			attribute: "sensorData",
-			value: [
-				{
-					"type": "SensorDataEntry",
-					"value": {
-						"measurementType": {
-							"type": "string",
-							"value": "-"
-						},
-						"modifiedTime": {
-							"type": "string",
-							"value": new Date().toISOString()
-						},
-						"readings": {
-							"type": "array",
-							"value": [
-								{
-									"type": "SensorReading",
-									"value": {
-										"reading": {
-											"type": "boolean",
-											"value": this.checked
+	$('#currentOnOffSensors').on('click', 'input[type=button]', function(e) {
+		var sensorAgentId = this.id.substr("onOffSensorButton_".length);				
+		if (currentlyProcessing.indexOf(sensorAgentId) != -1) {
+			return;
+		} else {
+			currentlyProcessing.push(sensorAgentId);
+		
+			// first send true
+			ngsiConnection.v2.replaceEntityAttributeValue({
+				id: sensorAgentId,
+				attribute: "sensorData",
+				value: [
+					{
+						"type": "SensorDataEntry",
+						"value": {
+							"measurementType": {
+								"type": "string",
+								"value": "-"
+							},
+							"modifiedTime": {
+								"type": "string",
+								"value": new Date().toISOString()
+							},
+							"readings": {
+								"type": "array",
+								"value": [
+									{
+										"type": "SensorReading",
+										"value": {
+											"reading": {
+												"type": "boolean",
+												"value": true
+											}
 										}
 									}
-								}
-							]
-						},
-						"sensorId": {
-							"type": "string",
-							"value": this.id.substr("booleanToggle_".length)
-						},
-						"sensorManufacturer": {
-							"type": "string",
-							"value": "-"
-						},
-						"sensorType": {
-							"type": "string",
-							"value": ON_OFF_SENSOR
+								]
+							},
+							"sensorId": {
+								"type": "string",
+								"value": sensorAgentId
+							},
+							"sensorManufacturer": {
+								"type": "string",
+								"value": "-"
+							},
+							"sensorType": {
+								"type": "string",
+								"value": ON_OFF_SENSOR
+							}
 						}
 					}
+				]
+			}).then(
+				(response) => {				
+					// then send false:
+					ngsiConnection.v2.replaceEntityAttributeValue({
+						id: sensorAgentId,
+						attribute: "sensorData",
+						value: [
+							{
+								"type": "SensorDataEntry",
+								"value": {
+									"measurementType": {
+										"type": "string",
+										"value": "-"
+									},
+									"modifiedTime": {
+										"type": "string",
+										"value": new Date().toISOString()
+									},
+									"readings": {
+										"type": "array",
+										"value": [
+											{
+												"type": "SensorReading",
+												"value": {
+													"reading": {
+														"type": "boolean",
+														"value": false
+													}
+												}
+											}
+										]
+									},
+									"sensorId": {
+										"type": "string",
+										"value": sensorAgentId
+									},
+									"sensorManufacturer": {
+										"type": "string",
+										"value": "-"
+									},
+									"sensorType": {
+										"type": "string",
+										"value": ON_OFF_SENSOR
+									}
+								}
+							}
+						]
+					}).then(
+						(response) => {
+							currentlyProcessing = jQuery.grep(currentlyProcessing, function(value) {
+								return value != sensorAgentId;
+							});
+							// Entity value replaced successfully
+							// response.value entity value
+							// response.correlator transaction id associated with the server response
+						}, (error) => {
+							// Error replacing attribute value
+							// If the error was reported by Orion, error.correlator will be
+							// filled with the associated transaction id
+						}
+					);				
+					
+				}, (error) => {
+					// Error replacing attribute value
+					// If the error was reported by Orion, error.correlator will be
+					// filled with the associated transaction id
 				}
-			]
-		}).then(
-			(response) => {
-				// Entity value replaced successfully
-				// response.value entity value
-				// response.correlator transaction id associated with the server response
-			}, (error) => {
-				// Error replacing attribute value
-				// If the error was reported by Orion, error.correlator will be
-				// filled with the associated transaction id
-			}
-		);
+			);
+		}
     });
+	
+	$('#currentOnOffSensors').on('click', 'a.removeOnOffSensorButton', function(e) {	
+		event.stopPropagation();
+		if (confirm("Are you sure you want to delete?")) {
+			var sensorAgentId = this.id.substr("removeOnOffSensorButton_".length)
+			ngsiConnection.v2.deleteEntity(sensorAgentId).then(
+				(response) => {
+					$("#onOffSensor_" + sensorAgentId).remove();
+					// Entity deleted successfully
+					// response.correlator transaction id associated with the server response
+					showAndDismissAlert("success", "On/off sensor deleted succesfully!", "sensorsAlert");
+				}, (error) => {
+					// Error deleting the entity
+					// If the error was reported by Orion, error.correlator will be
+					// filled with the associated transaction id
+					showAndDismissAlert("error", "There was an error deleting the on/off sensor: " + error + "!", "sensorsAlert");
+				}
+			);
+		} else {}       
+		event.preventDefault();
+	});
+	
 }
 
 function updateSensors(notification) {						
 	//console.log("Received notification: " + JSON.stringify(notification));					   
 	$.each(notification.data, function () {
 		var sensorAgentId = this.id;
-		$.each(this.sensorData.value, function () {						
-			var manufacturer = ""; // this.value.sensorManufacturer.value;	
-			var measurementType = ""; // this.value.measurementType.value;	
-			var sensorId = ""; // this.value.sensorId.value;	
-			var sensorType = this.value.sensorType.value;	
-			if (sensorType == ON_OFF_SENSOR) {	
-				var sensorValue = false;	
-				$.each(this.value.readings.value, function() {						
-					if (this.value.reading.type == "Boolean" || this.value.reading.type == "boolean") {				
-						sensorValue = this.value.reading.value;					
-					}
-				});
-				var checked = "";
-				if (sensorValue == true) {
-					checked = "checked";
-				}
-				var booleanSensorHTML = getBooleanSensorRowHTML(sensorAgentId, manufacturer, measurementType, sensorId, sensorType, checked);
-				if ($("#booleanSensor_" + sensorAgentId).length) {
-					$("#booleanSensor_" + sensorAgentId).html(booleanSensorHTML);
+		$.each(this.sensorData.value, function () {							
+			if (this.value.sensorType.value == ON_OFF_SENSOR) {
+				var onOffSensorHTML = getOnOffSensorRowHTML(sensorAgentId);
+				if ($("#onOffSensor_" + sensorAgentId).length) {
+					$("#onOffSensor_" + sensorAgentId).html(onOffSensorHTML);
 				} else {
-					$("#currentBooleanSensors").append("<tr id=\"booleanSensor_" + sensorAgentId + "\">" + booleanSensorHTML + "</tr>");
-				}
-				$("#booleanToggle_" + sensorAgentId).bootstrapToggle();			
+					$("#currentOnOffSensors").append("<tr id=\"onOffSensor_" + sensorAgentId + "\">" + onOffSensorHTML + "</tr>");
+				}	
 			}
 		});
 	});	
 }
 
-function getBooleanSensorRowHTML(sensorAgentId, manufacturer, measurementType, sensorId, sensorType, checked) {
+function getOnOffSensorRowHTML(sensorAgentId) {
 	//return "<td>" + sensorAgentId + "</td><td>" + manufacturer + "</td><td>" + measurementType + "</td><td>" + sensorId + "</td><td>" + sensorType + "</td><td><input id=\"booleanToggle_" + sensorAgentId + "_" + sensorId + "\" class=\"booleanToggle\" type=\"checkbox\" " + checked + "></td>";
-	return "<td>" + sensorAgentId + "</td><td><input id=\"booleanToggle_" + sensorAgentId + "\" class=\"booleanToggle\" type=\"checkbox\" " + checked + "></td>";
+	//return "<td>" + sensorAgentId + "</td><td><input id=\"booleanToggle_" + sensorAgentId + "\" class=\"booleanToggle\" type=\"checkbox\" " + checked + "></td>";
+	var htmlStr = "<td><input type=\"button\" id=\"onOffSensorButton_" + sensorAgentId + "\" value=\"" + sensorAgentId + "\"></input>";
+	<% if (user && user.role == "admin") { %> 
+		htmlStr += "&nbsp;(<a id=\"removeOnOffSensorButton_" + sensorAgentId + "\" class=\"removeOnOffSensorButton\" href=\"#\">delete</a>)";
+	<% } %>
+	htmlStr += "</td>";
+	return htmlStr;
 }
