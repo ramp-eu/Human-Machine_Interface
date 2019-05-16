@@ -14,7 +14,7 @@ function initSensorData(ngsiConnection) {
 						steppedLine = true;
 					}
 				});
-				$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + sensor.value.sensorId.value + " (" + sensor.value.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + sensor.value.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+				$("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + sensor.value.sensorId.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + sensor.value.sensorId.value + " (" + sensor.value.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + sensor.value.sensorId.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
 				var chartCanvas = document.getElementById(sensor.value.sensorId.value + "_Chart");
 				var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
 				var chartOptions =
