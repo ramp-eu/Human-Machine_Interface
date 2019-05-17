@@ -108,13 +108,14 @@ function initSensors(ngsiConnection) {
 			});
 		});
 	});			
-	$('#currentOnOffSensors').on('click', 'input[type=button]', function(e) {
-		var sensorId = this.id.substr("onOffSensorButton_".length);				
+	$('#currentOnOffSensors').on('click', 'a', function(e) {
+		var sensorId = this.id.substr("onOffSensorButton_".length);						
 		if (currentlyProcessing.indexOf(sensorId) != -1) {
-			return;
+			return false;
 		} else {
 			currentlyProcessing.push(sensorId);
-		
+			$("#onOffSensorButton_" + sensorId).toggleClass("hmi-button").toggleClass("hmi-button-disabled");	
+			
 			// first send true
 			ngsiConnection.v2.replaceEntityAttributeValue({
 				id: sensorId,
@@ -163,65 +164,67 @@ function initSensors(ngsiConnection) {
 			}).then(
 				(response) => {				
 					// then send false:
-					ngsiConnection.v2.replaceEntityAttributeValue({
-						id: sensorId,
-						attribute: "sensorData",
-						value: [
-							{
-								"type": "SensorDataEntry",
-								"value": {
-									"measurementType": {
-										"type": "string",
-										"value": "-"
-									},
-									"modifiedTime": {
-										"type": "string",
-										"value": new Date().toISOString()
-									},
-									"readings": {
-										"type": "array",
-										"value": [
-											{
-												"type": "SensorReading",
-												"value": {
-													"reading": {
-														"type": "boolean",
-														"value": false
+					setTimeout(function() {
+						ngsiConnection.v2.replaceEntityAttributeValue({
+							id: sensorId,
+							attribute: "sensorData",
+							value: [
+								{
+									"type": "SensorDataEntry",
+									"value": {
+										"measurementType": {
+											"type": "string",
+											"value": "-"
+										},
+										"modifiedTime": {
+											"type": "string",
+											"value": new Date().toISOString()
+										},
+										"readings": {
+											"type": "array",
+											"value": [
+												{
+													"type": "SensorReading",
+													"value": {
+														"reading": {
+															"type": "boolean",
+															"value": false
+														}
 													}
 												}
-											}
-										]
-									},
-									"sensorId": {
-										"type": "string",
-										"value": sensorId
-									},
-									"sensorManufacturer": {
-										"type": "string",
-										"value": "-"
-									},
-									"sensorType": {
-										"type": "string",
-										"value": ON_OFF_SENSOR
+											]
+										},
+										"sensorId": {
+											"type": "string",
+											"value": sensorId
+										},
+										"sensorManufacturer": {
+											"type": "string",
+											"value": "-"
+										},
+										"sensorType": {
+											"type": "string",
+											"value": ON_OFF_SENSOR
+										}
 									}
 								}
+							]
+						}).then(
+							(response) => {
+								currentlyProcessing = jQuery.grep(currentlyProcessing, function(value) {
+									return value != sensorId;
+								});
+								$("#onOffSensorButton_" + sensorId).toggleClass("hmi-button-disabled").toggleClass("hmi-button");		
+								// Entity value replaced successfully
+								// response.value entity value
+								// response.correlator transaction id associated with the server response
+							}, (error) => {
+								// Error replacing attribute value
+								// If the error was reported by Orion, error.correlator will be
+								// filled with the associated transaction id
 							}
-						]
-					}).then(
-						(response) => {
-							currentlyProcessing = jQuery.grep(currentlyProcessing, function(value) {
-								return value != sensorId;
-							});
-							// Entity value replaced successfully
-							// response.value entity value
-							// response.correlator transaction id associated with the server response
-						}, (error) => {
-							// Error replacing attribute value
-							// If the error was reported by Orion, error.correlator will be
-							// filled with the associated transaction id
-						}
-					);				
-					
+						);				
+					}, 1500);					
 				}, (error) => {
 					// Error replacing attribute value
 					// If the error was reported by Orion, error.correlator will be
@@ -262,9 +265,7 @@ function updateSensors(notification) {
 		$.each(this.sensorData.value, function () {							
 			if (this.value.sensorType.value == ON_OFF_SENSOR) {
 				var onOffSensorHTML = getOnOffSensorRowHTML(sensorId);
-				if ($("#onOffSensor_" + sensorId).length) {
-					$("#onOffSensor_" + sensorId).html(onOffSensorHTML);
-				} else {
+				if (!$("#onOffSensor_" + sensorId).length) {
 					$("#currentOnOffSensors").append("<tr id=\"onOffSensor_" + sensorId + "\">" + onOffSensorHTML + "</tr>");
 				}	
 			}
@@ -275,7 +276,8 @@ function updateSensors(notification) {
 function getOnOffSensorRowHTML(sensorId) {
 	//return "<td>" + sensorId + "</td><td>" + manufacturer + "</td><td>" + measurementType + "</td><td>" + sensorId + "</td><td>" + sensorType + "</td><td><input id=\"booleanToggle_" + sensorAgentId + "_" + sensorId + "\" class=\"booleanToggle\" type=\"checkbox\" " + checked + "></td>";
 	//return "<td>" + sensorId + "</td><td><input id=\"booleanToggle_" + sensorId + "\" class=\"booleanToggle\" type=\"checkbox\" " + checked + "></td>";
-	var htmlStr = "<td><input type=\"button\" class=\"btn btn-primary\" id=\"onOffSensorButton_" + sensorId + "\" value=\"" + sensorId + "\"></input>";
+	//var htmlStr = "<td><input type=\"button\" class=\"btn btn-primary\" id=\"onOffSensorButton_" + sensorId + "\" value=\"" + sensorId + "\"></input>";
+	var htmlStr = "<td><a href=\"#\" id=\"onOffSensorButton_" + sensorId + "\" class=\"hmi-button\">" + sensorId + "</a>";
 	<% if (user && user.role == "admin") { %> 
 		htmlStr += "&nbsp;(<a id=\"removeOnOffSensorButton_" + sensorId + "\" class=\"removeOnOffSensorButton\" href=\"#\">delete</a>)";
 	<% } %>

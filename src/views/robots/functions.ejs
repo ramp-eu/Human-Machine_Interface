@@ -22,6 +22,7 @@ function updateRobotsTable(notification) {
 		//if ($("#robottr"+this.id).length < 1) 
 		//    $("#robotsTbody").append("<tr id=\"robottr" + this.id + "\"class=\"clickable-row\"></tr>");
 		$("#robottr"+this.id).empty();
-		$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.agv_msg.value.current_position.value.x.value + "</td><td>" + dObj.agv_msg.value.current_position.value.y.value + "</td><td>" + dObj.agv_msg.value.current_position.value.theta.value + "</td>");
+		//console.log(dObj.agv_msg.value.current_position.value.theta.value);
+		$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.agv_msg.value.current_position.value.x.value + " mm</td><td>" + dObj.agv_msg.value.current_position.value.y.value + " mm</td><td>" + dObj.agv_msg.value.current_position.value.theta.value * (180/Math.PI) + "&#176;</td>");
 	});									
 }

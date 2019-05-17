@@ -6,3 +6,37 @@
     overflow-y: hidden;
 } 
 /* bootstrap hack end */
+
+a.hmi-button{
+    display: inline-block;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    background: #668ad8;/*Button Color*/
+    color: #FFF;
+    border-bottom: solid 4px #627295;
+    border-radius: 3px;
+}
+a.hmi-button:active {/*on Click*/
+    -ms-transform: translateY(4px);
+    -webkit-transform: translateY(4px);
+    transform: translateY(4px);/*Move down*/
+    border-bottom: none;/*disappears*/
+}
+
+a.hmi-button-disabled{
+    display: inline-block;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    background: gray;/*Button Color*/
+    color: #FFF;
+    border-bottom: solid 4px darkgray;
+    border-radius: 3px;	
+}
+a.hmi-button-disabled:active {/*on Click*/
+}
+
+a.disabled{
+	color: gray;
+    pointer-events: none;
+    cursor: default;
+}
