@@ -24,7 +24,9 @@ function submitForm() {
 		};
 		floorPlanImage.src = data.imgurl;
 	}).fail(function(xhr, status, err){
-		alert(xhr.responseText);
+		var responseText = JSON.parse(xhr.responseText);
+		showAndDismissAlert("danger", "An error occurred while uploading the floorplan: " + responseText.Message, "floorplanAlert");	
+		//alert(xhr.responseText);
 	});
 		return false;
 }
