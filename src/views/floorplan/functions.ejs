@@ -20,7 +20,7 @@ function submitForm() {
 		floorPlanImage.onload = function() {		
 			drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
 			drawImageOnCanvas(floorPlanImage, "#floorplan");
-			$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + data.name + ", <strong>scale:</strong> " + data.scale + " mm/px, <strong>x-offset:</strong> " + data.xoffset + " px, <strong>y-offset:</strong> " + data.yoffset + " px</p>");
+			$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + data.name + ", <strong>scale:</strong> " + data.scale + " m/px, <strong>x-offset:</strong> " + data.xoffset + " px, <strong>y-offset:</strong> " + data.yoffset + " px</p>");
 		};
 		floorPlanImage.src = data.imgurl;
 	}).fail(function(xhr, status, err){
