@@ -23,6 +23,20 @@ function initTaskSpecifications(ngsiConnection) {
 }
 
 function initCurrentTasks(ngsiConnection) {
+	ngsiConnection.v2.listEntities({type: "taskSet"}).then((response) => {
+		var entities = response.results;
+		$.each(entities, function(i, entity) {	
+			var currentTasks = entity.taskList.value;
+			$.each(currentTasks, function(i, currentTask) {
+				var taskValue = currentTask.value;
+				var currentTaskHTML = getCurrentTaskHTML(taskValue);
+				$("#currentTasks").append(taskHTML);			
+			});	
+		});
+	});					
+}
+
+function initOngoingTasks(ngsiConnection) {
 	ngsiConnection.v2.listEntities({type: "Task"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
@@ -30,8 +44,8 @@ function initCurrentTasks(ngsiConnection) {
 			var taskDescription = entity.taskName.value;
 			var taskStatus = entity.state.value;		
 			var time = entity.time.value;	
-			var taskHTML = getCurrentTaskHTML(taskId, taskDescription, taskStatus, time);
-			$("#currentTasks").append(taskHTML);			
+			var taskHTML = getOngoingTaskHTML(taskId, taskDescription, taskStatus, time);
+			$("#ongoingTasks").append(taskHTML);			
 		});
 	});					
 }
@@ -60,6 +74,21 @@ function updateTaskSpecifications(notification) {
 
 function updateCurrentTasks(notification) {							   
 	$.each(notification.data, function () {		
+		var currentTasks = this.taskList.value;
+		$.each(currentTasks, function(i, currentTask) {
+			var taskValue = currentTask.value;
+			var currentTaskHTML = getCurrentTaskHTML(taskValue);
+			if ($("#currentTask_" + taskValue).length) {
+				// already exists
+			} else {
+				$("#currentTasks").append(taskHTML);			
+			}
+		});	
+	});
+}
+
+function updateOngoingTasks(notification) {							   
+	$.each(notification.data, function () {		
 		var taskId = this.id;
 		var taskStatus = this.state.value;		
 		var taskStatusStr = "";
@@ -80,13 +109,13 @@ function updateCurrentTasks(notification) {
 		}		
 		var taskDescription = this.taskName.value;			
 		var time = this.time.value;			
-		if ($("#currentTask_" + taskId).length) {
-			$("#currentTask_status_" + taskId).html(taskStatusStr);
-			$("#currentTask_description_" + taskId).html(taskDescription);
-			$("#currentTask_time_" + taskId).html(time);
+		if ($("#ongoingTask_" + taskId).length) {
+			$("#ongoingTask_status_" + taskId).html(taskStatusStr);
+			$("#ongoingTask_description_" + taskId).html(taskDescription);
+			$("#ongoingTask_time_" + taskId).html(time);
 		} else {
-			var taskHTML = getCurrentTaskHTML(taskId, taskDescription, taskStatusStr, time);
-			$("#currentTasks").append(taskHTML);			
+			var taskHTML = getOngoingTaskHTML(taskId, taskDescription, taskStatusStr, time);
+			$("#ongoingTasks").append(taskHTML);			
 		}			
 	});
 }
@@ -96,8 +125,13 @@ function getTaskSpecificationHTML(taskId, taskStatus, taskMessage, task) {
 	/*<td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";*/
 }
 
-function getCurrentTaskHTML(taskId, taskDescription, taskStatus, time) {
-	return "<tr id=\"currentTask_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"currentTask_description_" + taskId + "\">" + taskDescription + "</td><td id=\"currentTask_status_" + taskId + "\">" + taskStatus + "</td><td id=\"currentTask_time_" + taskId + "\">" + time + "</td></tr>";
+function getCurrentTaskHTML(taskValue) {
+	return "<tr id=\"currentTask_" + taskValue + "\" class=\"clickable-row\"><td>" + taskValue + "</td></tr>";
+	/*<td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";*/
+}
+
+function getOngoingTaskHTML(taskId, taskDescription, taskStatus, time) {
+	return "<tr id=\"ongoingTask_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"ongoingTask_description_" + taskId + "\">" + taskDescription + "</td><td id=\"ongoingTask_status_" + taskId + "\">" + taskStatus + "</td><td id=\"ongoingTask_time_" + taskId + "\">" + time + "</td></tr>";
 	/*<td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";*/
 }
 

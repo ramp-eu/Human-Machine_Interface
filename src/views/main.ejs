@@ -141,10 +141,28 @@
 
 										ngsiConnection.v2.createSubscription({
 											"description": "Updating current tasks",
-											"subject": { "entities": [ { "idPattern": ".*", "type": "Task" } ] },
+											"subject": { "entities": [ { "idPattern": ".*", "type": "taskSet" } ] },
 											"notification": {
 												"callback": function (notification) {				   
 													updateCurrentTasks(notification);
+												}
+											},
+											//"expires": "2040-04-05T14:00:00.00Z",
+											//"throttling": 5
+										}).then(
+											(response) => {
+												//console.log("Created subscription: " + JSON.stringify(response));
+											}, (error) => {
+												//console.log(error);
+											}
+										);										
+										
+										ngsiConnection.v2.createSubscription({
+											"description": "Updating ongoing tasks",
+											"subject": { "entities": [ { "idPattern": ".*", "type": "Task" } ] },
+											"notification": {
+												"callback": function (notification) {				   
+													updateOngoingTasks(notification);
 												}
 											},
 											//"expires": "2040-04-05T14:00:00.00Z",
