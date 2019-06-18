@@ -160,27 +160,29 @@ function updateSensorData(notification) {
 				chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
 				sensorDataCharts.set(this.value.sensorId.value, chart);
 			}
-			var modifiedTime = this.value.modifiedTime.value;
-			$.each(this.value.readings.value, function () {
-				// FOR TESTING (remove all elements when test data starts from the beginning) -->
-				
-				if (chart.data.labels.length > 0 && (modifiedTime < chart.data.labels[chart.data.labels.length-1])) {
-					chart.data.labels = [];
+			if (typeof this.value.modifiedTime !== "undefined") {
+				var modifiedTime = this.value.modifiedTime.value;
+				$.each(this.value.readings.value, function () {
+					// FOR TESTING (remove all elements when test data starts from the beginning) -->
+					
+					if (chart.data.labels.length > 0 && (modifiedTime < chart.data.labels[chart.data.labels.length-1])) {
+						chart.data.labels = [];
+						chart.data.datasets.forEach((dataset) => {
+							dataset.data = [];
+						});
+					}
+					
+					// <-- FOR TESTING
+					chart.data.labels.push(modifiedTime);
 					chart.data.datasets.forEach((dataset) => {
-						dataset.data = [];
+						dataset.data.push(this.value.reading.value); // add new value
 					});
-				}
-				
-				// <-- FOR TESTING
-				chart.data.labels.push(modifiedTime);
-				chart.data.datasets.forEach((dataset) => {
-					dataset.data.push(this.value.reading.value); // add new value
+					//chart.update();											
+					chart.update({
+						preservation: true
+					});
 				});
-				//chart.update();											
-				chart.update({
-                    preservation: true
-                });
-			});
+			}
 		});
 	});	
 }
