@@ -20,6 +20,7 @@ var i18n = require('i18n-2');
 var inituser = require('./config/inituser.js');
 var cleanup = require('./config/cleanup.js');
 var gracefulShutdown = require('http-graceful-shutdown');
+var pjson = require('./package.json');
 
 // configuration ===============================================================
 mongoose.Promise = global.Promise;
@@ -73,7 +74,7 @@ require('./app/routes.js')(app, passport); // load our routes and pass in our ap
 
 // launch ======================================================================
 var server = app.listen(port);
-console.log('Server started at ' + new Date().toISOString() + ' on port ' + port);
+console.log('Server version ' + pjson.version + ' started at ' + new Date().toISOString() + ' on port ' + port);
 
 // this enables the graceful shutdown with advanced options
 gracefulShutdown(server,

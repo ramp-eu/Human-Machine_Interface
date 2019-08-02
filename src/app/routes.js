@@ -1,11 +1,11 @@
 var User = require('./models/user');
 var Floorplan = require('./models/floorplan');
 var Config = require('./models/config');
-var crypto = require('crypto');
 var multer  = require('multer');
 var path = require('path');
 var fs = require('fs');
 var request = require('request');
+var pjson = require('../package.json');
 
 var MAGIC_NUMBERS = {
     jpg: 'ffd8ffe0',
@@ -31,6 +31,10 @@ module.exports = function(app, passport) {
     app.get('/', function(req, res) {
         //res.render('index.ejs');
 		res.render('login.ejs', { message: req.flash('loginMessage'), messagepos: '' });
+    });
+    // show the app version 
+    app.get('/version', function(req, res) {
+        res.send(pjson.version);
     });
     // show the test page 
     //app.get('/test', isLoggedIn, function(req, res) {
@@ -320,7 +324,8 @@ module.exports = function(app, passport) {
         else if (req.user.role === "user")
             res.redirect('/somewhere');
         else*/ res.render('main.ejs', {
-            user : req.user
+            user : req.user,
+            version : pjson.version
         });
     });
 

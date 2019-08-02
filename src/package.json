@@ -1,4 +1,6 @@
 {
+  "name": "mod.sw.ahmi",
+  "version": "2.0.12-beta",
   "main": "server.js",
   "scripts": {
     "start": "node ./server.js"
@@ -10,7 +12,7 @@
     "passport": "~0.4.0",
     "passport-local" : "~1.0.0",
     "connect-flash": "~0.1.1",
-    "bcrypt-nodejs" : "latest",
+    "bcrypt" : "latest",
     "morgan": "~1.9.1",
     "body-parser": "~1.18.3",
     "cookie-parser": "~1.4.3",
