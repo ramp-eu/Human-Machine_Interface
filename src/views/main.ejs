@@ -219,7 +219,10 @@
 								}
 							});
 						}
-					}			
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+					  $("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\"><p>Error. Cannot connect to database.</p><p>" + thrownError + "</p><p>" + xhr.statusText + "</p><p>" + xhr.responseText + "</p></div>");
+					}					
 				});
 			}
 			
@@ -242,7 +245,6 @@
 		<div class="container">
 		    <div class="text-right" >
 				<form action="/logout" method="post">
-                                    HMI version&nbsp;<%= version %>&nbsp;
 					<button class="btn btn-default btn-sm" style=" margin-top:10px;" disabled>Logged in as <%= user.name %>&nbsp;</button>&nbsp;<button type="submit" class="btn btn-default btn-sm" style=" margin-top:10px;"><%= __("logout") %></button>
                 </form>
 			</div>
