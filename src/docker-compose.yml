@@ -24,9 +24,12 @@ services:
       #WINDOWS
       #- node_dir:/usr/src/app/public/uploads:Z                
     ports:
-      - "8081:8081"
+      - "80:8081"
     links:
       - mongodb
+    depends_on:
+      - mongodb
+    command: bash -c './wait-for mongodb:27017 -- node server.js'
 
 #WINDOWS
 #volumes:

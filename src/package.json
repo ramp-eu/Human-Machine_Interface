@@ -3,7 +3,7 @@
   "version": "2.0.12-beta",
   "main": "server.js",
   "scripts": {
-    "start": "node ./server.js"
+    "start": "node server.js"
   },
   "dependencies" : {
     "express": "~4.16.4",
