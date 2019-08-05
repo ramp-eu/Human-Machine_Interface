@@ -131,7 +131,7 @@ function getCurrentTaskHTML(taskValue) {
 }
 
 function getOngoingTaskHTML(taskId, taskDescription, taskStatus, time) {
-	return "<tr id=\"ongoingTask_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"ongoingTask_description_" + taskId + "\">" + taskDescription + "</td><td id=\"ongoingTask_status_" + taskId + "\">" + taskStatus + "</td><td id=\"ongoingTask_time_" + taskId + "\">" + time + "</td></tr>";
+	return "<tr id=\"ongoingTask_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"ongoingTask_description_" + taskId + "\">" + taskDescription + "</td><td id=\"ongoingTask_status_" + taskId + "\">" + taskStatus + "</td><td id=\"ongoingTask_time_" + taskId + "\">" + new Date(time).toLocaleDateString() + " " + new Date(time).toLocaleTimeString() + "</td></tr>";
 	/*<td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";*/
 }
 
