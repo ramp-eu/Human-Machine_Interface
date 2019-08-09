@@ -49,7 +49,7 @@ function createNewSensor() {
 													}
 												]
 											},
-											"sensorId": {
+											"sensorID": {
 												"type": "string",
 												//"value": $("#new_sensor_id").val()
 												"value": sensorId
@@ -103,7 +103,7 @@ function initSensors(ngsiConnection) {
 				var sensorValue = false;
 				var manufacturer = sensor.value.sensorManufacturer.value;
 				var measurementType = sensor.value.measurementType.value;
-				var sensorId = sensor.value.sensorId.value;
+				var sensorId = sensor.value.sensorID.value;
 				var sensorType = sensor.value.sensorType.value;				
 				if (sensorType == ON_OFF_SENSOR) {
 					$.each(sensor.value.readings.value, function(i, sensorValue) {
@@ -155,7 +155,7 @@ function initSensors(ngsiConnection) {
 									}
 								]
 							},
-							"sensorId": {
+							"sensorID": {
 								"type": "string",
 								"value": sensorId
 							},
@@ -203,7 +203,7 @@ function initSensors(ngsiConnection) {
 												}
 											]
 										},
-										"sensorId": {
+										"sensorID": {
 											"type": "string",
 											"value": sensorId
 										},
