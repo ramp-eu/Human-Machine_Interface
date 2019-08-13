@@ -8,6 +8,8 @@ services:
       #WINDOWS
       #- mongo_db:/data/db:Z
   app:
+    container_name: hminode
+    #build: .
     image: l4ms/opil.sw.hmi:latest
     environment:
      - inituser=admin
@@ -18,9 +20,10 @@ services:
       #WINDOWS
       #- node_dir:/usr/src/app/public/uploads:Z                
     ports:
-      - "8081:8081"
-    links:
+      - "80:8081"
+    depends_on:
       - mongodb
+    command: bash -c './wait-for mongodb:27017 -- node server.js'
 
 #WINDOWS
 #volumes:
