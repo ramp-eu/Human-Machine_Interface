@@ -197,14 +197,13 @@
 										
 										ngsiConnection.v2.createSubscription({
 											"description": "Updating sensor data",
-											"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ], "condition": { "attrs": [ "sensorData" ] } },
+											"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ] },
 											"notification": {
 												"callback": function (notification) {
 													updateSensorsOnOverview(notification);
 													updateSensors(notification);	
 													updateSensorData(notification);					
-												},
-												"attrs": [ "sensorData" ]
+												}
 											},
 											//"expires": "2040-04-05T14:00:00.00Z",
 											//"throttling": 5

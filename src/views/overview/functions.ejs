@@ -212,18 +212,16 @@ function updateSensorsOnOverview(notification) {
 	if (typeof floorPlanImage !== "undefined") {
 	
 		var temp = 1;
-		$.each(notification.data, function () {
-			$.each(this.sensorData.value, function () {					
-				var objIndex = sensorsOnOverview.findIndex((obj => obj.id == this.value.sensorID.value));
-				if (objIndex == -1) {
-					sensorsOnOverview.push({index: temp, id: this.value.sensorID.value, type: this.value.sensorType.value, x: -1, y: -1});
-				} else {
-					sensorsOnOverview[objIndex].index = temp;
-					sensorsOnOverview[objIndex].id = this.value.sensorID.value;			
-					sensorsOnOverview[objIndex].type = this.value.sensorType.value;	
-				}
-				temp++;
-			});
+		$.each(notification.data, function () {				
+			var objIndex = sensorsOnOverview.findIndex((obj => obj.id == this.sensorID.value));
+			if (objIndex == -1) {
+				sensorsOnOverview.push({index: temp, id: this.sensorID.value, type: this.sensorType.value, x: -1, y: -1});
+			} else {
+				sensorsOnOverview[objIndex].index = temp;
+				sensorsOnOverview[objIndex].id = this.sensorID.value;			
+				sensorsOnOverview[objIndex].type = this.sensorType.value;	
+			}
+			temp++;
 		});
 		
 		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
