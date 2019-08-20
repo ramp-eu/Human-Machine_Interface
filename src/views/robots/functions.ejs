@@ -12,17 +12,19 @@ function initRobotsTable(ngsiConnection) {
 function updateRobotsTable(notification) {
    //console.log("Received Robot notif: " + JSON.stringify(notification));					   
    $.each(notification.data, function () {
-		//var d = decodeURIComponent(this.status_channel.value);
+		//var d = decodeURIComponent(this.position_channel.value);
 		//var dObj = JSON.parse(d.replace(/\'/g, "\""));
-		var dObj = this.status_channel.value;
+		var dObj = this.position_channel.value;
 		var ran_status = "unknown";
-		if (dObj.ran_status.value == 0) ran_status = "waiting";
-		else if (dObj.ran_status.value == 1) ran_status = "moving";
-		else if (dObj.ran_status.value == 2) ran_status = "acting";
+		//if (dObj.ran_status.value == 0) ran_status = "waiting";
+		//else if (dObj.ran_status.value == 1) ran_status = "moving";
+		//else if (dObj.ran_status.value == 2) ran_status = "acting";
 		//if ($("#robottr"+this.id).length < 1) 
 		//    $("#robotsTbody").append("<tr id=\"robottr" + this.id + "\"class=\"clickable-row\"></tr>");
 		$("#robottr"+this.id).empty();
 		//console.log(dObj.agv_msg.value.current_position.value.theta.value);
-		$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.agv_msg.value.current_position.value.x.value + " mm</td><td>" + dObj.agv_msg.value.current_position.value.y.value + " mm</td><td>" + dObj.agv_msg.value.current_position.value.theta.value * (180/Math.PI) + "&#176;</td>");
+		$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.value.pose.value.position.value.x.value + " mm</td><td>" + dObj.current_position.value.pose.value.position.value.y.value + " mm</td><td>" + dObj.current_position.value.pose.value.orientation.type + "</td>");
+		
+		// aste &#176;
 	});									
 }

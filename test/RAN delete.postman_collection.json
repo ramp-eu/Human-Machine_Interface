@@ -1,0 +1,63 @@
+{
+	"info": {
+		"_postman_id": "8a3bcb82-5288-4ae2-bdf1-2a3bceaa09c0",
+		"name": "RAN delete",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Delete R1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "13.79.17.152:1026/v2/entities/robot_opil_v2_R1",
+					"host": [
+						"13",
+						"79",
+						"17",
+						"152"
+					],
+					"port": "1026",
+					"path": [
+						"v2",
+						"entities",
+						"robot_opil_v2_R1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete R2",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "13.79.17.152:1026/v2/entities/robot_opil_v2_R2",
+					"host": [
+						"13",
+						"79",
+						"17",
+						"152"
+					],
+					"port": "1026",
+					"path": [
+						"v2",
+						"entities",
+						"robot_opil_v2_R2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

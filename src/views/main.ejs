@@ -177,13 +177,13 @@
 										
 										ngsiConnection.v2.createSubscription({
 											"description": "Updating robot data",
-											"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "status_channel" ] } },
+											"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "position_channel" ] } },
 											"notification": {
 												"callback": function (notification) {
 													updateRobotsOnOverview(notification);
 													updateRobotsTable(notification);
 											   },
-											   "attrs": [ "status_channel" ]
+											   "attrs": [ "position_channel" ]
 											},
 											//"expires": "2040-04-05T14:00:00.00Z",
 											//"throttling": 5
