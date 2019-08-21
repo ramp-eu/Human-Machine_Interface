@@ -7,7 +7,9 @@ var userSchema = mongoose.Schema({
     userid      : String,
     password    : String,
     role        : String,
-    name        : String
+    name        : String,
+    created     : Date,
+    updated     : Date
 });
 
 // generating a hash

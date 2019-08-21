@@ -1,6 +1,7 @@
 var User = require('./models/user');
 var Floorplan = require('./models/floorplan');
 var Config = require('./models/config');
+var Hmibutton = require('./models/hmibutton');
 var multer  = require('multer');
 var path = require('path');
 var fs = require('fs');
@@ -53,7 +54,8 @@ module.exports = function(app, passport) {
     //    res.render('main.ejs');
     //});
 
-    // FLOORPLAN SECTION =======================================================
+// FLOORPLAN SECTION =======================================================
+
     app.get('/floorplan', function(req, res) {
         res.render('floorplan.ejs');
     });
@@ -113,7 +115,7 @@ module.exports = function(app, passport) {
             var magic = buffer.toString('hex', 0, 4);
             var filename = req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
             var imgurl = 'uploads/' + filename;
-            
+
             var newFp = new Floorplan();
             newFp.fieldname     = req.file.fieldname;
             newFp.originalname  = req.file.originalname;
@@ -128,7 +130,7 @@ module.exports = function(app, passport) {
             newFp.yoffset       = req.body.yoffset;
             newFp.created       = new Date().toISOString();
             newFp.updated       = new Date().toISOString();
-            
+
             if (checkMagicNumbers(magic)) {
                 fs.writeFile('./public/uploads/' + filename, buffer, 'binary', function(err) {
                     if (err) return next(err);
@@ -139,12 +141,13 @@ module.exports = function(app, passport) {
                 });
             } else {
                 //res.send({ "imgurl": "" });
-                res.status(422).send({ message: 'Image must be format of png or jpg.' })
+                res.status(422).send({ message: 'Image must be format of png or jpg or gif.' })
             }
         });
     });
 
-    // USER SECTION =======================================================
+// USER SECTION =======================================================
+
     // User is created in sigunup in passport.js
     // Get all users
     app.get('/api/user', function(req, res, next) {
@@ -162,10 +165,7 @@ module.exports = function(app, passport) {
             else res.status(404).send({ message: 'User not found.' });
         });
      });
-    
-            
 
-    
     // Delete a user by mongo id
     app.delete('/api/user/:id/:ocb_host/:ocb_port', function(req, res, next) {
         User.findByIdAndDelete(req.params.id, { password: 0}, function(err, data) {
@@ -173,7 +173,7 @@ module.exports = function(app, passport) {
             if (data.userid) {
                 data.password = null;
                 res.send(data);
-//Code block below was for creating HAN entity to Orion Context Broker
+//Code block below was for deleting HAN entity from Orion Context Broker
 //                 var ocb_url = 'http://' + req.params.ocb_host + ':' + req.params.ocb_port + '/v2/entities/' + data.userid;
 //                 request.del(ocb_url, function (err, resp, body) {
 //                     if (err) return next(err);
@@ -191,10 +191,11 @@ module.exports = function(app, passport) {
             if (err) return next(err);
             if (user) {
                 //user.userid = req.body.userid;
-                user.userid = user.userid;
-                user.password = user.generateHash(req.body.password);
-                user.role = req.body.role;
-                user.name = req.body.name;
+                user.userid     = user.userid;
+                user.password   = user.generateHash(req.body.password);
+                user.role       = req.body.role;
+                user.name       = req.body.name;
+                user.updated    = new Date().toISOString();
 
                 user.save(function (err, data) {
                     if (err) return next(err);
@@ -218,6 +219,8 @@ module.exports = function(app, passport) {
                 newUser.password    = newUser.generateHash(req.body.password);
                 newUser.role        = req.body.role;
                 newUser.name        = req.body.name;
+                newUser.created     = new Date().toISOString();
+                newUser.updated     = new Date().toISOString();
 
                 newUser.save(function(err, data) {
                     if (err) return next(err);
@@ -240,6 +243,8 @@ module.exports = function(app, passport) {
 //                                     newUser.password    = newUser.generateHash(req.body.password);
 //                                     newUser.role        = req.body.role;
 //                                     newUser.name        = req.body.name;
+//                                    newUser.created     = new Date().toISOString();
+//                                    newUser.updated     = new Date().toISOString();
 // 
 //                                     newUser.save(function(err, data) {
 //                                         if (err) return next(err);
@@ -257,8 +262,8 @@ module.exports = function(app, passport) {
         });
     });
 
-    
-    // CONFIG SECTION =======================================================
+// CONFIG SECTION =======================================================
+
     //app.get('/api/config', isLoggedIn, function(req, res, next) {
     app.get('/api/config', function(req, res, next) {
         Config.find({}, function(err, data) {
@@ -318,7 +323,64 @@ module.exports = function(app, passport) {
         });
     });
 
-    // MAIN SECTION =========================
+// HMIBUTTON SECTION =======================================================
+
+    //app.get('/api/hmibutton', isLoggedIn, function(req, res, next) {
+    app.get('/api/hmibutton', function(req, res, next) {
+        Hmibutton.find({}, function(err, data) {
+            if (err) return next(err);
+            if (data) res.send(data);
+            else res.status(404).send({ message: 'No hmibuttons found.' });
+        });
+    });
+    //app.get('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
+    app.get('/api/hmibutton/:id', function(req, res, next) {
+        Hmibutton.findById(req.params.id, function(err, data) {
+            if (err) return next(err);
+            if (data) res.send(data);
+            else res.status(404).send({ message: 'Hmibutton not found.' });
+        });
+     });
+    //app.delete('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
+    app.delete('/api/hmibutton/:id', function(req, res, next) {
+        Hmibutton.findByIdAndDelete(req.params.id, function(err, data) {
+            if (err) return next(err);
+            if (data) res.send(data);
+            else res.status(404).send({ message: 'Hmibutton not found.' });
+        });
+     });
+    //app.put('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
+    app.put('/api/hmibutton/:id', function(req, res, next) {
+        Hmibutton.findByIdAndUpdate(req.params.id,
+                                   {'ocb_id'    : req.body.ocb_id,
+                                    'ocb_type'  : req.body.ocb_type,
+                                    'sensortype': req.body.sensortype,
+                                    'updated'   : new Date().toISOString()
+                                   },
+                                   {new: true},
+                                   function(err, data) {
+                                        if (err) return next(err);
+                                        res.send(data);
+                                   }
+        );
+     });
+    //app.post('/api/hmibutton', isLoggedIn, function(req, res, next) {
+    app.post('/api/hmibutton', function(req, res, next) {
+
+        var newHmibutton        = new Hmibutton();
+        newHmibutton.ocb_id     = req.body.ocb_id;
+        newHmibutton.ocb_type   = req.body.ocb_type;
+        newHmibutton.sensortype = req.body.sensortype;
+        newHmibutton.created    = new Date().toISOString();
+        newHmibutton.updated    = new Date().toISOString();
+
+        newHmibutton.save(function(err, data) {
+            if (err) return next(err);
+            res.send(data);
+        });
+    });
+
+// MAIN SECTION =========================
     app.get('/main', isLoggedIn, function(req, res) {
         /*if (req.user.role === "admin")
             res.redirect('/admin');

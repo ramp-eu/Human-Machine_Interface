@@ -1,7 +1,5 @@
-// load the things we need
 var mongoose = require('mongoose');
 
-// define the schema for our user model
 var fpSchema = mongoose.Schema({
     fieldname   : String,
     originalname: String,
@@ -18,5 +16,4 @@ var fpSchema = mongoose.Schema({
     updated     : Date
 });
 
-// create the model for users and expose it to our app
 module.exports = mongoose.model('Floorplan', fpSchema);

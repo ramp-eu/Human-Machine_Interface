@@ -1,3 +1,5 @@
+# These documents are all deprecated, current docs are updated in Documents-repository
+
 # Overview
 
 HMI (Human Machine Interface) is a software layer module of the OPIL architecture. This module’s name was changed to MOD.SW.HMI from AHMI when the requirements changed for the OPIL version 2.0.
