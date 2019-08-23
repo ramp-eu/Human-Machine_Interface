@@ -39,16 +39,16 @@ module.exports = function(app, passport) {
         res.send(pjson.version);
     });
     // show the test page 
-    //app.get('/test', isLoggedIn, function(req, res) {
-    app.get('/test', function(req, res) {
-        if (req.user && req.user.role === "admin")
-            res.redirect('/admin');
-        else if (req.user && req.user.role === "user")
-            res.redirect('/somewhere');
-        else res.render('test.ejs', {
-            user : req.user
-        });
-    });
+//     app.get('/test', isLoggedIn, function(req, res) {
+//     //app.get('/test', function(req, res) {
+//         if (req.user && req.user.role === "admin")
+//             res.redirect('/admin');
+//         else if (req.user && req.user.role === "user")
+//             res.redirect('/somewhere');
+//         else res.render('test.ejs', {
+//             user : req.user
+//         });
+//     });
 
     //app.get('/main', isLoggedIn, function(req, res) {
     //    res.render('main.ejs');
@@ -56,27 +56,27 @@ module.exports = function(app, passport) {
 
 // FLOORPLAN SECTION =======================================================
 
-    app.get('/floorplan', function(req, res) {
-        res.render('floorplan.ejs');
-    });
-    //app.get('/api/fp', isLoggedIn, function(req, res, next) {
-    app.get('/api/fp', function(req, res, next) {
+//     app.get('/floorplan', function(req, res) {
+//         res.render('floorplan.ejs');
+//     });
+    app.get('/api/fp', isLoggedIn, function(req, res, next) {
+    //app.get('/api/fp', function(req, res, next) {
         Floorplan.find({}, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
             else res.status(404).send({ message: 'No floorplans found.' });
         });
     });
-    //app.get('/api/fp/:id', isLoggedIn, function(req, res, next) {
-    app.get('/api/fp/:id', function(req, res, next) {
+    app.get('/api/fp/:id', isLoggedIn, function(req, res, next) {
+    //app.get('/api/fp/:id', function(req, res, next) {
         Floorplan.findById(req.params.id, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
             else res.status(404).send({ message: 'Floorplan not found.' });
         });
      });
-    //app.delete('/api/fp/:id', isLoggedIn, function(req, res, next) {
-    app.delete('/api/fp/:id', function(req, res, next) {
+    app.delete('/api/fp/:id', isLoggedIn, function(req, res, next) {
+    //app.delete('/api/fp/:id', function(req, res, next) {
         Floorplan.findByIdAndDelete(req.params.id, function(err, data) {
             if (err) return next(err);
             if (data.filename) {
@@ -90,8 +90,8 @@ module.exports = function(app, passport) {
             else res.status(404).send({ message: 'Floorplan not found.' });
         });
      });
-    //app.put('/api/fp/:id', isLoggedIn, function(req, res, next) {
-    app.put('/api/fp/:id', function(req, res, next) {
+    app.put('/api/fp/:id', isLoggedIn, function(req, res, next) {
+    //app.put('/api/fp/:id', function(req, res, next) {
         Floorplan.findByIdAndUpdate(req.params.id,
                                    {'name': req.body.name,
                                     'scale': req.body.scale,
@@ -106,8 +106,8 @@ module.exports = function(app, passport) {
                                    }
         );
      });
-    //app.post('/api/fp', isLoggedIn, function(req, res, next) {
-    app.post('/api/fp', function(req, res, next) {
+    app.post('/api/fp', isLoggedIn, function(req, res, next) {
+    //app.post('/api/fp', function(req, res, next) {
         var upload = multer({storage: multer.memoryStorage()}).single('floorplan');
         upload(req, res, function(err) {
             var buffer = req.file.buffer;
@@ -150,7 +150,7 @@ module.exports = function(app, passport) {
 
     // User is created in sigunup in passport.js
     // Get all users
-    app.get('/api/user', function(req, res, next) {
+    app.get('/api/user', isLoggedIn, function(req, res, next) {
         User.find({}, { password: 0}, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
@@ -158,7 +158,7 @@ module.exports = function(app, passport) {
         });
     });
     // Get a user by mongo id
-    app.get('/api/user/:id', function(req, res, next) {
+    app.get('/api/user/:id', isLoggedIn, function(req, res, next) {
         User.findById(req.params.id, { password: 0}, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
@@ -167,7 +167,9 @@ module.exports = function(app, passport) {
      });
 
     // Delete a user by mongo id
-    app.delete('/api/user/:id/:ocb_host/:ocb_port', function(req, res, next) {
+    app.delete('/api/user/:id', isLoggedIn, function(req, res, next) {
+//Code block below was for deleting HAN entity from Orion Context Broker
+//    app.delete('/api/user/:id/:ocb_host/:ocb_port', function(req, res, next) {
         User.findByIdAndDelete(req.params.id, { password: 0}, function(err, data) {
             if (err) return next(err);
             if (data.userid) {
@@ -186,7 +188,7 @@ module.exports = function(app, passport) {
         });
      });
     // Update a user by mongo id
-    app.put('/api/user/:id', function(req, res, next) {
+    app.put('/api/user/:id', isLoggedIn, function(req, res, next) {
         User.findById(req.params.id, function(err, user) {
             if (err) return next(err);
             if (user) {
@@ -209,7 +211,7 @@ module.exports = function(app, passport) {
         });
      });
     // Create a user
-    app.post('/api/user', function(req, res, next) {
+    app.post('/api/user', isLoggedIn, function(req, res, next) {
         User.findOne({ 'userid' :  req.body.userid }, function(err, user) {
             if (err) return next(err);
             if (user) res.status(409).send({ message: 'This user id is already created.' });
@@ -264,32 +266,32 @@ module.exports = function(app, passport) {
 
 // CONFIG SECTION =======================================================
 
-    //app.get('/api/config', isLoggedIn, function(req, res, next) {
-    app.get('/api/config', function(req, res, next) {
+    app.get('/api/config', isLoggedIn, function(req, res, next) {
+    //app.get('/api/config', function(req, res, next) {
         Config.find({}, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
             else res.status(404).send({ message: 'No configs found.' });
         });
     });
-    //app.get('/api/config/:id', isLoggedIn, function(req, res, next) {
-    app.get('/api/config/:id', function(req, res, next) {
+    app.get('/api/config/:id', isLoggedIn, function(req, res, next) {
+    //app.get('/api/config/:id', function(req, res, next) {
         Config.findById(req.params.id, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
             else res.status(404).send({ message: 'Config not found.' });
         });
      });
-    //app.delete('/api/config/:id', isLoggedIn, function(req, res, next) {
-    app.delete('/api/config/:id', function(req, res, next) {
+    app.delete('/api/config/:id', isLoggedIn, function(req, res, next) {
+    //app.delete('/api/config/:id', function(req, res, next) {
         Config.findByIdAndDelete(req.params.id, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
             else res.status(404).send({ message: 'Config not found.' });
         });
      });
-    //app.put('/api/config/:id', isLoggedIn, function(req, res, next) {
-    app.put('/api/config/:id', function(req, res, next) {
+    app.put('/api/config/:id', isLoggedIn, function(req, res, next) {
+    //app.put('/api/config/:id', function(req, res, next) {
         Config.findByIdAndUpdate(req.params.id,
                                    {'ocb_host': req.body.ocb_host,
                                     'ocb_port': req.body.ocb_port,
@@ -305,8 +307,8 @@ module.exports = function(app, passport) {
                                    }
         );
      });
-    //app.post('/api/config', isLoggedIn, function(req, res, next) {
-    app.post('/api/config', function(req, res, next) {
+    app.post('/api/config', isLoggedIn, function(req, res, next) {
+    //app.post('/api/config', function(req, res, next) {
 
         var newConfig = new Config();
         newConfig.ocb_host          = req.body.ocb_host;
@@ -325,36 +327,35 @@ module.exports = function(app, passport) {
 
 // HMIBUTTON SECTION =======================================================
 
-    //app.get('/api/hmibutton', isLoggedIn, function(req, res, next) {
-    app.get('/api/hmibutton', function(req, res, next) {
+    app.get('/api/hmibutton', isLoggedIn, function(req, res, next) {
+    //app.get('/api/hmibutton', function(req, res, next) {
         Hmibutton.find({}, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
             else res.status(404).send({ message: 'No hmibuttons found.' });
         });
     });
-    //app.get('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
-    app.get('/api/hmibutton/:id', function(req, res, next) {
+    app.get('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
+    //app.get('/api/hmibutton/:id', function(req, res, next) {
         Hmibutton.findById(req.params.id, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
             else res.status(404).send({ message: 'Hmibutton not found.' });
         });
      });
-    //app.delete('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
-    app.delete('/api/hmibutton/:id', function(req, res, next) {
+    app.delete('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
+    //app.delete('/api/hmibutton/:id', function(req, res, next) {
         Hmibutton.findByIdAndDelete(req.params.id, function(err, data) {
             if (err) return next(err);
             if (data) res.send(data);
             else res.status(404).send({ message: 'Hmibutton not found.' });
         });
      });
-    //app.put('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
-    app.put('/api/hmibutton/:id', function(req, res, next) {
+    app.put('/api/hmibutton/:id', isLoggedIn, function(req, res, next) {
+    //app.put('/api/hmibutton/:id', function(req, res, next) {
         Hmibutton.findByIdAndUpdate(req.params.id,
                                    {'ocb_id'    : req.body.ocb_id,
-                                    'ocb_type'  : req.body.ocb_type,
-                                    'sensortype': req.body.sensortype,
+                                    'text'      : req.body.text,
                                     'updated'   : new Date().toISOString()
                                    },
                                    {new: true},
@@ -364,13 +365,12 @@ module.exports = function(app, passport) {
                                    }
         );
      });
-    //app.post('/api/hmibutton', isLoggedIn, function(req, res, next) {
-    app.post('/api/hmibutton', function(req, res, next) {
+    app.post('/api/hmibutton', isLoggedIn, function(req, res, next) {
+    //app.post('/api/hmibutton', function(req, res, next) {
 
         var newHmibutton        = new Hmibutton();
         newHmibutton.ocb_id     = req.body.ocb_id;
-        newHmibutton.ocb_type   = req.body.ocb_type;
-        newHmibutton.sensortype = req.body.sensortype;
+        newHmibutton.text       = req.body.text;
         newHmibutton.created    = new Date().toISOString();
         newHmibutton.updated    = new Date().toISOString();
 
