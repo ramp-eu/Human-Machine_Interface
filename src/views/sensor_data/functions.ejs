@@ -13,75 +13,152 @@ function initSensorData(ngsiConnection) {
 					steppedLine = true;
 				}
 			});
-			$("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + entity.sensorID.value + " (" + entity.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
-			var chartCanvas = document.getElementById(entity.sensorID.value + "_Chart");
-			var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
-			var chartOptions =
-				{
-					legend: {
-						display: false
-					},
-					scales: {
-						yAxes:
-							[{ 
-								ticks: {
-									stepSize: 1
-								}
-							}],
-						xAxes:
-							[{
-								type: 'realtime',
-								time: {
-									unit: 'minute',
-									unitStepSize: 1,
-									displayFormats: { 'minute': 'HH:mm' }
-								},
-								realtime: {
-									duration: 20000,    // data in the past 20000 ms will be displayed
-									refresh: 1000,      // onRefresh callback will be called every 1000 ms
-									delay: 1000,        // delay of 1000 ms, so upcoming values are known before plotting a line
-									pause: false,       // chart is not paused
-									ttl: 60000,     // data will be automatically deleted as it disappears off the chart
+			if (entity.sensorType.value == ON_OFF_SENSOR) {
+				$.ajax({
+					type: "GET",
+					url: "./api/hmibutton",
+					dataType: "json",
+					success: function (data) {			
+						$(data).each(function(i, item) {
+							if (item.ocb_id == entity.sensorID.value) {								
+								$("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">" + item.text + " (" + entity.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+								var chartCanvas = document.getElementById(entity.sensorID.value + "_Chart");
+								var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
+								var chartOptions =
+									{
+										legend: {
+											display: false
+										},
+										scales: {
+											yAxes:
+												[{ 
+													ticks: {
+														stepSize: 1
+													}
+												}],
+											xAxes:
+												[{
+													type: 'realtime',
+													time: {
+														unit: 'minute',
+														unitStepSize: 1,
+														displayFormats: { 'minute': 'HH:mm' }
+													},
+													realtime: {
+														duration: 20000,    // data in the past 20000 ms will be displayed
+														refresh: 1000,      // onRefresh callback will be called every 1000 ms
+														delay: 1000,        // delay of 1000 ms, so upcoming values are known before plotting a line
+														pause: false,       // chart is not paused
+														ttl: 60000,     // data will be automatically deleted as it disappears off the chart
 
-									// a callback to update datasets
-									onRefresh: function(chart) {}
-								}
-							}]
-					},
-					plugins: {
-						streaming: {            // per-chart option
-							frameRate: 30       // chart is drawn 30 times every second
-						}
-					},
-					pan: {
-						enabled: true,    // Enable panning
-						mode: 'x',        // Allow panning in the x direction
-						rangeMin: {
-							x: null       // Min value of the delay option
-						},
-						rangeMax: {
-							x: null       // Max value of the delay option
-						}
-					},
-					zoom: {
-						enabled: true,    // Enable zooming
-						mode: 'x',        // Allow zooming in the x direction
-						rangeMin: {
-							x: null       // Min value of the duration option
-						},
-						rangeMax: {
-							x: null       // Max value of the duration option
-						}
+														// a callback to update datasets
+														onRefresh: function(chart) {}
+													}
+												}]
+										},
+										plugins: {
+											streaming: {            // per-chart option
+												frameRate: 30       // chart is drawn 30 times every second
+											}
+										},
+										pan: {
+											enabled: true,    // Enable panning
+											mode: 'x',        // Allow panning in the x direction
+											rangeMin: {
+												x: null       // Min value of the delay option
+											},
+											rangeMax: {
+												x: null       // Max value of the delay option
+											}
+										},
+										zoom: {
+											enabled: true,    // Enable zooming
+											mode: 'x',        // Allow zooming in the x direction
+											rangeMin: {
+												x: null       // Min value of the duration option
+											},
+											rangeMax: {
+												x: null       // Max value of the duration option
+											}
+										}
+									};
+								var chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
+								sensorDataCharts.set(entity.sensorID.value, chart);											
+							}
+						})
 					}
-				};
-			var chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
-			sensorDataCharts.set(entity.sensorID.value, chart);
+				});
+			} else {
+				$("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + entity.sensorID.value + " (" + entity.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+				var chartCanvas = document.getElementById(entity.sensorID.value + "_Chart");
+				var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
+				var chartOptions =
+					{
+						legend: {
+							display: false
+						},
+						scales: {
+							yAxes:
+								[{ 
+									ticks: {
+										stepSize: 1
+									}
+								}],
+							xAxes:
+								[{
+									type: 'realtime',
+									time: {
+										unit: 'minute',
+										unitStepSize: 1,
+										displayFormats: { 'minute': 'HH:mm' }
+									},
+									realtime: {
+										duration: 20000,    // data in the past 20000 ms will be displayed
+										refresh: 1000,      // onRefresh callback will be called every 1000 ms
+										delay: 1000,        // delay of 1000 ms, so upcoming values are known before plotting a line
+										pause: false,       // chart is not paused
+										ttl: 60000,     // data will be automatically deleted as it disappears off the chart
+
+										// a callback to update datasets
+										onRefresh: function(chart) {}
+									}
+								}]
+						},
+						plugins: {
+							streaming: {            // per-chart option
+								frameRate: 30       // chart is drawn 30 times every second
+							}
+						},
+						pan: {
+							enabled: true,    // Enable panning
+							mode: 'x',        // Allow panning in the x direction
+							rangeMin: {
+								x: null       // Min value of the delay option
+							},
+							rangeMax: {
+								x: null       // Max value of the delay option
+							}
+						},
+						zoom: {
+							enabled: true,    // Enable zooming
+							mode: 'x',        // Allow zooming in the x direction
+							rangeMin: {
+								x: null       // Min value of the duration option
+							},
+							rangeMax: {
+								x: null       // Max value of the duration option
+							}
+						}
+					};
+				var chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
+				sensorDataCharts.set(entity.sensorID.value, chart);											
+			}				
 		});
 	});						
 }
 
 function updateSensorData(notification) {						
-	console.log("Received notification: " + JSON.stringify(notification));					   
+	//console.log("Received notification: " + JSON.stringify(notification));					   
 	$.each(notification.data, function () {		
 		var chart = sensorDataCharts.get(this.sensorID.value);							
 		if (typeof chart === "undefined") {	
@@ -94,7 +171,6 @@ function updateSensorData(notification) {
 					steppedLine = true;
 				}
 			});
-			console.log("steppedLine: " + steppedLine);
 			$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + this.sensorID.value + " (" + this.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + this.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
 			var chartCanvas = document.getElementById(this.sensorID.value + "_Chart");
 			var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
@@ -162,10 +238,8 @@ function updateSensorData(notification) {
 			var modifiedTime = this.modifiedTime.value;
 			$.each(this.readings.value, function () {
 				chart.data.labels.push(modifiedTime);
-				console.log("Labels: " + JSON.stringify(chart.data.labels));
 				chart.data.datasets.forEach((dataset) => {
-					dataset.data.push(this.value.reading.value); // add new value
-					console.log("Dataset: " + JSON.stringify(dataset.data));					
+					dataset.data.push(this.value.reading.value); // add new value				
 				});
 				//chart.update();																
 				chart.update({

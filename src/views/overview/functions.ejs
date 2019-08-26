@@ -212,14 +212,38 @@ function updateSensorsOnOverview(notification) {
 	if (typeof floorPlanImage !== "undefined") {
 	
 		var temp = 1;
-		$.each(notification.data, function () {				
-			var objIndex = sensorsOnOverview.findIndex((obj => obj.id == this.sensorID.value));
-			if (objIndex == -1) {
-				sensorsOnOverview.push({index: temp, id: this.sensorID.value, type: this.sensorType.value, x: -1, y: -1});
-			} else {
-				sensorsOnOverview[objIndex].index = temp;
-				sensorsOnOverview[objIndex].id = this.sensorID.value;			
-				sensorsOnOverview[objIndex].type = this.sensorType.value;	
+		$.each(notification.data, function (i, entity) {	
+			if (entity.sensorType.value == ON_OFF_SENSOR) {
+				$.ajax({
+					type: "GET",
+					url: "./api/hmibutton",
+					dataType: "json",
+					success: function (data) {			
+						$(data).each(function(i, item) {
+							if (item.ocb_id == entity.sensorID.value) {					
+								var objIndex = sensorsOnOverview.findIndex((obj => obj.id == item.text));
+								if (objIndex == -1) {
+									sensorsOnOverview.push({index: temp, id: item.text, type: entity.sensorType.value, x: -1, y: -1});
+								} else {
+									sensorsOnOverview[objIndex].index = temp;
+									sensorsOnOverview[objIndex].id = item.text;			
+									sensorsOnOverview[objIndex].type = entity.sensorType.value;	
+								}							
+							}
+						});
+					    updateSensorsTable();
+					}
+				});
+			} else {	
+				var objIndex = sensorsOnOverview.findIndex((obj => obj.id == entity.sensorID.value));
+				if (objIndex == -1) {
+					sensorsOnOverview.push({index: temp, id: entity.sensorID.value, type: entity.sensorType.value, x: -1, y: -1});
+				} else {
+					sensorsOnOverview[objIndex].index = temp;
+					sensorsOnOverview[objIndex].id = entity.sensorID.value;			
+					sensorsOnOverview[objIndex].type = entity.sensorType.value;	
+				}
+			    updateSensorsTable();
 			}
 			temp++;
 		});
@@ -227,7 +251,6 @@ function updateSensorsOnOverview(notification) {
 		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
 		drawRobotsOnCanvas();
 		drawSensorsOnCanvas();
-		updateSensorsTable();
 	}
 }
 
