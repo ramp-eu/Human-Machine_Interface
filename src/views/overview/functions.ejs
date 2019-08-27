@@ -211,7 +211,6 @@ function updateSensorsOnOverview(notification) {
 	
 	if (typeof floorPlanImage !== "undefined") {
 	
-		var temp = 1;
 		$.each(notification.data, function (i, entity) {	
 			if (entity.sensorType.value == ON_OFF_SENSOR) {
 				$.ajax({
@@ -223,9 +222,8 @@ function updateSensorsOnOverview(notification) {
 							if (item.ocb_id == entity.sensorID.value) {					
 								var objIndex = sensorsOnOverview.findIndex((obj => obj.id == item.text));
 								if (objIndex == -1) {
-									sensorsOnOverview.push({index: temp, id: item.text, type: entity.sensorType.value, x: -1, y: -1});
+									sensorsOnOverview.push({index: sensorsOnOverview.length+1, id: item.text, type: entity.sensorType.value, x: -1, y: -1});
 								} else {
-									sensorsOnOverview[objIndex].index = temp;
 									sensorsOnOverview[objIndex].id = item.text;			
 									sensorsOnOverview[objIndex].type = entity.sensorType.value;	
 								}							
@@ -237,15 +235,13 @@ function updateSensorsOnOverview(notification) {
 			} else {	
 				var objIndex = sensorsOnOverview.findIndex((obj => obj.id == entity.sensorID.value));
 				if (objIndex == -1) {
-					sensorsOnOverview.push({index: temp, id: entity.sensorID.value, type: entity.sensorType.value, x: -1, y: -1});
+					sensorsOnOverview.push({index: sensorsOnOverview.length+1, id: entity.sensorID.value, type: entity.sensorType.value, x: -1, y: -1});
 				} else {
-					sensorsOnOverview[objIndex].index = temp;
 					sensorsOnOverview[objIndex].id = entity.sensorID.value;			
 					sensorsOnOverview[objIndex].type = entity.sensorType.value;	
 				}
 			    updateSensorsTable();
 			}
-			temp++;
 		});
 		
 		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
