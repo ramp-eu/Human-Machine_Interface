@@ -5,7 +5,7 @@ exports.delTaskSpecs = function(signal) {
 
     return new Promise((resolve) => {
         console.log('... called signal: ' + signal);
-        console.log('... deleting TaskSpecs');
+        console.log('... deleting TaskSpecs & SensorAgent.HMI buttons');
 
         Config.find().sort({ _id: -1 }).limit(1).find(function (err, data) {
 
@@ -22,7 +22,7 @@ exports.delTaskSpecs = function(signal) {
                     var jsonarr = JSON.parse(body);
                     if (jsonarr.length > 0) {
                         for (var i = jsonarr.length-1; i >= 0; i--) {
-                            if (jsonarr[i].type == "SensorAgent" && jsonarr[i].sensorType.value == "HMI button") {
+                            if (jsonarr[i].type == "SensorAgent" && jsonarr[i].sensorType.value !== undefined && jsonarr[i].sensorType.value == "HMI button") {
                                 delete jsonarr[i].measurementType;
                                 delete jsonarr[i].modifiedTime;
                                 delete jsonarr[i].readings;
@@ -30,6 +30,7 @@ exports.delTaskSpecs = function(signal) {
                                 delete jsonarr[i].sensorID;
                                 delete jsonarr[i].sensorManufacturer;
                                 delete jsonarr[i].sensorType;
+                                delete jsonarr[i].units;
                             }
                             else if (jsonarr[i].type == "TaskSpec") {
                                 delete jsonarr[i].TaskSpec;

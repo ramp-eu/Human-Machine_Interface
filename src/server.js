@@ -18,6 +18,7 @@ var configDB = require('./config/database.js');
 var i18n = require('i18n-2');
 //var cors = require('cors')
 var inituser = require('./config/inituser.js');
+var initbuttons = require('./config/initbuttons.js');
 var cleanup = require('./config/cleanup.js');
 var gracefulShutdown = require('http-graceful-shutdown');
 var pjson = require('./package.json');
@@ -29,6 +30,7 @@ mongoose.connect(configDB.url, { useNewUrlParser: true }); // connect to our dat
 require('./config/passport')(passport); // pass passport for configuration
 
 inituser.init(process.env.inituser, process.env.initpw);
+initbuttons.init(process.env.ocb_host, process.env.ocb_port);
 
 // set up our express application
 app.use(express.static('public'));

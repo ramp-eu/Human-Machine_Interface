@@ -5,7 +5,7 @@ var Hmibutton = require('./models/hmibutton');
 var multer  = require('multer');
 var path = require('path');
 var fs = require('fs');
-var request = require('request');
+//var request = require('request');
 var pjson = require('../package.json');
 
 var MAGIC_NUMBERS = {
@@ -388,7 +388,11 @@ module.exports = function(app, passport) {
             res.redirect('/somewhere');
         else*/ res.render('main.ejs', {
             user : req.user,
-            version : pjson.version
+            version : pjson.version,
+            ocb_host : process.env.ocb_host, 
+            ocb_port : process.env.ocb_port,
+            ngsi_proxy_host : process.env.ngsi_proxy_host, 
+            ngsi_proxy_port : process.env.ngsi_proxy_port
         });
     });
 
