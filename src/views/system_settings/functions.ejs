@@ -1,4 +1,8 @@
 function initSystemSettings() {	
+	$("#ocb_host").val(<%- '"' + ocb_host + '"' %>);	
+	$("#ocb_port").val(<%- '"' + ocb_port + '"' %>);	
+	$("#ngsi_proxy_host").val(<%- '"' + ngsi_proxy_host + '"' %>);	
+	$("#ngsi_proxy_port").val(<%- '"' + ngsi_proxy_port + '"' %>);
 	$.ajax({
 		type: "GET",
 		url: "./api/config",

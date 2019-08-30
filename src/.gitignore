@@ -6,7 +6,7 @@ logs
 *.log
 npm-debug.log*
 
-#docker-compose.yml
+docker-compose.yml
 
 # Runtime data
 pids
