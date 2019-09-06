@@ -154,12 +154,12 @@ function initSensorData(ngsiConnection) {
 				chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
 				sensorDataCharts.set(entity.sensorID.value, chart);											
 			}
-			if (typeof entity.modifiedTime !== "undefined" && chart != null) {
+			if (typeof entity.modifiedTime !== "undefined") {
 				var modifiedTime = entity.modifiedTime.value;
 				$.each(entity.readings.value, function () {
 					chart.data.labels.push(modifiedTime);
 					chart.data.datasets.forEach((dataset) => {
-						dataset.data.push(entity.value.reading.value); // add new value				
+						dataset.data.push(this.value.reading.value); // add new value				
 					});
 					//chart.update();																
 					chart.update({
