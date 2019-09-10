@@ -58,7 +58,7 @@ exports.init = function(ocb_host, ocb_port) {
                             json : true,
                             body : entity},
                             function(err, resp, body) {
-                                if (err) return next(err);
+                                if (err) return done(err);
                                 else if (resp.statusCode == 201) {
                                     console.log('Created OCB entity id: ' + button.ocb_id);
                                 }
