@@ -3,100 +3,119 @@ var ON_OFF_SENSOR = "HMI button";
 var currentlyProcessing = new Array();
 
 function createNewSensor() {
-	if ($("#new_sensor_agent_id").val() != "") {
+	if ($("#new_sensor_name").val() != "" && $("#new_sensor_id").val() != "") {
 		$.ajax({
 			type: "GET",
-			url: "./api/config",
+			url: "./api/hmibutton",
 			dataType: "json",
-			success: function (data) {					
-				var ngsiConnection = null;
-				$(data).each(function(i, item) {							
-					ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
-						ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
-					});
-				})
-				if (ngsiConnection != null) {
-					var sensorId = $("#new_sensor_agent_id").val();					
-					var ocbId = "hmibutton_" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
-					$.ajax({
-						url: "./api/hmibutton",
-						type: "POST",
-						data: {
-							"ocb_id": ocbId,
-							"text": sensorId
+			success: function (data) {			
+				var alreadyExists = false;
+				$(data).each(function(i, item) {
+					if (item.ocb_id == $("#new_sensor_id").val()) {					
+						if (!alreadyExists) {
+							showAndDismissAlert("danger", "Given id exists already.", "sensorsAlert");	
+							alreadyExists = true;
 						}
-					}).done(function(data) {				
-						ngsiConnection.v2.createEntity({
-							"id": ocbId,
-							"type": "SensorAgent",
-							"measurementType": {
-								"type": "string",
-								//"value": $("#new_sensor_measurement_type").val()
-								"value": "-"
-							},
-							"modifiedTime": {
-								"type": "string",
-								"value": new Date().toISOString()
-							},
-							"readings": {
-								"type": "array",
-								"value": [
-									{
-										"type": "SensorReading",
-										"value": {
-											"reading": {
-												"type": "boolean",
-												"value": false
-											}
-										}
+					}
+				});
+				if (!alreadyExists) {
+					$.ajax({
+						type: "GET",
+						url: "./api/config",
+						dataType: "json",
+						success: function (data) {					
+							var ngsiConnection = null;
+							$(data).each(function(i, item) {							
+								ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
+									ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
+								});
+							})
+							if (ngsiConnection != null) {
+								var sensorId = $("#new_sensor_name").val();					
+								var ocbId = $("#new_sensor_id").val();
+								$.ajax({
+									url: "./api/hmibutton",
+									type: "POST",
+									data: {
+										"ocb_id": ocbId,
+										"text": sensorId
 									}
-								]
-							},
-							"sanID": {
-								"type": "string",
-								//"value": $("#new_sensor_id").val()
-								"value": "SAN_" + ocbId
-							},						
-							"sensorID": {
-								"type": "string",
-								//"value": $("#new_sensor_id").val()
-								"value": ocbId
-							},
-							"sensorManufacturer": {
-								"type": "string",
-								//"value": $("#new_sensor_manufacturer").val()
-								"value": "-"
-							},
-							"sensorType": {
-								"type": "string",
-								//"value": $("#new_sensor_type").val()
-								"value": ON_OFF_SENSOR
-							}
-						}).then(
-							(response) => {
-								// Entity created successfully
-								var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, sensorId) + "</tr>";
-								$("#currentOnOffSensors").append(onOffSensorHTML);							
-								$("#new_sensor_agent_id").val("");							
-								//$("#new_sensor_measurement_type").val("");
-								//$("#new_sensor_id").val("");
-								//$("#new_sensor_manufacturer").val("");
-								//$("#new_sensor_type").val("");							
-								showAndDismissAlert("success", "New HMI button created succesfully!", "sensorsAlert");
-							}, (error) => {
-								console.log(error);
-								// Error creating the entity
-								showAndDismissAlert("danger", "There was an error creating the HMI button (" + error + ")!", "sensorsAlert");
-							}
-						);
-					}).fail(function(xhr, status, err) {
-						showAndDismissAlert("danger", xhr.responseText, "sensorsAlert");				
-					});				
-				}					
+								}).done(function(data) {				
+									ngsiConnection.v2.createEntity({
+										"id": ocbId,
+										"type": "SensorAgent",
+										"measurementType": {
+											"type": "string",
+											//"value": $("#new_sensor_measurement_type").val()
+											"value": "-"
+										},
+										"modifiedTime": {
+											"type": "string",
+											"value": new Date().toISOString()
+										},
+										"readings": {
+											"type": "array",
+											"value": [
+												{
+													"type": "SensorReading",
+													"value": {
+														"reading": {
+															"type": "boolean",
+															"value": false
+														}
+													}
+												}
+											]
+										},
+										"sanID": {
+											"type": "string",
+											//"value": $("#new_sensor_id").val()
+											"value": "SAN_" + ocbId
+										},						
+										"sensorID": {
+											"type": "string",
+											//"value": $("#new_sensor_id").val()
+											"value": ocbId
+										},
+										"sensorManufacturer": {
+											"type": "string",
+											//"value": $("#new_sensor_manufacturer").val()
+											"value": "-"
+										},
+										"sensorType": {
+											"type": "string",
+											//"value": $("#new_sensor_type").val()
+											"value": ON_OFF_SENSOR
+										}
+									}).then(
+										(response) => {
+											// Entity created successfully
+											var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, sensorId) + "</tr>";
+											$("#currentOnOffSensors").append(onOffSensorHTML);							
+											$("#new_sensor_name").val("");							
+											$("#new_sensor_id").val("");									
+											//$("#new_sensor_measurement_type").val("");
+											//$("#new_sensor_id").val("");
+											//$("#new_sensor_manufacturer").val("");
+											//$("#new_sensor_type").val("");							
+											showAndDismissAlert("success", "New HMI button created succesfully!", "sensorsAlert");
+										}, (error) => {
+											console.log(error);
+											// Error creating the entity
+											showAndDismissAlert("danger", "There was an error creating the HMI button (" + error + ")!", "sensorsAlert");
+										}
+									);
+								}).fail(function(xhr, status, err) {
+									showAndDismissAlert("danger", xhr.responseText, "sensorsAlert");				
+								});				
+							}					
+						}
+					});
+				}
 			}
 		});
 	} else {
-		showAndDismissAlert("danger", "Id field is required.", "sensorsAlert");		
+		showAndDismissAlert("danger", "Name and id fields are required.", "sensorsAlert");		
 	}
 }
 
