@@ -47,11 +47,11 @@ function createNewSensor() {
 										"measurementType": {
 											"type": "string",
 											//"value": $("#new_sensor_measurement_type").val()
-											"value": "-"
+											"value": "boolean"
 										},
 										"modifiedTime": {
 											"type": "string",
-											"value": new Date().toISOString()
+											"value": new Date().toISOString().split('.')[0]+"Z"
 										},
 										"readings": {
 											"type": "array",
@@ -86,7 +86,11 @@ function createNewSensor() {
 											"type": "string",
 											//"value": $("#new_sensor_type").val()
 											"value": ON_OFF_SENSOR
-										}
+										},
+										"units": {
+											"type": "string",
+											"value": "boolean"
+										}										
 									}).then(
 										(response) => {
 											// Entity created successfully
@@ -151,7 +155,7 @@ function initSensors(ngsiConnection) {
 			}
 		});
 	});			
-	$('#currentOnOffSensors').on('click', 'a', function(e) {
+	$('#currentOnOffSensors').on('click', 'a.hmi-button', function(e) {
 		var ocbId = this.id.substr("onOffSensorButton_".length);
 		if (currentlyProcessing.indexOf(ocbId) != -1) {
 			return false;
@@ -164,7 +168,7 @@ function initSensors(ngsiConnection) {
 			"id": ocbId,
 			"modifiedTime": {
 					"type": "string",
-					"value": new Date().toISOString()
+					"value": new Date().toISOString().split('.')[0]+"Z" 
 			},
 			"readings": {
 							"type": "array",
@@ -188,7 +192,7 @@ function initSensors(ngsiConnection) {
 							"id": ocbId,
 							"modifiedTime": {
 									"type": "string",
-									"value": new Date().toISOString()
+									"value": new Date().toISOString().split('.')[0]+"Z" 
 							},
 							"readings": {
 											"type": "array",
