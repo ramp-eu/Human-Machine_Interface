@@ -60,7 +60,7 @@ exports.delTaskSpecs = function(signal) {
                                                         body : {"actionType": "delete", "entities": jsonarr}},
                                                         function(e, r, b) {
                                                             if (e) {
-                                                                console.log(er);
+                                                                console.log(e);
                                                                 resolve();
                                                             }
                                                             else {

@@ -2,25 +2,35 @@ var User = require('../app/models/user');
 
 exports.init = function(id, pw) {
 
-    User.findOne({ 'userid' :  id }, function(err, user) {
-        // if there are any errors, return the error
-        if (err) return done(err);
+    return new Promise((resolve) => {
+        
+        console.log('... creating admin');
 
-        // check to see if theres already a user with that userid
-        if (user) {
-            return;
-        } else {
+        User.findOne({ 'userid' :  id }, function(err, user) {
+            // if there are any errors, return the error
+            if (err) {
+                console.log(err);
+                resolve();
+            }
 
-            // create the user
-            var newUser = new User();
-            newUser.userid      = id;
-            newUser.password    = newUser.generateHash(pw);
-            newUser.role        = 'admin';
-            newUser.name        = 'admin';
+            // check to see if theres already a user with that userid
+            if (user) {
+                resolve();
+            } else {
 
-            newUser.save(function(err) {
-                if (err) return done(err);
-            });
-        }
+                // create the user
+                var newUser = new User();
+                newUser.userid      = id;
+                newUser.password    = newUser.generateHash(pw);
+                newUser.role        = 'admin';
+                newUser.name        = 'admin';
+
+                newUser.save(function(err) {
+                    if (err) console.log(err);
+                    else console.log('... User admin created');
+                    resolve();
+                });
+            }
+        });
     });
 }
