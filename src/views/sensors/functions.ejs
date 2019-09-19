@@ -18,103 +18,91 @@ function createNewSensor() {
 						}
 					}
 				});
-				if (!alreadyExists) {
-					$.ajax({
-						type: "GET",
-						url: "./api/config",
-						dataType: "json",
-						success: function (data) {					
-							var ngsiConnection = null;
-							$(data).each(function(i, item) {							
-								ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
-									ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
-								});
-							})
-							if (ngsiConnection != null) {
-								var sensorId = $("#new_sensor_name").val();					
-								var ocbId = $("#new_sensor_id").val();
-								$.ajax({
-									url: "./api/hmibutton",
-									type: "POST",
-									data: {
-										"ocb_id": ocbId,
-										"text": sensorId
-									}
-								}).done(function(data) {				
-									ngsiConnection.v2.createEntity({
-										"id": ocbId,
-										"type": "SensorAgent",
-										"measurementType": {
-											"type": "string",
-											//"value": $("#new_sensor_measurement_type").val()
-											"value": "boolean"
-										},
-										"modifiedTime": {
-											"type": "string",
-											"value": new Date().toISOString().split('.')[0]+"Z"
-										},
-										"readings": {
-											"type": "array",
-											"value": [
-												{
-													"type": "SensorReading",
-													"value": {
-														"reading": {
-															"type": "boolean",
-															"value": false
-														}
-													}
-												}
-											]
-										},
-										"sanID": {
-											"type": "string",
-											//"value": $("#new_sensor_id").val()
-											"value": "SAN_" + ocbId
-										},						
-										"sensorID": {
-											"type": "string",
-											//"value": $("#new_sensor_id").val()
-											"value": ocbId
-										},
-										"sensorManufacturer": {
-											"type": "string",
-											//"value": $("#new_sensor_manufacturer").val()
-											"value": "-"
-										},
-										"sensorType": {
-											"type": "string",
-											//"value": $("#new_sensor_type").val()
-											"value": ON_OFF_SENSOR
-										},
-										"units": {
-											"type": "string",
-											"value": "boolean"
-										}										
-									}).then(
-										(response) => {
-											// Entity created successfully
-											var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, sensorId) + "</tr>";
-											$("#currentOnOffSensors").append(onOffSensorHTML);							
-											$("#new_sensor_name").val("");							
-											$("#new_sensor_id").val("");									
-											//$("#new_sensor_measurement_type").val("");
-											//$("#new_sensor_id").val("");
-											//$("#new_sensor_manufacturer").val("");
-											//$("#new_sensor_type").val("");							
-											showAndDismissAlert("success", "New HMI button created succesfully!", "sensorsAlert");
-										}, (error) => {
-											console.log(error);
-											// Error creating the entity
-											showAndDismissAlert("danger", "There was an error creating the HMI button (" + error + ")!", "sensorsAlert");
-										}
-									);
-								}).fail(function(xhr, status, err) {
-									showAndDismissAlert("danger", xhr.responseText, "sensorsAlert");				
-								});				
-							}					
-						}
+				if (!alreadyExists) {				
+					var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
+						ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
 					});
+					var sensorId = $("#new_sensor_name").val();					
+					var ocbId = $("#new_sensor_id").val();
+					$.ajax({
+						url: "./api/hmibutton",
+						type: "POST",
+						data: {
+							"ocb_id": ocbId,
+							"text": sensorId
+						}
+					}).done(function(data) {				
+						ngsiConnection.v2.createEntity({
+							"id": ocbId,
+							"type": "SensorAgent",
+							"measurementType": {
+								"type": "string",
+								//"value": $("#new_sensor_measurement_type").val()
+								"value": "boolean"
+							},
+							"modifiedTime": {
+								"type": "string",
+								"value": new Date().toISOString().split('.')[0]+"Z"
+							},
+							"readings": {
+								"type": "array",
+								"value": [
+									{
+										"type": "SensorReading",
+										"value": {
+											"reading": {
+												"type": "boolean",
+												"value": false
+											}
+										}
+									}
+								]
+							},
+							"sanID": {
+								"type": "string",
+								//"value": $("#new_sensor_id").val()
+								"value": "SAN_" + ocbId
+							},						
+							"sensorID": {
+								"type": "string",
+								//"value": $("#new_sensor_id").val()
+								"value": ocbId
+							},
+							"sensorManufacturer": {
+								"type": "string",
+								//"value": $("#new_sensor_manufacturer").val()
+								"value": "-"
+							},
+							"sensorType": {
+								"type": "string",
+								//"value": $("#new_sensor_type").val()
+								"value": ON_OFF_SENSOR
+							},
+							"units": {
+								"type": "string",
+								"value": "boolean"
+							}										
+						}).then(
+							(response) => {
+								// Entity created successfully
+								var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, sensorId) + "</tr>";
+								$("#currentOnOffSensors").append(onOffSensorHTML);							
+								$("#new_sensor_name").val("");							
+								$("#new_sensor_id").val("");									
+								//$("#new_sensor_measurement_type").val("");
+								//$("#new_sensor_id").val("");
+								//$("#new_sensor_manufacturer").val("");
+								//$("#new_sensor_type").val("");							
+								showAndDismissAlert("success", "New HMI button created succesfully!", "sensorsAlert");
+							}, (error) => {
+								console.log(error);
+								// Error creating the entity
+								showAndDismissAlert("danger", "There was an error creating the HMI button (" + error + ")!", "sensorsAlert");
+							}
+						);
+					}).fail(function(xhr, status, err) {
+						showAndDismissAlert("danger", xhr.responseText, "sensorsAlert");				
+					});									
 				}
 			}
 		});

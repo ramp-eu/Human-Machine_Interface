@@ -32,6 +32,11 @@
 			var floorPlanImageXOffset = 0;
 			var floorPlanImageYOffset = 0;
 		
+			var ocb_host = <%- '"' + ocb_host + '"' %>;	
+			var ocb_port = <%- '"' + ocb_port + '"' %>;	
+			var ngsi_proxy_host = <%- '"' + ngsi_proxy_host + '"' %>;	
+			var ngsi_proxy_port = <%- '"' + ngsi_proxy_port + '"' %>;		
+		
 			$(document).ready(function() {
 				
 				startSubscriptions();
@@ -50,179 +55,162 @@
 			});
 			
 			function startSubscriptions() {
-				$.ajax({
-					type: "GET",
-					url: "./api/config",
-					dataType: "json",
-					success: function (data) {
-						var ngsiConnection = null;
-						$(data).each(function(i, item) {
-							<% if (user && user.role == "admin") { %>							
-							$("#ocb_host").val(item.ocb_host);	
-							$("#ocb_port").val(item.ocb_port);	
-							$("#ngsi_proxy_host").val(item.ngsi_proxy_host);	
-							$("#ngsi_proxy_port").val(item.ngsi_proxy_port);
-							<% } %>
-							if (item.ocb_host != "" && item.ocb_port != "" && item.ngsi_proxy_host != "" && item.ngsi_proxy_port != "") {
-								ngsiConnection = new NGSI.Connection("http://" + item.ocb_host + ":" + item.ocb_port, {
-									ngsi_proxy_url: "http://" + item.ngsi_proxy_host + ":" + item.ngsi_proxy_port
-								});
-								ngsiConnection.getServerDetails().then(
-								(response) => {
-								}, (error) => {
-									$("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. Cannot connect to OCB.<% if (user && user.role == "admin") { %> Check configuration.<% } %></div>");
-								});										
+				var ngsiConnection = null;
+				if (ocb_host != "" && ocb_port != "" && ngsi_proxy_host != "" && ngsi_proxy_port != "") {
+					ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
+						ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
+					});
+					ngsiConnection.getServerDetails().then(
+					(response) => {
+					}, (error) => {
+						$("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. Cannot connect to OCB.<% if (user && user.role == "admin") { %> Check configuration.<% } %></div>");
+					});										
+				} else {
+					$("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. Cannot connect to OCB.<% if (user && user.role == "admin") { %> Check configuration.<% } %></div>");				
+				}
+				if (ngsiConnection == null) {
+					$("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. OCB is not configured.<% if (user && user.role == "admin") { %> Configure OCB in System Settings.<% } %></div>");
+				} else {
+					$.ajax({
+						type: "GET",
+						url: "./api/fp",
+						dataType: "json",
+						success: function (data) {					
+							var created = "";
+							var imgURL = "";
+							var name = "";
+							var xoffset = "";
+							var yoffset = "";
+							$(data).each(function(i, item) {						
+								if (item.created > created) {						
+									created = item.created;
+									imgURL = item.imgurl;
+									name = item.name;
+									floorPlanImageScale = item.scale;
+									floorPlanImageXOffset = item.xoffset;
+									floorPlanImageYOffset = item.yoffset;
+								}						
+							})
+							if (imgURL != "") {
+								floorPlanImage = new Image();
+								floorPlanImage.onload = function() {		
+									drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+									drawImageOnCanvas(floorPlanImage, "#floorplan");
+									$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + floorPlanImageScale + " m/px, <strong>x-offset:</strong> " + floorPlanImageXOffset + " px, <strong>y-offset:</strong> " + floorPlanImageYOffset + " px</p>");
+								};
+								floorPlanImage.src = imgURL;	
 							}
-						})
-						if (ngsiConnection == null) {
-							$("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. OCB is not configured.<% if (user && user.role == "admin") { %> Configure OCB in System Settings.<% } %></div>");
-						} else {
-							$.ajax({
-								type: "GET",
-								url: "./api/fp",
-								dataType: "json",
-								success: function (data) {					
-									var created = "";
-									var imgURL = "";
-									var name = "";
-									var xoffset = "";
-									var yoffset = "";
-									$(data).each(function(i, item) {						
-										if (item.created > created) {						
-											created = item.created;
-											imgURL = item.imgurl;
-											name = item.name;
-											floorPlanImageScale = item.scale;
-											floorPlanImageXOffset = item.xoffset;
-											floorPlanImageYOffset = item.yoffset;
-										}						
-									})
-									if (imgURL != "") {
-										floorPlanImage = new Image();
-										floorPlanImage.onload = function() {		
-											drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
-											drawImageOnCanvas(floorPlanImage, "#floorplan");
-											$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + floorPlanImageScale + " m/px, <strong>x-offset:</strong> " + floorPlanImageXOffset + " px, <strong>y-offset:</strong> " + floorPlanImageYOffset + " px</p>");
-										};
-										floorPlanImage.src = imgURL;	
-									}
-															
-									if (ngsiConnection != null) {
-							
-										/* INITIALIZATIONS */				
-										initTaskSpecifications(ngsiConnection);						    
-										initCurrentTasks(ngsiConnection);										
-										initRobotsTable(ngsiConnection);									
-										initSensors(ngsiConnection);	
-										initSensorData(ngsiConnection);		
-										<% if (user && user.role == "admin") { %>
-											initSystemSettings();
-											initUsers();
-										<% } %>
+													
+							if (ngsiConnection != null) {
+					
+								/* INITIALIZATIONS */				
+								initTaskSpecifications(ngsiConnection);						    
+								initCurrentTasks(ngsiConnection);										
+								initRobotsTable(ngsiConnection);									
+								initSensors(ngsiConnection);	
+								initSensorData(ngsiConnection);		
+								<% if (user && user.role == "admin") { %>
+									initUsers();
+								<% } %>
 
-										/* SUBSCRIPTIONS */
-										ngsiConnection.v2.createSubscription({
-											"description": "Updating task specifications",
-											"subject": { "entities": [ { "idPattern": ".*", "type": "TaskSpecState" } ] },
-											"notification": {
-												"callback": function (notification) {				   
-													updateTaskSpecifications(notification);
-												}
-											},
-											//"expires": "2040-04-05T14:00:00.00Z",
-											//"throttling": 5
-										}).then(
-											(response) => {
-												//console.log("Created subscription: " + JSON.stringify(response));
-											}, (error) => {
-												//console.log(error);
-											}
-										);		
-
-										ngsiConnection.v2.createSubscription({
-											"description": "Updating current tasks",
-											"subject": { "entities": [ { "idPattern": ".*", "type": "taskSet" } ] },
-											"notification": {
-												"callback": function (notification) {				   
-													updateCurrentTasks(notification);
-												}
-											},
-											//"expires": "2040-04-05T14:00:00.00Z",
-											//"throttling": 5
-										}).then(
-											(response) => {
-												//console.log("Created subscription: " + JSON.stringify(response));
-											}, (error) => {
-												//console.log(error);
-											}
-										);										
-										
-										ngsiConnection.v2.createSubscription({
-											"description": "Updating ongoing tasks",
-											"subject": { "entities": [ { "idPattern": ".*", "type": "Task" } ] },
-											"notification": {
-												"callback": function (notification) {				   
-													updateOngoingTasks(notification);
-												}
-											},
-											//"expires": "2040-04-05T14:00:00.00Z",
-											//"throttling": 5
-										}).then(
-											(response) => {
-												//console.log("Created subscription: " + JSON.stringify(response));
-											}, (error) => {
-												//console.log(error);
-											}
-										);										
-										
-										ngsiConnection.v2.createSubscription({
-											"description": "Updating robot data",
-											"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "position_channel" ] } },
-											"notification": {
-												"callback": function (notification) {
-													updateRobotsOnOverview(notification);
-													updateRobotsTable(notification);
-											   },
-											   "attrs": [ "position_channel" ]
-											},
-											//"expires": "2040-04-05T14:00:00.00Z",
-											//"throttling": 5
-										}).then(
-											(response) => {
-												//console.log("Created subscription: " + JSON.stringify(response));
-											}, (error) => {
-												//console.log(error);
-											}
-										);
-										
-										ngsiConnection.v2.createSubscription({
-											"description": "Updating sensor data",
-											"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ] },
-											"notification": {
-												"callback": function (notification) {
-													updateSensorsOnOverview(notification);
-													updateSensors(notification);	
-													updateSensorData(notification);					
-												}
-											},
-											//"expires": "2040-04-05T14:00:00.00Z",
-											//"throttling": 5
-										}).then(
-											(response) => {
-												//console.log("Created subscription: " + JSON.stringify(response));
-											}, (error) => {
-												//console.log(error);
-											}
-										);							
+								/* SUBSCRIPTIONS */
+								ngsiConnection.v2.createSubscription({
+									"description": "Updating task specifications",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "TaskSpecState" } ] },
+									"notification": {
+										"callback": function (notification) {				   
+											updateTaskSpecifications(notification);
+										}
+									},
+									//"expires": "2040-04-05T14:00:00.00Z",
+									//"throttling": 5
+								}).then(
+									(response) => {
+										//console.log("Created subscription: " + JSON.stringify(response));
+									}, (error) => {
+										//console.log(error);
 									}
-								}
-							});
+								);		
+
+								ngsiConnection.v2.createSubscription({
+									"description": "Updating current tasks",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "taskSet" } ] },
+									"notification": {
+										"callback": function (notification) {				   
+											updateCurrentTasks(notification);
+										}
+									},
+									//"expires": "2040-04-05T14:00:00.00Z",
+									//"throttling": 5
+								}).then(
+									(response) => {
+										//console.log("Created subscription: " + JSON.stringify(response));
+									}, (error) => {
+										//console.log(error);
+									}
+								);										
+								
+								ngsiConnection.v2.createSubscription({
+									"description": "Updating ongoing tasks",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "Task" } ] },
+									"notification": {
+										"callback": function (notification) {				   
+											updateOngoingTasks(notification);
+										}
+									},
+									//"expires": "2040-04-05T14:00:00.00Z",
+									//"throttling": 5
+								}).then(
+									(response) => {
+										//console.log("Created subscription: " + JSON.stringify(response));
+									}, (error) => {
+										//console.log(error);
+									}
+								);										
+								
+								ngsiConnection.v2.createSubscription({
+									"description": "Updating robot data",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "position_channel" ] } },
+									"notification": {
+										"callback": function (notification) {
+											updateRobotsOnOverview(notification);
+											updateRobotsTable(notification);
+									   },
+									   "attrs": [ "position_channel" ]
+									},
+									//"expires": "2040-04-05T14:00:00.00Z",
+									//"throttling": 5
+								}).then(
+									(response) => {
+										//console.log("Created subscription: " + JSON.stringify(response));
+									}, (error) => {
+										//console.log(error);
+									}
+								);
+								
+								ngsiConnection.v2.createSubscription({
+									"description": "Updating sensor data",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ] },
+									"notification": {
+										"callback": function (notification) {
+											updateSensorsOnOverview(notification);
+											updateSensors(notification);	
+											updateSensorData(notification);					
+										}
+									},
+									//"expires": "2040-04-05T14:00:00.00Z",
+									//"throttling": 5
+								}).then(
+									(response) => {
+										//console.log("Created subscription: " + JSON.stringify(response));
+									}, (error) => {
+										//console.log(error);
+									}
+								);							
+							}
 						}
-					},
-					error: function(xhr, ajaxOptions, thrownError) {
-					  $("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\"><p>Error. Cannot connect to database.</p><p>" + thrownError + "</p><p>" + xhr.statusText + "</p><p>" + xhr.responseText + "</p></div>");
-					}					
-				});
+					});
+				}
 			}
 			
 			<% include ./generalFunctions.ejs %>			
@@ -232,8 +220,7 @@
 			<% include ./robots/functions.ejs %>
 			<% include ./sensors/functions.ejs %>				
 			<% include ./sensor_data/functions.ejs %>		
-			<% if (user && user.role == "admin") { %>
-				<% include ./system_settings/functions.ejs %>		
+			<% if (user && user.role == "admin") { %>	
 				<% include ./user_management/functions.ejs %>
 			<% } %>		
 		</script>
@@ -257,8 +244,7 @@
 				<li><a href="#sensorsTab" role="tab" data-toggle="tab">Control</a></li>				
 				<li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>			
 				<% if (user && user.role == "admin") { %>  
-				<li><a href="#usersTab" role="tab" data-toggle="tab">User Management</a></li>					
-				<li><a href="#settingsTab" role="tab" data-toggle="tab">System Settings</a></li>				
+				<li><a href="#usersTab" role="tab" data-toggle="tab">User Management</a></li>
 				<% } %>
 			</ul>
 			<div class="tab-content">
@@ -283,9 +269,6 @@
 				<% if (user && user.role == "admin") { %>  			
 					<div class="tab-pane" id="usersTab" style="margin-top:0px;">
 						<% include ./user_management/tabContent.ejs %>
-					</div>
-					<div class="tab-pane" id="settingsTab" style="margin-top:0px;">
-						<% include ./system_settings/tabContent.ejs %>
 					</div>
                 <% } %>				
 			</div>	
