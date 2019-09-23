@@ -15,6 +15,7 @@ exports.init = function(id, pw) {
 
             // check to see if theres already a user with that userid
             if (user) {
+                console.log('... User admin already created found');
                 resolve();
             } else {
 

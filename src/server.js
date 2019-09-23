@@ -1,10 +1,10 @@
 // server.js
 
 // set up ======================================================================
+var port     = 8081;
 // get all the tools we need
 var express  = require('express');
 var app      = express();
-var port     = 8081;
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash    = require('connect-flash');
@@ -17,6 +17,7 @@ var session      = require('express-session');
 var configDB = require('./config/database.js');
 var i18n = require('i18n-2');
 //var cors = require('cors')
+var inittestconns = require('./config/inittestconns.js');
 var inituser = require('./config/inituser.js');
 var initbuttons = require('./config/initbuttons.js');
 var cleanup = require('./config/cleanup.js');
@@ -29,6 +30,7 @@ mongoose.connect(configDB.url, { useNewUrlParser: true }); // connect to our dat
 
 require('./config/passport')(passport); // pass passport for configuration
 
+inittestconns.test(process.env.ocb_host, process.env.ocb_port, process.env.ngsi_proxy_host, process.env.ngsi_proxy_port);
 inituser.init(process.env.inituser, process.env.initpw);
 initbuttons.init(process.env.ocb_host, process.env.ocb_port);
 

@@ -5,7 +5,7 @@ exports.init = function(ocb_host, ocb_port) {
     
     return new Promise((resolve) => {
         
-    console.log('... creating HMI buttons');
+    console.log('... creating HMI buttons if found from local MongoDB');
 
         Hmibutton.find({}).exec(function(err, buttons) {
             if (err) {
