@@ -19,11 +19,12 @@ function addNewUser() {
 		showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
 	} else if ($("#newUserPassword").val() != $("#newUserConfirmPw").val()) {
 		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
-	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");				
+//Not needed anymore (OCB connection). Left here commented out for possible later use
+		/*	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
+		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");*/				
 	} else {				
-		$("#newUserOCBHost").val($("#ocb_host").val());
-		$("#newUserOCBPort").val($("#ocb_port").val());
+//		$("#newUserOCBHost").val($("#ocb_host").val());
+//		$("#newUserOCBPort").val($("#ocb_port").val());
 		$.ajax({
 			url: "./api/user",
 			type: "POST",
@@ -54,11 +55,13 @@ function addNewUser() {
 function deleteUser(id) {			
 	bootbox.confirm("Are you sure you want to delete the user?", function(result) {
 		if (result == true) {
-			if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-				showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");				
-			} else {							
+//Not needed anymore (OCB connection). Left here commented out for possible later use
+//			if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
+//				showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");				
+//			} else {							
 				$.ajax({
-					url: "./api/user/" + id + "/" + $("#ocb_host").val() + "/" + $("#ocb_port").val(),
+//					url: "./api/user/" + id + "/" + $("#ocb_host").val() + "/" + $("#ocb_port").val(),
+					url: "./api/user/" + id,
 					type: 'DELETE',
 					success: function(result) {
 						$("#" + id).remove();
@@ -69,7 +72,7 @@ function deleteUser(id) {
 						showAndDismissAlert("danger", err.Message, "usersAlert");	
 					}
 				});
-			}
+// See up			}
 		}
 	});
 	return false;			
@@ -85,11 +88,12 @@ function updateUser(id) {
 	}
 	if ($("#password_" + id).val() != "" && $("#password_" + id).val() != $("#confirm_pw_" + id).val()) {
 		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
-	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to update users.", "usersAlert");				
+//Not needed anymore (OCB connection). Left here commented out for possible later use
+//	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
+//		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to update users.", "usersAlert");				
 	} else {				
-		$("#newUserOCBHost").val($("#ocb_host").val());
-		$("#newUserOCBPort").val($("#ocb_port").val());
+//		$("#newUserOCBHost").val($("#ocb_host").val());
+//		$("#newUserOCBPort").val($("#ocb_port").val());
 		$.ajax({
 			url: "./api/user/" + id,
 			type: "PUT",
@@ -121,7 +125,7 @@ function getUserHTML(id, userid, role, name) {
 		"<td><input type=\"password\" class=\"form-control\" id=\"confirm_pw_" + id + "\" value=\"\"/></td>" +
 		"<td><button type=\"button\" class=\"btn btn-primary btn-block\" onClick=\"updateUser(\'" + id + "\')\">Update</button></td><td><button type=\"button\" class=\"btn btn-primary btn-block\" onClick=\"deleteUser(\'" + id + "\')\"";
 	if (role == "admin") { 
-		//userHTML += " disabled";  // SHOULD DELETING ADMINS BE DISABLED?
+		//userHTML += " disabled";  // SHOULD DELETING ADMINS BE DISABLED? paju's comment: not yet needed, admin should generally be able to do everything (sane)
 	}														
 	userHTML += ">Delete</button></td></tr>";	
 	return userHTML;
