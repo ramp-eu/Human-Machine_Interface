@@ -29,7 +29,12 @@ function addNewUser() {
 			url: "./api/user",
 			type: "POST",
 			data: $("#newUser").serialize()
-		}).done(function(data) {				
+		}).done(function(data) {
+			$("#newUserUserId").val("");
+			$("#newUserRole").val("user");
+			$("#newUserName").val("");
+			$("#newUserPassword").val("");
+			$("#newUserConfirmPw").val("");	
 			$.ajax({
 				type: "GET",
 				url: "./api/user",
@@ -64,7 +69,7 @@ function deleteUser(id) {
 					url: "./api/user/" + id,
 					type: 'DELETE',
 					success: function(result) {
-						$("#" + id).remove();
+						$("#updateUser_" + id).remove();
 						showAndDismissAlert("success", "User deleted succesfully!", "usersAlert");
 					},
 					error: function(xhr, status, error) {
