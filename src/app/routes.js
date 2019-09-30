@@ -2,6 +2,7 @@ var User = require('./models/user');
 var Floorplan = require('./models/floorplan');
 var Config = require('./models/config');
 var Hmibutton = require('./models/hmibutton');
+var Subscription = require('./models/subscription');
 var multer  = require('multer');
 var path = require('path');
 var fs = require('fs');
@@ -379,8 +380,24 @@ module.exports = function(app, passport) {
             res.send(data);
         });
     });
+    
+// SUBSCRIPTION SECTION =======================================================
+    
+    app.post('/api/subscription', isLoggedIn, function(req, res, next) {
+
+        var newSubsc     = new Subscription();
+        newSubsc.subs_id = req.body.subs_id;
+        newSubsc.created = new Date().toISOString();
+        newSubsc.updated = new Date().toISOString();
+
+        newSubsc.save(function(err, data) {
+            if (err) return next(err);
+            res.send(data);
+        });
+    });
 
 // MAIN SECTION =========================
+    
     app.get('/main', isLoggedIn, function(req, res) {
         /*if (req.user.role === "admin")
             res.redirect('/admin');
