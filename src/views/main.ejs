@@ -127,6 +127,16 @@
 								}).then(
 									(response) => {
 										//console.log("Created subscription: " + JSON.stringify(response));
+										$.ajax({
+											url: "./api/subscription",
+											type: "POST",
+											data: {
+												"subs_id": response.subscription.id
+											}
+										}).done(function(data) {
+										}).fail(function(xhr, status, err) {
+											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
+										});			
 									}, (error) => {
 										//console.log(error);
 									}
@@ -145,6 +155,16 @@
 								}).then(
 									(response) => {
 										//console.log("Created subscription: " + JSON.stringify(response));
+										$.ajax({
+											url: "./api/subscription",
+											type: "POST",
+											data: {
+												"subs_id": response.subscription.id
+											}
+										}).done(function(data) {
+										}).fail(function(xhr, status, err) {
+											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
+										});	
 									}, (error) => {
 										//console.log(error);
 									}
@@ -163,6 +183,16 @@
 								}).then(
 									(response) => {
 										//console.log("Created subscription: " + JSON.stringify(response));
+										$.ajax({
+											url: "./api/subscription",
+											type: "POST",
+											data: {
+												"subs_id": response.subscription.id
+											}
+										}).done(function(data) {
+										}).fail(function(xhr, status, err) {
+											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
+										});											
 									}, (error) => {
 										//console.log(error);
 									}
@@ -183,6 +213,16 @@
 								}).then(
 									(response) => {
 										//console.log("Created subscription: " + JSON.stringify(response));
+										$.ajax({
+											url: "./api/subscription",
+											type: "POST",
+											data: {
+												"subs_id": response.subscription.id
+											}
+										}).done(function(data) {
+										}).fail(function(xhr, status, err) {
+											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
+										});											
 									}, (error) => {
 										//console.log(error);
 									}
@@ -203,6 +243,16 @@
 								}).then(
 									(response) => {
 										//console.log("Created subscription: " + JSON.stringify(response));
+										$.ajax({
+											url: "./api/subscription",
+											type: "POST",
+											data: {
+												"subs_id": response.subscription.id
+											}
+										}).done(function(data) {
+										}).fail(function(xhr, status, err) {
+											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
+										});											
 									}, (error) => {
 										//console.log(error);
 									}
