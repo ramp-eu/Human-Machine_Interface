@@ -357,6 +357,7 @@ module.exports = function(app, passport) {
         Hmibutton.findByIdAndUpdate(req.params.id,
                                    {'ocb_id'    : req.body.ocb_id,
                                     'text'      : req.body.text,
+                                    'user_id'   : req.body.user_id,
                                     'updated'   : new Date().toISOString()
                                    },
                                    {new: true},
@@ -372,6 +373,7 @@ module.exports = function(app, passport) {
         var newHmibutton        = new Hmibutton();
         newHmibutton.ocb_id     = req.body.ocb_id;
         newHmibutton.text       = req.body.text;
+        newHmibutton.user_id    = req.body.user_id;
         newHmibutton.created    = new Date().toISOString();
         newHmibutton.updated    = new Date().toISOString();
 
