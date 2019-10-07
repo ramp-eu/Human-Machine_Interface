@@ -24,12 +24,14 @@ function createNewSensor() {
 					});
 					var sensorId = $("#new_sensor_name").val();					
 					var ocbId = $("#new_sensor_id").val();
+					var userId = $("#new_sensor_assign_to_select").val();
 					$.ajax({
 						url: "./api/hmibutton",
 						type: "POST",
 						data: {
 							"ocb_id": ocbId,
-							"text": sensorId
+							"text": sensorId,
+							"user_id" : userId
 						}
 					}).done(function(data) {				
 						ngsiConnection.v2.createEntity({
@@ -85,10 +87,11 @@ function createNewSensor() {
 						}).then(
 							(response) => {
 								// Entity created successfully
-								var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, sensorId) + "</tr>";
+								var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, sensorId, userId) + "</tr>";
 								$("#currentOnOffSensors").append(onOffSensorHTML);							
 								$("#new_sensor_name").val("");							
-								$("#new_sensor_id").val("");									
+								$("#new_sensor_id").val("");	
+								$("#new_sensor_assign_to_select").val("all");								
 								//$("#new_sensor_measurement_type").val("");
 								//$("#new_sensor_id").val("");
 								//$("#new_sensor_manufacturer").val("");
@@ -113,6 +116,19 @@ function createNewSensor() {
 
 function initSensors(ngsiConnection) {	
 
+	$.ajax({
+		type: "GET",
+		url: "./api/user",
+		dataType: "json",
+		success: function (data) {					
+			$(data).each(function(i, item) {
+				if (item.role == "user") {
+					$("#new_sensor_assign_to_select").append("<option value=\"" + item.userid + "\">" + item.name + "</option>");					
+				}
+			})
+		}
+	});
+
 	ngsiConnection.v2.listEntities({type: "SensorAgent"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
@@ -133,8 +149,8 @@ function initSensors(ngsiConnection) {
 					dataType: "json",
 					success: function (data) {					
 						$(data).each(function(i, item) {
-							if (item.ocb_id == ocbId) {				
-								var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, item.text) + "</tr>";
+							if (item.ocb_id == ocbId && (<%- '"' + user.role + '"' %> == "admin" || (item.user_id == "all" || item.user_id == <%- '"' + user.userid + '"' %>))) {
+								var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, item.text, item.user_id) + "</tr>";
 								$("#currentOnOffSensors").append(onOffSensorHTML);							
 							}
 						})
@@ -276,8 +292,8 @@ function updateSensors(notification) {
 				dataType: "json",
 				success: function (data) {					
 					$(data).each(function(i, item) {
-						if (item.ocb_id == ocbId) {	
-							var onOffSensorHTML = getOnOffSensorRowHTML(ocbId, item.text);
+						if (item.ocb_id == ocbId && (<%- '"' + user.role + '"' %> == "admin" || (item.user_id == "all" || item.user_id == <%- '"' + user.userid + '"' %>))) {						
+							var onOffSensorHTML = getOnOffSensorRowHTML(ocbId, item.text, item.user_id);
 							if (!$("#onOffSensor_" + ocbId).length) {
 								$("#currentOnOffSensors").append("<tr id=\"onOffSensor_" + ocbId + "\">" + onOffSensorHTML + "</tr>");
 							}						
@@ -290,10 +306,10 @@ function updateSensors(notification) {
 	});	
 }
 
-function getOnOffSensorRowHTML(ocbId, sensorId) {
+function getOnOffSensorRowHTML(ocbId, sensorId, assignedTo) {
 	var htmlStr = "<td><a href=\"#\" id=\"onOffSensorButton_" + ocbId + "\" class=\"hmi-button\">" + sensorId + "</a>";
 	<% if (user && user.role == "admin") { %> 
-		htmlStr += "&nbsp;(<a id=\"removeOnOffSensorButton_" + ocbId + "\" class=\"removeOnOffSensorButton\" href=\"#\">delete</a>)";
+		htmlStr += "&nbsp;(assigned to " + assignedTo + ")&nbsp;(<a id=\"removeOnOffSensorButton_" + ocbId + "\" class=\"removeOnOffSensorButton\" href=\"#\">delete</a>)";
 	<% } %>
 	htmlStr += "</td>";
 	return htmlStr;

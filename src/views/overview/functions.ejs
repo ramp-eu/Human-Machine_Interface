@@ -41,6 +41,7 @@ function drawImageOnCanvas(img, targetCanvas) {
 	}
 	*/
 
+	/*
 	ctx2.beginPath();
 	ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 10);
 	ctx2.lineTo(originScaleCanvas.width-20, 10);
@@ -56,7 +57,24 @@ function drawImageOnCanvas(img, targetCanvas) {
 	ctx2.font = "12px";
 	ctx2.fillStyle = "#000000";			
 	ctx2.fillText(scaleText, originScaleCanvas.width-20-scaleDistance-20, 10);	
-
+    */
+	
+	ctx2.beginPath();
+	ctx2.moveTo(32, 10);
+	ctx2.lineTo(32 + scaleDistance, 10);
+	ctx2.stroke();	
+	ctx2.beginPath();	
+	ctx2.moveTo(32, 10);
+	ctx2.lineTo(32, 4);
+	ctx2.stroke();	
+	ctx2.beginPath();	
+	ctx2.moveTo(32 + scaleDistance, 10);
+	ctx2.lineTo(32 + scaleDistance, 4);
+	ctx2.stroke();	
+	ctx2.font = "12px";
+	ctx2.fillStyle = "#000000";			
+	ctx2.fillText(scaleText, 10, 10);		
+	
 	var xOrigin = floorPlanImageXOffset * floorPlanImageToWebPageScale;
 	var yOrigin = (img.height - floorPlanImageYOffset) * floorPlanImageToWebPageScale;			
 	
