@@ -1,0 +1,15 @@
+var sensingAndPerceptionEdges = new Array();
+var sensingAndPerceptionVertices = new Array();
+var sensingAndPerceptionTooltips = new Array();
+
+function initSensingAndPerception(ngsiConnection) {	
+	ngsiConnection.v2.listEntities({type: "SP"}).then((response) => {
+		var entities = response.results;
+		$.each(entities, function(i, entity) {
+			sensingAndPerceptionEdges = entity.graph.value.edges.value;
+			sensingAndPerceptionVertices = entity.graph.value.vertices.value;
+		});
+	});
+}
+
+

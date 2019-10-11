@@ -12,7 +12,8 @@ function drawImageOnCanvas(img, targetCanvas) {
 	//$(targetCanvas).attr('height', parentHeight);			
 	//$(targetCanvas).attr('height', 720);				
 	//floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
-	floorPlanImageToWebPageScale = canvas.width / img.width;	
+	floorPlanImageToWebPageScale = canvas.width / img.width;
+	console.log("Canvas width: " + canvas.width + ", img.width: " + img.width + ", floorPlanImageToWebPageScale: " + floorPlanImageToWebPageScale);
 	$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);	
 	// get the top left position of the image
 	var x = (canvas.width / 2) - (img.width / 2) * floorPlanImageToWebPageScale;
@@ -21,12 +22,64 @@ function drawImageOnCanvas(img, targetCanvas) {
 	//$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);  // resize the canvas smaller if the image is also smaller
 	ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);	
 	
+	/* COMMENTED OUT FOR NOW BEFORE CONFIRMED TO BE WORKING PROPERLY (ALSO NEED TO ADD BUTTON TO ENABLE / DISABLE SHOWING OF VERTICES / EDGES)
+	$.each(sensingAndPerceptionVertices, function (i, vertex) {
+		var x = (((vertex.value.x.value * -1) / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
+		var y = (floorPlanImage.height - (((vertex.value.y.value * -1) / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;
+		console.log("X: " + x + "Y: " + y);
+		ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';		
+		ctx.fillRect(x, y, 5, 5);
+		sensingAndPerceptionTooltips.push({
+            x: x,
+            y: y,
+            r: 4,
+            rXr: 16,
+            tip: "Y: " + vertex.value.y.value + ", X: " + vertex.value.x.value + ", UUID: " + vertex.value.uuid.value + ", theta: " + vertex.value.theta.value + ", name: " + vertex.value.name.value
+        });
+	});
+
+	$("#sensingAndPerceptionTip").attr('width', parentWidth-30);
+	var tipCanvas = document.getElementById("sensingAndPerceptionTip");
+	var tipCtx = tipCanvas.getContext("2d");	
+	
+	$(targetCanvas).mousemove(function(e) {
+
+		var canvasOffset = $(targetCanvas).offset();
+		var offsetX = canvasOffset.left;
+		var offsetY = canvasOffset.top - $(window).scrollTop();
+		
+		mouseX=parseInt(e.clientX-offsetX);
+		mouseY=parseInt(e.clientY-offsetY);
+
+		var hit = false;
+		for (var i = 0; i < sensingAndPerceptionTooltips.length; i++) {
+			var tooltip = sensingAndPerceptionTooltips[i];
+			var dx = mouseX - tooltip.x;
+			var dy = mouseY - tooltip.y;
+			if (dx * dx + dy * dy < tooltip.rXr) {
+				//tipCanvas.style.left = (tooltip.x) + "px";
+				//tipCanvas.style.top = (tooltip.y - 40) + "px";
+				tipCtx.clearRect(0, 0, tipCanvas.width, tipCanvas.height);
+				tipCtx.fillText(tooltip.tip, 5, 15);
+				hit = true;
+			}
+		}
+		if (!hit) {
+			//tipCanvas.style.left = "-200px";
+			//tipCanvas.style.top = (tooltip.y - 40) + "px";
+			tipCtx.clearRect(0, 0, tipCanvas.width, tipCanvas.height);
+			tipCtx.fillText("", 5, 15);
+		}
+			
+	});
+	*/
+	
     var originScaleCanvas = $("#overviewFloorplanOriginScale")[0];
 	var ctx2 = originScaleCanvas.getContext("2d");
 	$("#overviewFloorplanOriginScale").attr('width', parentWidth-30);		
 	$("#overviewFloorplanOriginScale").attr('height', 12);	
 	var scaleText = "1 m"
-	var scaleDistance = ((100 / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+	var scaleDistance = ((1 / floorPlanImageScale)) * floorPlanImageToWebPageScale;
 	/*
 	var temp = 1;
 	while (scaleDistance < 50) {

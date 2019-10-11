@@ -104,6 +104,7 @@
 							if (ngsiConnection != null) {
 					
 								/* INITIALIZATIONS */				
+								initSensingAndPerception(ngsiConnection);
 								initTaskSpecifications(ngsiConnection);						    
 								initCurrentTasks(ngsiConnection);										
 								initRobotsTable(ngsiConnection);									
@@ -264,6 +265,7 @@
 			}
 			
 			<% include ./generalFunctions.ejs %>			
+			<% include ./sp/functions.ejs %>				
 			<% include ./overview/functions.ejs %>		
 			<% include ./floorplan/functions.ejs %>		
 			<% include ./task_management/functions.ejs %>
