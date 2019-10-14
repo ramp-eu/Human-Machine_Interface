@@ -14,11 +14,11 @@ services:
     environment:
      - inituser=admin
      - initpw=admin
-#     - ocb_host=13.79.17.152
-     - ocb_host=13.79.247.180
+     - ocb_host=13.79.17.152
+#     - ocb_host=13.79.247.180
      - ocb_port=1026
-#     - ngsi_proxy_host=13.79.17.152
-     - ngsi_proxy_host=13.79.247.180
+     - ngsi_proxy_host=13.79.17.152
+#     - ngsi_proxy_host=13.79.247.180
      - ngsi_proxy_port=3000
     restart: always
     volumes:
