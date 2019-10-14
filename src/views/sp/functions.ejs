@@ -1,15 +1,30 @@
 var sensingAndPerceptionEdges = new Array();
+var sensingAndPerceptionEdgesTooltips = new Array();
 var sensingAndPerceptionVertices = new Array();
-var sensingAndPerceptionTooltips = new Array();
+var sensingAndPerceptionVerticesTooltips = new Array();
 
 function initSensingAndPerception(ngsiConnection) {	
 	ngsiConnection.v2.listEntities({type: "SP"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
-			sensingAndPerceptionEdges = entity.graph.value.edges.value;
-			sensingAndPerceptionVertices = entity.graph.value.vertices.value;
+			var edges = entity.graph.value.edges.value;
+			var vertices = entity.graph.value.vertices.value;
+			for (i=0; i < edges.length; i++) {
+				var edge = edges[i];
+				var destVertexUUID = edge.value.uuid_dest.value;
+				var srcVertexUUID = edge.value.uuid_src.value;
+				$.each(vertices, function (i, vertex) {
+					if (vertex.value.uuid.value == destVertexUUID) {
+						edge.value.uuid_dest.value = vertex.value;
+					}
+					if (vertex.value.uuid.value == srcVertexUUID) {
+						edge.value.uuid_src.value = vertex.value;
+					}
+				});
+				edges[i] = edge;
+			}
+			sensingAndPerceptionEdges = edges;
+			sensingAndPerceptionVertices = vertices;
 		});
 	});
 }
-
-

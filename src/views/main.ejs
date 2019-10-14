@@ -40,7 +40,11 @@
 			$(document).ready(function() {
 				
 				startSubscriptions();
-							
+			
+				$('#spOnOff').change(function() {
+					updateSPGraphOnCanvas();
+				});
+						
 				$("#sendTaskSpecification").click(function() {
 					sendTaskSpecification();
 					return false;
@@ -50,7 +54,7 @@
 				$("#createNewSensor").click(function() {
 					createNewSensor();
 					return false;
-				});	
+				});
 				<% } %>
 			});
 			

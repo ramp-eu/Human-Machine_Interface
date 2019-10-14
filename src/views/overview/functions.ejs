@@ -13,7 +13,6 @@ function drawImageOnCanvas(img, targetCanvas) {
 	//$(targetCanvas).attr('height', 720);				
 	//floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
 	floorPlanImageToWebPageScale = canvas.width / img.width;
-	console.log("Canvas width: " + canvas.width + ", img.width: " + img.width + ", floorPlanImageToWebPageScale: " + floorPlanImageToWebPageScale);
 	$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);	
 	// get the top left position of the image
 	var x = (canvas.width / 2) - (img.width / 2) * floorPlanImageToWebPageScale;
@@ -22,57 +21,93 @@ function drawImageOnCanvas(img, targetCanvas) {
 	//$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);  // resize the canvas smaller if the image is also smaller
 	ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);	
 	
-	/* COMMENTED OUT FOR NOW BEFORE CONFIRMED TO BE WORKING PROPERLY (ALSO NEED TO ADD BUTTON TO ENABLE / DISABLE SHOWING OF VERTICES / EDGES)
-	$.each(sensingAndPerceptionVertices, function (i, vertex) {
-		var x = (((vertex.value.x.value * -1) / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
-		var y = (floorPlanImage.height - (((vertex.value.y.value * -1) / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;
-		console.log("X: " + x + "Y: " + y);
-		ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';		
-		ctx.fillRect(x, y, 5, 5);
-		sensingAndPerceptionTooltips.push({
-            x: x,
-            y: y,
-            r: 4,
-            rXr: 16,
-            tip: "Y: " + vertex.value.y.value + ", X: " + vertex.value.x.value + ", UUID: " + vertex.value.uuid.value + ", theta: " + vertex.value.theta.value + ", name: " + vertex.value.name.value
-        });
-	});
-
-	$("#sensingAndPerceptionTip").attr('width', parentWidth-30);
-	var tipCanvas = document.getElementById("sensingAndPerceptionTip");
-	var tipCtx = tipCanvas.getContext("2d");	
 	
-	$(targetCanvas).mousemove(function(e) {
-
-		var canvasOffset = $(targetCanvas).offset();
-		var offsetX = canvasOffset.left;
-		var offsetY = canvasOffset.top - $(window).scrollTop();
+	if ($("#spOnOff").prop('checked')) {
+	
+		var xOriginMeters = floorPlanImageXOffset * floorPlanImageScale * -1;
+		var yOriginMeters = floorPlanImageYOffset * floorPlanImageScale * -1;
 		
-		mouseX=parseInt(e.clientX-offsetX);
-		mouseY=parseInt(e.clientY-offsetY);
+		$.each(sensingAndPerceptionEdges, function (i, edge) {
+			var xSrc = ((edge.value.uuid_src.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+			var ySrc = (floorPlanImage.height - ((edge.value.uuid_src.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;			
+			var xDest = ((edge.value.uuid_dest.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+			var yDest = (floorPlanImage.height - ((edge.value.uuid_dest.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';			
+			ctx.beginPath();
+			ctx.moveTo(xSrc, ySrc);
+			ctx.lineTo(xDest, yDest);
+			ctx.stroke();		 
+			sensingAndPerceptionEdgesTooltips.push({
+				xSrc: xSrc,
+				ySrc: ySrc,
+				xDest: xDest,
+				yDest: yDest,
+				tip: "Edge: " + edge.value.name.value + " (UUID: " + edge.value.uuid.value + ")"
+			});		
+		});
 
-		var hit = false;
-		for (var i = 0; i < sensingAndPerceptionTooltips.length; i++) {
-			var tooltip = sensingAndPerceptionTooltips[i];
-			var dx = mouseX - tooltip.x;
-			var dy = mouseY - tooltip.y;
-			if (dx * dx + dy * dy < tooltip.rXr) {
-				//tipCanvas.style.left = (tooltip.x) + "px";
-				//tipCanvas.style.top = (tooltip.y - 40) + "px";
-				tipCtx.clearRect(0, 0, tipCanvas.width, tipCanvas.height);
-				tipCtx.fillText(tooltip.tip, 5, 15);
-				hit = true;
-			}
-		}
-		if (!hit) {
-			//tipCanvas.style.left = "-200px";
-			//tipCanvas.style.top = (tooltip.y - 40) + "px";
-			tipCtx.clearRect(0, 0, tipCanvas.width, tipCanvas.height);
-			tipCtx.fillText("", 5, 15);
-		}
+		$.each(sensingAndPerceptionVertices, function (i, vertex) {
+			var x = ((vertex.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+			var y = (floorPlanImage.height - ((vertex.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';		
+			ctx.fillRect(x-3, y-3, 6, 6);
+			sensingAndPerceptionVerticesTooltips.push({
+				x: x-3,
+				y: y-3,
+				tip: "Vertex: " + vertex.value.name.value + " (UUID: " + vertex.value.uuid.value + ")"
+			});
+		});
+
+		$(targetCanvas).mousemove(function(e) {
+
+			var canvasOffset = $(targetCanvas).offset();
+			var offsetX = canvasOffset.left;
+			var offsetY = canvasOffset.top - $(window).scrollTop();
 			
-	});
-	*/
+			mouseX = parseInt(e.clientX-offsetX);
+			mouseY = parseInt(e.clientY-offsetY);
+
+			var hit = false;
+			
+			// check if mouse cursor on a vertex
+			for (var i = 0; i < sensingAndPerceptionVerticesTooltips.length; i++) {
+				var tooltip = sensingAndPerceptionVerticesTooltips[i];				
+				var tolerance = 4;
+				var dx = mouseX - tooltip.x;
+				var dy = mouseY - tooltip.y;
+				if (dx * dx + dy * dy < tolerance*tolerance) {
+					$("#spTooltip").html(tooltip.tip);
+					hit = true;
+				}
+			}
+			if (!hit) {
+				// check if mouse cursor on an edge
+				for (var i = 0; i < sensingAndPerceptionEdgesTooltips.length; i++) {
+					var tooltip = sensingAndPerceptionEdgesTooltips[i];				
+					var line = { x0: tooltip.xSrc, y0: tooltip.ySrc, x1: tooltip.xDest, y1: tooltip.yDest };
+					var tolerance = 3;
+					if ((line.x0 < line.x1 && mouseX >= line.x0 && mouseX <= line.x1) ||
+							(line.x1 < line.x0 && mouseX >= line.x1 && mouseX <= line.x0) ||
+							(line.x0 == line.x1 && line.y0 < line.y1 && mouseY >= line.y0 && mouseY <= line.y1) ||
+							(line.x0 == line.x1 && line.y1 < line.y0 && mouseY >= line.y1 && mouseY <= line.y0)) {
+						var linepoint = linepointNearestMouse(line, mouseX, mouseY);	
+						var dx = mouseX - linepoint.x;
+						var dy = mouseY - linepoint.y;
+						var distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
+						if (distance < tolerance) {
+							$("#spTooltip").html(tooltip.tip);
+							hit = true;
+						}
+					}
+				}				
+			}
+				
+			// mouse cursor not on a vertex or and edge
+			if (!hit) {
+				$("#spTooltip").html("");
+			}				
+		});
+	}
 	
     var originScaleCanvas = $("#overviewFloorplanOriginScale")[0];
 	var ctx2 = originScaleCanvas.getContext("2d");
@@ -94,7 +129,6 @@ function drawImageOnCanvas(img, targetCanvas) {
 	}
 	*/
 
-	/*
 	ctx2.beginPath();
 	ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 10);
 	ctx2.lineTo(originScaleCanvas.width-20, 10);
@@ -110,8 +144,8 @@ function drawImageOnCanvas(img, targetCanvas) {
 	ctx2.font = "12px";
 	ctx2.fillStyle = "#000000";			
 	ctx2.fillText(scaleText, originScaleCanvas.width-20-scaleDistance-20, 10);	
-    */
-	
+    
+	/*
 	ctx2.beginPath();
 	ctx2.moveTo(32, 10);
 	ctx2.lineTo(32 + scaleDistance, 10);
@@ -127,6 +161,7 @@ function drawImageOnCanvas(img, targetCanvas) {
 	ctx2.font = "12px";
 	ctx2.fillStyle = "#000000";			
 	ctx2.fillText(scaleText, 10, 10);		
+	*/
 	
 	var xOrigin = floorPlanImageXOffset * floorPlanImageToWebPageScale;
 	var yOrigin = (img.height - floorPlanImageYOffset) * floorPlanImageToWebPageScale;			
@@ -191,6 +226,21 @@ function drawImageOnCanvas(img, targetCanvas) {
  
  }
 
+function linepointNearestMouse(line, x, y) {    
+    lerp = function(a, b, x) {
+      return (a + x * (b - a));
+    };
+    var dx = line.x1 - line.x0;
+    var dy = line.y1 - line.y0;
+    var t = ((x - line.x0) * dx + (y - line.y0) * dy) / (dx * dx + dy * dy);
+    var lineX = lerp(line.x0, line.x1, t);
+    var lineY = lerp(line.y0, line.y1, t);
+    return ({
+		x: lineX,
+		y: lineY
+    });
+};
+  
 function drawRobotsOnCanvas() {
 	var canvas = $("#overviewFloorplan")[0];
 	var ctx = canvas.getContext("2d");	
@@ -242,6 +292,14 @@ function drawSensorsOnCanvas() {
 			ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);		
 		}
 	});
+}
+
+function updateSPGraphOnCanvas() {
+	if (typeof floorPlanImage !== "undefined") {
+		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
+		drawRobotsOnCanvas();
+		drawSensorsOnCanvas();
+	}
 }
 
 function updateRobotsOnOverview(notification) {
