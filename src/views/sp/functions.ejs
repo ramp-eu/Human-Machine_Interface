@@ -4,7 +4,7 @@ var sensingAndPerceptionVertices = new Array();
 var sensingAndPerceptionVerticesTooltips = new Array();
 
 function initSensingAndPerception(ngsiConnection) {	
-	ngsiConnection.v2.listEntities({type: "SP"}).then((response) => {
+	ngsiConnection.v2.listEntities({type: "CentralSP"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 			var edges = entity.graph.value.edges.value;
