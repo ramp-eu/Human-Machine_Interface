@@ -3,7 +3,9 @@ function initRobotsTable(ngsiConnection) {
 		var entities = response.results;
 		$("#robotsTab").html("<table id=\"robotsTable\" class=\"table table-responsive table-striped\"><thead><tr><th scope=\"col\">ID</th><th scope=\"col\">RAN status</th><th scope=\"col\">Pos X</th><th scope=\"col\">Pos Y</th><th scope=\"col\">Theta</th></tr></thead><tbody id=\"robotsTbody\">");
 		$.each(entities, function(i, entity) {
-			$("#robotsTbody").append("<tr id=\"robottr" + entity.id + "\"class=\"clickable-row\"></tr>");
+			if (!entity.graph) {
+				$("#robotsTbody").append("<tr id=\"robottr" + entity.id + "\"class=\"clickable-row\"></tr>");
+			}
 		});
 		$("#robotsTab").append("</tbody></table>");
 	});
@@ -12,19 +14,20 @@ function initRobotsTable(ngsiConnection) {
 function updateRobotsTable(notification) {
    //console.log("Received Robot notif: " + JSON.stringify(notification));					   
    $.each(notification.data, function () {
-		//var d = decodeURIComponent(this.position_channel.value);
-		//var dObj = JSON.parse(d.replace(/\'/g, "\""));
-		var dObj = this.position_channel.value;
-		var ran_status = "unknown";
-		//if (dObj.ran_status.value == 0) ran_status = "waiting";
-		//else if (dObj.ran_status.value == 1) ran_status = "moving";
-		//else if (dObj.ran_status.value == 2) ran_status = "acting";
-		//if ($("#robottr"+this.id).length < 1) 
-		//    $("#robotsTbody").append("<tr id=\"robottr" + this.id + "\"class=\"clickable-row\"></tr>");
-		$("#robottr"+this.id).empty();
-		//console.log(dObj.agv_msg.value.current_position.value.theta.value);
-		$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.value.pose.value.position.value.x.value + " mm</td><td>" + dObj.current_position.value.pose.value.position.value.y.value + " mm</td><td>" + dObj.current_position.value.pose.value.orientation.type + "</td>");
-		
+	   	if (!this.graph) {
+			//var d = decodeURIComponent(this.position_channel.value);
+			//var dObj = JSON.parse(d.replace(/\'/g, "\""));
+			var dObj = this.position_channel.value;
+			var ran_status = "unknown";
+			//if (dObj.ran_status.value == 0) ran_status = "waiting";
+			//else if (dObj.ran_status.value == 1) ran_status = "moving";
+			//else if (dObj.ran_status.value == 2) ran_status = "acting";
+			//if ($("#robottr"+this.id).length < 1) 
+			//    $("#robotsTbody").append("<tr id=\"robottr" + this.id + "\"class=\"clickable-row\"></tr>");
+			$("#robottr"+this.id).empty();
+			//console.log(dObj.agv_msg.value.current_position.value.theta.value);
+			$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.value.pose.value.position.value.x.value + " mm</td><td>" + dObj.current_position.value.pose.value.position.value.y.value + " mm</td><td>" + dObj.current_position.value.pose.value.orientation.type + "</td>");
+		}
 		// aste &#176;
 	});									
 }
