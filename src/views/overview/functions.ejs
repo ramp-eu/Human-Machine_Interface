@@ -107,6 +107,8 @@ function drawImageOnCanvas(img, targetCanvas) {
 				$("#spTooltip").html("");
 			}				
 		});
+	} else {
+		$(targetCanvas).off('mousemove');
 	}
 	
     var originScaleCanvas = $("#overviewFloorplanOriginScale")[0];
