@@ -45,8 +45,8 @@
 					updateSPGraphOnCanvas();
 				});
 						
-				$("#sendTaskSpecification").click(function() {
-					sendTaskSpecification();
+				$("#sendMaterialFlow").click(function() {
+					sendMaterialFlow();
 					return false;
 				});			
 				
@@ -109,8 +109,8 @@
 					
 								/* INITIALIZATIONS */				
 								initSensingAndPerception(ngsiConnection);
-								initTaskSpecifications(ngsiConnection);						    
-								initCurrentTasks(ngsiConnection);										
+								initMaterialFlows(ngsiConnection);						    
+								initTransportOrders(ngsiConnection);										
 								initRobotsTable(ngsiConnection);									
 								initSensors(ngsiConnection);	
 								initSensorData(ngsiConnection);		
@@ -120,11 +120,11 @@
 
 								/* SUBSCRIPTIONS */
 								ngsiConnection.v2.createSubscription({
-									"description": "Updating task specifications",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "TaskSpecState" } ] },
+									"description": "Updating material flow specifications",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "MaterialflowSpecificationState" } ] },
 									"notification": {
 										"callback": function (notification) {				   
-											updateTaskSpecifications(notification);
+											updateMaterialFlows(notification);
 										}
 									},
 									//"expires": "2040-04-05T14:00:00.00Z",
@@ -148,11 +148,11 @@
 								);		
 
 								ngsiConnection.v2.createSubscription({
-									"description": "Updating current tasks",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "taskSet" } ] },
+									"description": "Updating transport orders",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "TransportOrderUpdate" } ] },
 									"notification": {
 										"callback": function (notification) {				   
-											updateCurrentTasks(notification);
+											updateTransportOrders(notification);
 										}
 									},
 									//"expires": "2040-04-05T14:00:00.00Z",
@@ -170,34 +170,6 @@
 										}).fail(function(xhr, status, err) {
 											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
 										});	
-									}, (error) => {
-										//console.log(error);
-									}
-								);										
-								
-								ngsiConnection.v2.createSubscription({
-									"description": "Updating ongoing tasks",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "Task" } ] },
-									"notification": {
-										"callback": function (notification) {				   
-											updateOngoingTasks(notification);
-										}
-									},
-									//"expires": "2040-04-05T14:00:00.00Z",
-									//"throttling": 5
-								}).then(
-									(response) => {
-										//console.log("Created subscription: " + JSON.stringify(response));
-										$.ajax({
-											url: "./api/subscription",
-											type: "POST",
-											data: {
-												"subs_id": response.subscription.id
-											}
-										}).done(function(data) {
-										}).fail(function(xhr, status, err) {
-											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-										});											
 									}, (error) => {
 										//console.log(error);
 									}

@@ -1,180 +1,175 @@
-function initTaskSpecifications(ngsiConnection) {	
-	ngsiConnection.v2.listEntities({type: "TaskSpec"}).then((response) => {
+function initMaterialFlows(ngsiConnection) {	
+	ngsiConnection.v2.listEntities({type: "Materialflow"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
-			if (entity.id !== undefined && entity.TaskSpec !== undefined) {
-				var taskId = entity.id;
-				var task = urldecode(entity.TaskSpec.value);
-				ngsiConnection.v2.listEntities({type: "TaskSpecState"}).then((response2) => {
+			if (entity.id !== undefined && entity.specification !== undefined) {
+				var materialFlowId = entity.id;
+				var task = urldecode(entity.specification.value);
+				ngsiConnection.v2.listEntities({type: "MaterialflowSpecificationState"}).then((response2) => {
 					var entities2 = response2.results;
-					var taskHTML = getTaskSpecificationHTML(taskId, "&nbsp;", "&nbsp;", task);	
+					var materialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", task);	
 					$.each(entities2, function(i, entity2) {
-						if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == taskId) {		
-							var taskStatus = entity2.state.value;
-							var taskMessage = entity2.message.value;
-							taskHTML = getTaskSpecificationHTML(taskId, taskStatus, taskMessage, task);
+						if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == materialFlowId) {		
+							var materialFlowState = entity2.state.value;
+							var materialFlowMessage = entity2.message.value;
+							materialFlowHTML = getMaterialFlowHTML(materialFlowId, materialFlowState, materialFlowMessage, task);
 						}
 					});
-					$("#taskSpecifications").append(taskHTML);
+					$("#materialFlows").append(materialFlowHTML);
 				});
 			}
 		});
 	});
 }
 
-function initCurrentTasks(ngsiConnection) {
-	ngsiConnection.v2.listEntities({type: "taskSet"}).then((response) => {
-		var entities = response.results;
-		$.each(entities, function(i, entity) {	
-			var currentTasks = entity.taskList.value;
-			$.each(currentTasks, function(i, currentTask) {
-				var taskValue = currentTask.value;
-				var currentTaskHTML = getCurrentTaskHTML(taskValue);
-				$("#currentTasks").append(taskHTML);			
-			});	
-		});
-	});					
-}
-
-function initOngoingTasks(ngsiConnection) {
-	ngsiConnection.v2.listEntities({type: "Task"}).then((response) => {
+function initTransportOrders(ngsiConnection) {
+	ngsiConnection.v2.listEntities({type: "TransportOrderUpdate"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
-			var taskId = entity.id;
-			var taskDescription = entity.taskName.value;
-			var taskStatus = entity.state.value;		
-			var time = entity.time.value;	
-			var taskHTML = getOngoingTaskHTML(taskId, taskDescription, taskStatus, time);
-			$("#ongoingTasks").append(taskHTML);			
+		    var id = entity.id;
+			var type = entity.type;
+			var pickupFrom = entity.pickupFrom.value;
+			var deliverTo = entity.deliverTo.value;
+			var name = entity.name.value;
+			var refMaterialflowUpdateId = entity.refMaterialflowUpdateId.value;
+			var refOwnerId = entity.refOwnerId.value;
+			var taskInfo = entity.taskInfo.value;
+			var taskInfoStr = "";
+			if (taskInfo == 0) {
+				taskInfoStr = "Idle";
+			} else if (taskInfo == 1) {
+				taskInfoStr = "WaitForStartTrigger";
+			} else if (taskInfo == 2) {
+				taskInfoStr = "MovingToPickupDestination";
+			} else if (taskInfo == 3) {
+				taskInfoStr = "WaitForLoading";
+			} else if (taskInfo == 4) {
+				taskInfoStr = "MovingToDeliveryDestination";
+			} else if (taskInfo == 5) {
+				taskInfoStr = "WaitForUnloading";
+			}				
+			var updateTime = entity.updateTime.value;
+			var startTime = entity.startTime.value;
+			var transportOrderHTML = getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfoStr, updateTime, startTime);
+			$("#transportOrders").append(transportOrderHTML);			
 		});
 	});					
 }
 
-function updateTaskSpecifications(notification) {							   
+function updateMaterialFlows(notification) {							   
 	$.each(notification.data, function () {		
 		if (this.refId !== undefined && this.state !== undefined && this.message !== undefined) {	
-			var taskSpecId = this.refId.value
-			var taskStatus = this.state.value;
-			var taskMessage = this.message.value;	
-			if ($("#taskSpecification_" + taskSpecId).length) {
-				var taskStatusStr = "";
-				if (taskStatus == 0) {
-					taskStatusStr = "Idle";
-				} else if (taskStatus == 1) {
-					taskStatusStr = "Ok";
-				} else if (taskStatus == -1) {
-					taskStatusStr = "Error";
+			var materialFlowId = this.refId.value
+			var materialFlowState = this.state.value;
+			var materialFlowMessage = this.message.value;	
+			if ($("#materialFlow_" + materialFlowId).length) {
+				var materialFlowStateStr = "";
+				if (materialFlowState > 0) {
+					materialFlowStateStr = "Ok (state code: " + materialFlowState + ")";
+				} else if (materialFlowState == 0) {
+					materialFlowStateStr = "Ok";
+				} else if (materialFlowState == -1) {
+					materialFlowStateStr = "Error";
 				}
-				$("#taskSpecification_status_" + taskSpecId).html(taskStatusStr);
-				$("#Message_" + taskSpecId).html(taskMessage);
+				$("#state_" + materialFlowId).html(materialFlowStateStr);
+				$("#message_" + materialFlowId).html(materialFlowMessage);
 			}
 		}			
 	});
 }
 
-function updateCurrentTasks(notification) {							   
-	$.each(notification.data, function () {		
-		var currentTasks = this.taskList.value;
-		$.each(currentTasks, function(i, currentTask) {
-			var taskValue = currentTask.value;
-			var currentTaskHTML = getCurrentTaskHTML(taskValue);
-			if ($("#currentTask_" + taskValue).length) {
-				// already exists
-			} else {
-				$("#currentTasks").append(taskHTML);			
-			}
-		});	
-	});
-}
-
-function updateOngoingTasks(notification) {							   
-	$.each(notification.data, function () {		
-		var taskId = this.id;
-		var taskStatus = this.state.value;		
-		var taskStatusStr = "";
-		if (taskStatus == 0) {
-			taskStatusStr = "Idle";
-		} else if (taskStatus == 1) {
-			taskStatusStr = "Running";
-		} else if (taskStatus == 2) {
-			taskStatusStr = "Waiting";
-		} else if (taskStatus == 3) {
-			taskStatusStr = "Active";
-		} else if (taskStatus == 4) {
-			taskStatusStr = "Finished";
-		} else if (taskStatus == 5) {
-			taskStatusStr = "Aborted";
-		} else if (taskStatus == 6) {
-			taskStatusStr = "Error";
+function updateTransportOrders(notification) {							   
+	$.each(notification.data, function () {
+		var id = this.id;
+		var type = this.type;
+		var pickupFrom = this.pickupFrom.value;
+		var deliverTo = this.deliverTo.value;
+		var name = this.name.value;
+		var refMaterialflowUpdateId = this.refMaterialflowUpdateId.value;
+		var refOwnerId = this.refOwnerId.value;
+		var taskInfo = this.taskInfo.value;
+		var taskInfoStr = "";
+		if (taskInfo == 0) {
+			taskInfoStr = "Idle";
+		} else if (taskInfo == 1) {
+			taskInfoStr = "WaitForStartTrigger";
+		} else if (taskInfo == 2) {
+			taskInfoStr = "MovingToPickupDestination";
+		} else if (taskInfo == 3) {
+			taskInfoStr = "WaitForLoading";
+		} else if (taskInfo == 4) {
+			taskInfoStr = "MovingToDeliveryDestination";
+		} else if (taskInfo == 5) {
+			taskInfoStr = "WaitForUnloading";
 		}		
-		var taskDescription = this.taskName.value;			
-		var time = this.time.value;			
-		if ($("#ongoingTask_" + taskId).length) {
-			$("#ongoingTask_status_" + taskId).html(taskStatusStr);
-			$("#ongoingTask_description_" + taskId).html(taskDescription);
-			$("#ongoingTask_time_" + taskId).html(time);
-		} else {
-			var taskHTML = getOngoingTaskHTML(taskId, taskDescription, taskStatusStr, time);
-			$("#ongoingTasks").append(taskHTML);			
+		var updateTime = this.updateTime.value;
+		var startTime = this.startTime.value;			
+		var transportOrderHTML = getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfoStr, updateTime, startTime);		
+		if ($("#transportOrder_" + id).length) {
+			$("#transportOrder_" + id).replaceWith(transportOrderHTML);
+		} else {			
+			$("#transportOrders").append(transportOrderHTML);			
 		}			
 	});
 }
 
-function getTaskSpecificationHTML(taskId, taskStatus, taskMessage, task) {
-	return "<tr id=\"taskSpecification_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"taskSpecification_status_" + taskId + "\">" + taskStatus + "</td><td id=\"Message_" + taskId + "\">" + taskMessage + "</td><td><textarea id=\"TaskSpec_" + taskId + "\" rows=\"4\" readonly>" + task + "</textarea></td><td><button onclick=\"cancelTask('" + taskId + "')\">Delete</button></td></tr>";
+function getMaterialFlowHTML(materialFlowId, state, message, task) {
+	return "<tr id=\"materialFlow_" + materialFlowId + "\" class=\"clickable-row\"><td>" + materialFlowId + "</td><td id=\"state_" + materialFlowId + "\">" + state + "</td><td id=\"message_" + materialFlowId + "\">" + message + "</td><td><textarea id=\"task_" + materialFlowId + "\" rows=\"4\" readonly>" + task + "</textarea></td><td><button onclick=\"cancelMaterialFlow('" + materialFlowId + "')\">Delete</button></td></tr>";
 }
 
-function getCurrentTaskHTML(taskValue) {
-	return "<tr id=\"currentTask_" + taskValue + "\" class=\"clickable-row\"><td>" + taskValue + "</td></tr>";
-	/*<td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";*/
+function getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfo, updateTime, startTime) {
+	return "<tr id=\"transportOrder_" + id + "\" class=\"clickable-row\"><td>" + id + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + refOwnerId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
 }
 
-function getOngoingTaskHTML(taskId, taskDescription, taskStatus, time) {
-	return "<tr id=\"ongoingTask_" + taskId + "\" class=\"clickable-row\"><td>" + taskId + "</td><td id=\"ongoingTask_description_" + taskId + "\">" + taskDescription + "</td><td id=\"ongoingTask_status_" + taskId + "\">" + taskStatus + "</td><td id=\"ongoingTask_time_" + taskId + "\">" + new Date(time).toLocaleDateString() + " " + new Date(time).toLocaleTimeString() + "</td></tr>";
-	/*<td><button onclick=\"cancelTask('" + taskId + "')\">Cancel</button></td></tr>";*/
-}
-
-function sendTaskSpecification() {
+function sendMaterialFlow() {
 	if ($.trim($("#taskDescriptionTextArea").val()) != "") {				
 		var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
 			ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
 		});
-		var taskId = "TaskSpec_" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+		var materialFlowId = "MaterialFlow_" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
 		ngsiConnection.v2.createEntity({
-			"id": taskId,
-			"type": "TaskSpec",
-			"TaskSpec": {
+			"id": materialFlowId,
+			"type": "Materialflow",
+			"specification": {
 				"type": "Text",
 				"value": urlencode($("#taskDescriptionTextArea").val())
+			},
+			"ownerId": {
+				"type": "Text",
+				"value": "reviewers hmi"
+			},
+			"active": {
+				"type": "boolean",
+				"value": true
 			}
 		}).then(
 			(response) => {
 				// Entity created successfully
-				var newTaskHTML = getTaskSpecificationHTML(taskId, "&nbsp;", "&nbsp;", $("#taskDescriptionTextArea").val());
-				$("#taskSpecifications").append(newTaskHTML);
+				var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", $("#taskDescriptionTextArea").val());
+				$("#materialFlows").append(newMaterialFlowHTML);
 				$("#taskDescriptionTextArea").val("");							
-				showAndDismissAlert("success", "Task sent succesfully!", "taskManagementAlert");
+				showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");
 			}, (error) => {
 				console.log(error);
 				// Error creating the entity
-				showAndDismissAlert("error", "There was an error sending the task (" + error + ")!", "taskManagementAlert");
+				showAndDismissAlert("error", "There was an error sending the material flow (" + error + ")!", "taskManagementAlert");
 			}
 		);
 	}
 }
 
-function cancelTask(taskId) {
-	bootbox.confirm("Are you sure you want to delete the task specification?", function(result) {
+function cancelMaterialFlow(materialFlowId) {
+	bootbox.confirm("Are you sure you want to delete the material flow?", function(result) {
 		if (result == true) {				
 			var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
 				ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
 			});
-			ngsiConnection.v2.deleteEntity(taskId).then(
+			ngsiConnection.v2.deleteEntity(materialFlowId).then(
 				(response) => {
-					$("#taskSpecification_" + taskId).remove();
-					showAndDismissAlert("success", "Task specification deleted succesfully!", "taskManagementAlert");
+					$("#materialFlow_" + materialFlowId).remove();
+					showAndDismissAlert("success", "Material flow deleted succesfully!", "taskManagementAlert");
 				}, (error) => {
-					showAndDismissAlert("error", "There was an error deleting the task specification (" + error + ")!", "taskManagementAlert");
+					showAndDismissAlert("error", "There was an error deleting the material flow (" + error + ")!", "taskManagementAlert");
 				}
 			);			
 		}

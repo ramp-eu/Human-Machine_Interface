@@ -14,6 +14,10 @@ function initSensorData(ngsiConnection) {
 				}
 			});
 			var chart = null;
+			var sensorCurrentValue = "";
+			if (entity.readings !== undefined && entity.readings.value !== undefined && entity.readings.value[0].value !== undefined && entity.readings.value[0].value.reading !== undefined && entity.readings.value[0].value.reading.value !== undefined) {
+				sensorCurrentValue = entity.readings.value[0].value.reading.value;
+			}
 			if (entity.sensorType.value == ON_OFF_SENSOR) {
 				$.ajax({
 					type: "GET",
@@ -22,7 +26,7 @@ function initSensorData(ngsiConnection) {
 					success: function (data) {			
 						$(data).each(function(i, item) {
 							if (item.ocb_id == entity.sensorID.value) {								
-								$("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">" + item.text + " (" + entity.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+								$("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + item.text + " | Type: " + entity.sensorType.value + " | <span id=\"\currentValue_" + entity.sensorID.value + "\">Current value: " + sensorCurrentValue + "</span></div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
 								var chartCanvas = document.getElementById(entity.sensorID.value + "_Chart");
 								var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
 								var chartOptions =
@@ -103,7 +107,7 @@ function initSensorData(ngsiConnection) {
 					}
 				});
 			} else {
-				$("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + entity.sensorID.value + " (" + entity.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+				$("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + entity.sensorID.value + " | Type: " + entity.sensorType.value + " | <span id=\"\currentValue_" + entity.sensorID.value + "\">Current value: " + sensorCurrentValue + "</span></div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
 				var chartCanvas = document.getElementById(entity.sensorID.value + "_Chart");
 				var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
 				var chartOptions =
@@ -189,6 +193,10 @@ function updateSensorData(notification) {
 	console.log("Received notification: " + JSON.stringify(notification));					   
 	$.each(notification.data, function () {		
 		var chart = sensorDataCharts.get(this.sensorID.value);							
+		var sensorCurrentValue = "";
+		if (this.readings !== undefined && this.readings.value !== undefined && this.readings.value[0].value !== undefined && this.readings.value[0].value.reading !== undefined && this.readings.value[0].value.reading.value !== undefined) {
+			sensorCurrentValue = this.readings.value[0].value.reading.value;
+	    }			
 		if (typeof chart === "undefined") {	
 			var steppedLine = false;
 			if (this.sensorType.value == ON_OFF_SENSOR) {
@@ -198,8 +206,8 @@ function updateSensorData(notification) {
 				if (this.value.reading.type == "Boolean" || this.value.reading.type == "boolean") {
 					steppedLine = true;
 				}
-			});
-			$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Sensor Agent Node - " + this.sensorID.value + " (" + this.sensorType.value + ")</div><div class=\"panel-body\"><canvas id=\"" + this.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+			});		
+			$("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + this.sensorID.value + " | Type: " + this.sensorType.value + " | <span id=\"\currentValue_" + this.sensorID.value + "\">Current value: " + sensorCurrentValue + "</span></div><div class=\"panel-body\"><canvas id=\"" + this.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
 			var chartCanvas = document.getElementById(this.sensorID.value + "_Chart");
 			var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
 			var chartOptions =
@@ -275,5 +283,6 @@ function updateSensorData(notification) {
 				});					
 			});
 		}
+		$("#currentValue_" + this.sensorID.value).html("Current value: " + sensorCurrentValue);
 	});	
 }
