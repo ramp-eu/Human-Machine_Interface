@@ -315,15 +315,22 @@ function updateRobotsOnOverview(notification) {
 			//if (dObj.ran_status.value == 0) ran_status = "waiting";
 			//else if (dObj.ran_status.value == 1) ran_status = "moving";
 			//else if (dObj.ran_status.value == 2) ran_status = "acting";
+			var quaternion_x = dObj.current_position.value.pose.value.orientation.value.x.value;
+			var quaternion_y = dObj.current_position.value.pose.value.orientation.value.y.value;
+			var quaternion_z = dObj.current_position.value.pose.value.orientation.value.z.value;
+			var quaternion_w = dObj.current_position.value.pose.value.orientation.value.w.value;
+			var quaternion = new THREE.Quaternion().set(quaternion_x, quaternion_y, quaternion_z, quaternion_w);
+			var euler = new THREE.Euler().setFromQuaternion(quaternion);
+			var theta = euler.z;
 			var objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
 			if (objIndex == -1) {	
-				robotsOnOverview.push({index: temp, id: this.id, ran_status: ran_status, x: dObj.current_position.value.pose.value.position.value.x.value, y: dObj.current_position.value.pose.value.position.value.y.value, theta: dObj.current_position.value.pose.value.orientation.type});
+				robotsOnOverview.push({index: temp, id: this.id, ran_status: ran_status, x: dObj.current_position.value.pose.value.position.value.x.value, y: dObj.current_position.value.pose.value.position.value.y.value, theta: theta});
 			} else {	
 				robotsOnOverview[objIndex].index = temp;
 				robotsOnOverview[objIndex].ran_status = ran_status;			
 				robotsOnOverview[objIndex].x = dObj.current_position.value.pose.value.position.value.x.value;		
 				robotsOnOverview[objIndex].y = dObj.current_position.value.pose.value.position.value.y.value;		
-				robotsOnOverview[objIndex].theta = dObj.current_position.value.pose.value.orientation.type;						
+				robotsOnOverview[objIndex].theta = theta;						
 			}
 			temp++;
 		});

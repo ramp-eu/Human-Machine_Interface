@@ -26,7 +26,14 @@ function updateRobotsTable(notification) {
 			//    $("#robotsTbody").append("<tr id=\"robottr" + this.id + "\"class=\"clickable-row\"></tr>");
 			$("#robottr"+this.id).empty();
 			//console.log(dObj.agv_msg.value.current_position.value.theta.value);
-			$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.value.pose.value.position.value.x.value + " mm</td><td>" + dObj.current_position.value.pose.value.position.value.y.value + " mm</td><td>" + dObj.current_position.value.pose.value.orientation.type + "</td>");
+			var quaternion_x = dObj.current_position.value.pose.value.orientation.value.x.value;
+			var quaternion_y = dObj.current_position.value.pose.value.orientation.value.y.value;
+			var quaternion_z = dObj.current_position.value.pose.value.orientation.value.z.value;
+			var quaternion_w = dObj.current_position.value.pose.value.orientation.value.w.value;
+			var quaternion = new THREE.Quaternion().set(quaternion_x, quaternion_y, quaternion_z, quaternion_w);
+			var euler = new THREE.Euler().setFromQuaternion(quaternion);
+			var theta = euler.z;			
+			$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.value.pose.value.position.value.x.value + " mm</td><td>" + dObj.current_position.value.pose.value.position.value.y.value + " mm</td><td>" + Math.round(theta * (180/Math.PI) * 100) / 100 + "&#176;</td>");
 		}
 		// aste &#176;
 	});									
