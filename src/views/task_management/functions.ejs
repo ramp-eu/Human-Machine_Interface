@@ -4,15 +4,16 @@ function initMaterialFlows(ngsiConnection) {
 		$.each(entities, function(i, entity) {
 			if (entity.id !== undefined && entity.specification !== undefined) {
 				var materialFlowId = entity.id;
+				var active = entity.active.value;
 				var task = urldecode(entity.specification.value);
 				ngsiConnection.v2.listEntities({type: "MaterialflowSpecificationState"}).then((response2) => {
 					var entities2 = response2.results;
-					var materialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", task);	
+					var materialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, task);	
 					$.each(entities2, function(i, entity2) {
 						if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == materialFlowId) {		
 							var materialFlowState = entity2.state.value;
 							var materialFlowMessage = entity2.message.value;
-							materialFlowHTML = getMaterialFlowHTML(materialFlowId, materialFlowState, materialFlowMessage, task);
+							materialFlowHTML = getMaterialFlowHTML(materialFlowId, materialFlowState, materialFlowMessage, active, task);
 						}
 					});
 					$("#materialFlows").append(materialFlowHTML);
@@ -113,8 +114,41 @@ function updateTransportOrders(notification) {
 	});
 }
 
-function getMaterialFlowHTML(materialFlowId, state, message, task) {
-	return "<tr id=\"materialFlow_" + materialFlowId + "\" class=\"clickable-row\"><td>" + materialFlowId + "</td><td id=\"state_" + materialFlowId + "\">" + state + "</td><td id=\"message_" + materialFlowId + "\">" + message + "</td><td><textarea id=\"task_" + materialFlowId + "\" rows=\"4\" readonly>" + task + "</textarea></td><td><button onclick=\"cancelMaterialFlow('" + materialFlowId + "')\">Delete</button></td></tr>";
+function getMaterialFlowHTML(materialFlowId, state, message, active, task) {
+	var yesSelected = "";
+	var noSelected = "";
+	if (active == true) {
+		yesSelected = " SELECTED";	
+	} else {
+		noSelected = " SELECTED";	
+	}
+	var activeSelectHTML = "<select id=\"materialFlowActive_" + materialFlowId + "\" onchange=\"changeMaterialFlowActive(this)\"><option value=\"yes\"" + yesSelected + ">Yes</option><option value=\"no\"" + noSelected + ">No</option></select>";
+	return "<tr id=\"materialFlow_" + materialFlowId + "\" class=\"clickable-row\"><td>" + materialFlowId + "</td><td id=\"state_" + materialFlowId + "\">" + state + "</td><td id=\"message_" + materialFlowId + "\">" + message + "</td><td>" + activeSelectHTML + "</td><td><textarea id=\"task_" + materialFlowId + "\" rows=\"4\" readonly>" + task + "</textarea></td><td><button onclick=\"cancelMaterialFlow('" + materialFlowId + "')\">Delete</button></td></tr>";
+}
+
+function changeMaterialFlowActive(t) {
+	var selectId = t.id;
+	var selectedOption = $("#" + selectId).val();
+	var materialFlowId = selectId.substr("materialFlowActive_".length);
+	var active = false;
+	if (selectedOption == "yes") {
+		active = true;
+	}
+	var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
+		ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
+	});	
+	ngsiConnection.v2.updateEntityAttributes({
+		"id": materialFlowId,		
+		"active": {
+			"type": "boolean",
+			"value": active
+		}							
+	}).then(
+		(response) => {
+		}, (error) => {	
+		}
+	);
+	return false;	
 }
 
 function getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfo, updateTime, startTime) {
@@ -126,7 +160,8 @@ function sendMaterialFlow() {
 		var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
 			ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
 		});
-		var materialFlowId = "MaterialFlow_" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+		var materialFlowId = "MaterialFlow" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+		var active = true;
 		ngsiConnection.v2.createEntity({
 			"id": materialFlowId,
 			"type": "Materialflow",
@@ -140,15 +175,51 @@ function sendMaterialFlow() {
 			},
 			"active": {
 				"type": "boolean",
-				"value": true
+				"value": active
 			}
 		}).then(
 			(response) => {
-				// Entity created successfully
-				var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", $("#taskDescriptionTextArea").val());
-				$("#materialFlows").append(newMaterialFlowHTML);
-				$("#taskDescriptionTextArea").val("");							
-				showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");
+				// Entity created successfully, create MaterialflowSpecificationState entity next
+				var materialflowSpecificationStateId = "MaterialflowSpecificationState" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+				ngsiConnection.v2.createEntity({
+					"id": materialflowSpecificationStateId,
+					"type": "MaterialflowSpecificationState",
+					"message": {
+						"type": "string",
+						"value": "Success",
+						"metadata": {}
+					},
+					"refId": {
+						"type": "string",
+						"value": materialFlowId,
+						"metadata": {
+							"python": {
+								"type": "dataType",
+								"value": "unicode"
+							}
+						}
+					},
+					"state": {
+						"type": "number",
+						"value": 0,
+						"metadata": {
+							"python": {
+								"type": "dataType",
+								"value": "int"
+							}
+						}
+					}
+				}).then(
+					(response) => {				
+						var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, $("#taskDescriptionTextArea").val());
+						$("#materialFlows").append(newMaterialFlowHTML);
+						$("#taskDescriptionTextArea").val("");							
+						showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");
+					}, (error) => {
+						console.log(error);
+						// Error creating the entity
+						showAndDismissAlert("error", "There was an error sending the material flow (" + error + ")!", "taskManagementAlert");
+					});
 			}, (error) => {
 				console.log(error);
 				// Error creating the entity
