@@ -179,7 +179,13 @@ function sendMaterialFlow() {
 			}
 		}).then(
 			(response) => {
-				// Entity created successfully, create MaterialflowSpecificationState entity next
+				// Entity created successfully
+				var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, $("#taskDescriptionTextArea").val());
+				$("#materialFlows").append(newMaterialFlowHTML);
+				$("#taskDescriptionTextArea").val("");							
+				showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");				
+				/*
+				// create MaterialflowSpecificationState entity next
 				var materialflowSpecificationStateId = "MaterialflowSpecificationState" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
 				ngsiConnection.v2.createEntity({
 					"id": materialflowSpecificationStateId,
@@ -220,6 +226,7 @@ function sendMaterialFlow() {
 						// Error creating the entity
 						showAndDismissAlert("error", "There was an error sending the material flow (" + error + ")!", "taskManagementAlert");
 					});
+				*/
 			}, (error) => {
 				console.log(error);
 				// Error creating the entity
