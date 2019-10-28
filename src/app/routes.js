@@ -7,6 +7,7 @@ var Subscription = require('./models/subscription');
 var multer  = require('multer');
 var path = require('path');
 var fs = require('fs');
+var uuidv4 = require('uuid/v4');
 //var request = require('request');
 var pjson = require('../package.json');
 
@@ -56,6 +57,10 @@ module.exports = function(app, passport) {
     //    res.render('main.ejs');
     //});
 
+// get new UUID/v4
+    app.get('/api/uuid', function(req, res) {
+        res.send(uuidv4());
+    });
 // FLOORPLAN SECTION =======================================================
 
 //     app.get('/floorplan', function(req, res) {
