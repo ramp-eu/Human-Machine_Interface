@@ -2,6 +2,7 @@ var User = require('./models/user');
 var Floorplan = require('./models/floorplan');
 var Config = require('./models/config');
 var Hmibutton = require('./models/hmibutton');
+var Hmiinstance = require('./models/hmiinstance');
 var Subscription = require('./models/subscription');
 var multer  = require('multer');
 var path = require('path');
@@ -401,18 +402,27 @@ module.exports = function(app, passport) {
 // MAIN SECTION =========================
     
     app.get('/main', isLoggedIn, function(req, res) {
-        /*if (req.user.role === "admin")
-            res.redirect('/admin');
-        else if (req.user.role === "user")
-            res.redirect('/somewhere');
-        else*/ res.render('main.ejs', {
-            user : req.user,
-            version : pjson.version,
-            ocb_host : process.env.ocb_host, 
-            ocb_port : process.env.ocb_port,
-            ngsi_proxy_host : process.env.ngsi_proxy_host, 
-            ngsi_proxy_port : process.env.ngsi_proxy_port
+
+        Hmiinstance.find({}, function(err, data) {
+            if (err) return err;
+            else if (data) {
+                /*if (req.user.role === "admin")
+                    res.redirect('/admin');
+                else if (req.user.role === "user")
+                    res.redirect('/somewhere');
+                else*/ res.render('main.ejs', {
+                    hmi_id : data[0].hmi_id,
+                    user : req.user,
+                    version : pjson.version,
+                    ocb_host : process.env.ocb_host, 
+                    ocb_port : process.env.ocb_port,
+                    ngsi_proxy_host : process.env.ngsi_proxy_host, 
+                    ngsi_proxy_port : process.env.ngsi_proxy_port
+                });
+            }
+            else res.status(404).send({ message: 'No HMI instance id found.' });
         });
+
     });
 
     // LOGOUT ==============================

@@ -1,6 +1,6 @@
 {
   "name": "mod.sw.ahmi",
-  "version": "3.0.2-beta",
+  "version": "3.0.3-beta",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -22,6 +22,7 @@
     "multer": "~1.4.1",
     "cors": "~2.8.5",
     "request": "~2.88.0",
-    "http-graceful-shutdown": "~2.2.3"
+    "http-graceful-shutdown": "~2.2.3",
+    "uuid": "~3.3.3"
   }
 }
