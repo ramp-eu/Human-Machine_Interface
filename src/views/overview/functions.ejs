@@ -57,6 +57,32 @@ function drawImageOnCanvas(img, targetCanvas) {
 				tip: "Vertex: " + vertex.value.name.value + " (UUID: " + vertex.value.uuid.value + ")"
 			});
 		});
+		
+		$.each(sensingAndPerceptionAnnotations, function (i, annotation) {			
+			var uuid = annotation.value.uuid.value;
+			var name = annotation.value.name.value;
+			var theta = annotation.value.theta.value;
+			var distance = annotation.value.distance.value;
+			var headXMeters = annotation.value.x.value;			
+			var headYMeters = annotation.value.y.value;
+			var tailXMeters = headXMeters-distance*Math.cos(theta*Math.PI/180);
+			var tailYMeters = headYMeters-distance*Math.sin(theta*Math.PI/180);		
+			var tailX = ((tailXMeters - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+			var tailY = (floorPlanImage.height - ((tailYMeters - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+			var headX = ((headXMeters - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+			var headY = (floorPlanImage.height - ((headYMeters - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;			
+			if (distance > 0.1) {
+				drawArrow(ctx, {x: tailX, y: tailY}, {x: headX, y: headY}, 10);
+				sensingAndPerceptionAnnotationsTooltips.push({
+					xSrc: tailX,
+					ySrc: tailY,
+					xDest: headX,
+					yDest: headY,
+					tip: "Annotation: " + name + " (UUID: " + uuid + ")"
+				});
+			}
+		});
+		
 
 		$(targetCanvas).mousemove(function(e) {
 
@@ -101,6 +127,27 @@ function drawImageOnCanvas(img, targetCanvas) {
 					}
 				}				
 			}
+			if (!hit) {
+				// check if mouse cursor on an annotation
+				for (var i = 0; i < sensingAndPerceptionAnnotationsTooltips.length; i++) {
+					var tooltip = sensingAndPerceptionAnnotationsTooltips[i];				
+					var line = { x0: tooltip.xSrc, y0: tooltip.ySrc, x1: tooltip.xDest, y1: tooltip.yDest };
+					var tolerance = 10;
+					if ((line.x0 < line.x1 && mouseX >= line.x0 && mouseX <= line.x1) ||
+							(line.x1 < line.x0 && mouseX >= line.x1 && mouseX <= line.x0) ||
+							(line.x0 == line.x1 && line.y0 < line.y1 && mouseY >= line.y0 && mouseY <= line.y1) ||
+							(line.x0 == line.x1 && line.y1 < line.y0 && mouseY >= line.y1 && mouseY <= line.y0)) {
+						var linepoint = linepointNearestMouse(line, mouseX, mouseY);	
+						var dx = mouseX - linepoint.x;
+						var dy = mouseY - linepoint.y;
+						var distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
+						if (distance < tolerance) {
+							$("#spTooltip").html(tooltip.tip);
+							hit = true;
+						}
+					}
+				}				
+			}			
 				
 			// mouse cursor not on a vertex or and edge
 			if (!hit) {
@@ -167,6 +214,7 @@ function drawImageOnCanvas(img, targetCanvas) {
 	
 	var xOrigin = floorPlanImageXOffset * floorPlanImageToWebPageScale;
 	var yOrigin = (img.height - floorPlanImageYOffset) * floorPlanImageToWebPageScale;			
+	ctx.lineWidth = 1;
 	
 	if (xOrigin <= canvas.width / 2 && yOrigin <= canvas.height / 2) {  // top left corner -> draw zero point information below on the right side
 		ctx.fillStyle = "blue";	
@@ -242,7 +290,89 @@ function linepointNearestMouse(line, x, y) {
 		y: lineY
     });
 };
-  
+
+/*
+function drawArrow(ctx,fx,fy,tx,ty){ //ctx is the context
+    var angle=Math.atan2(ty-fy,tx-fx);
+    ctx.moveTo(fx,fy); ctx.lineTo(tx,ty);
+    var w=3.5; //width of arrow to one side. 7 pixels wide arrow is pretty
+    ctx.strokeStyle="#4d4d4d"; ctx.fillStyle="#4d4d4d";
+    angle=angle+Math.PI/2; tx=tx+w*Math.cos(angle); ty=ty+w*Math.sin(angle);
+    ctx.lineTo(tx,ty);
+  //Drawing an isosceles triangle of sides proportional to 2:7:2
+    angle=angle-1.849096; tx=tx+w*3.5*Math.cos(angle); ty=ty+w*3.5*Math.sin(angle);
+    ctx.lineTo(tx,ty);
+    angle=angle-2.584993; tx=tx+w*3.5*Math.cos(angle); ty=ty+w*3.5*Math.sin(angle);
+    ctx.lineTo(tx,ty);
+    angle=angle-1.849096; tx=tx+w*Math.cos(angle); ty=ty+w*Math.sin(angle);
+    ctx.lineTo(tx,ty);
+    ctx.stroke(); ctx.fill();
+}
+*/
+
+function drawArrow(ctx, p1, p2, size) {
+  var angle = Math.atan2((p2.y - p1.y) , (p2.x - p1.x));
+  var hyp = Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+
+  ctx.save();
+  ctx.translate(p1.x, p1.y);
+  ctx.rotate(angle);
+
+  // line
+  ctx.beginPath();	
+  ctx.moveTo(0, 0);
+  ctx.lineTo(hyp - size, 0);
+  ctx.strokeStyle = "#FFDC00";
+  ctx.lineWidth = 8;
+  ctx.stroke();
+
+  // triangle
+  ctx.lineWidth = 1;
+  ctx.fillStyle = "#FFDC00";
+  ctx.beginPath();
+  ctx.lineTo(hyp - size, size);
+  ctx.lineTo(hyp, 0);
+  ctx.lineTo(hyp - size, -size);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/*
+function drawArrow(ctx, fromx, fromy, tox, toy) {
+	var headlen = 10;
+
+	var angle = Math.atan2(toy-fromy, tox-fromx);
+
+	//starting path of the arrow from the start square to the end square and drawing the stroke
+	ctx.beginPath();
+	ctx.moveTo(fromx, fromy);
+	ctx.lineTo(tox, toy);
+	ctx.strokeStyle = "yellow";
+	ctx.lineWidth = 10;
+	ctx.stroke();
+
+	//starting a new path from the head of the arrow to one of the sides of the point
+	ctx.beginPath();
+	ctx.moveTo(tox, toy);
+	ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
+
+	//path from the side point of the arrow, to the other side point
+	ctx.lineTo(tox-headlen*Math.cos(angle+Math.PI/7),toy-headlen*Math.sin(angle+Math.PI/7));
+
+	//path from the side point back to the tip of the arrow, and then again to the opposite side point
+	ctx.lineTo(tox, toy);
+	ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
+
+	//draws the paths created above
+	//ctx.strokeStyle = "yellow";
+	//ctx.lineWidth = 10;
+	ctx.stroke();
+	ctx.fillStyle = "yellow";
+	ctx.fill();
+}
+*/
+
 function drawRobotsOnCanvas() {
 	var canvas = $("#overviewFloorplan")[0];
 	var ctx = canvas.getContext("2d");	

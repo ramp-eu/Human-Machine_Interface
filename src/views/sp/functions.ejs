@@ -2,6 +2,8 @@ var sensingAndPerceptionEdges = new Array();
 var sensingAndPerceptionEdgesTooltips = new Array();
 var sensingAndPerceptionVertices = new Array();
 var sensingAndPerceptionVerticesTooltips = new Array();
+var sensingAndPerceptionAnnotations = new Array();
+var sensingAndPerceptionAnnotationsTooltips = new Array();
 
 function initSensingAndPerception(ngsiConnection) {	
 	ngsiConnection.v2.listEntities({type: "ROBOT"}).then((response) => {
@@ -26,6 +28,9 @@ function initSensingAndPerception(ngsiConnection) {
 				}
 				sensingAndPerceptionEdges = edges;
 				sensingAndPerceptionVertices = vertices;
+			}
+			if (entity.annotations) {
+				sensingAndPerceptionAnnotations = entity.annotations.value.annotations.value;
 			}
 		});
 	});
