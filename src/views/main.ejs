@@ -32,25 +32,14 @@
 			var floorPlanImageToWebPageScale = 1;
 			var floorPlanImageXOffset = 0;
 			var floorPlanImageYOffset = 0;
-			var instanceUUID = "";
-		
-			var hmi_id = <%- '"' + hmi_id + '"' %>;
+
 			var ocb_host = <%- '"' + ocb_host + '"' %>;	
 			var ocb_port = <%- '"' + ocb_port + '"' %>;	
 			var ngsi_proxy_host = <%- '"' + ngsi_proxy_host + '"' %>;	
 			var ngsi_proxy_port = <%- '"' + ngsi_proxy_port + '"' %>;		
 		
 			$(document).ready(function() {
-			
-				$.ajax({
-					type: "GET",
-					url: "./api/uuid",
-					dataType: "text",
-					success: function (data) {					
-						instanceUUID = data;
-					}
-				});
-			
+						
 				startSubscriptions();
 			
 				$('#spOnOff').change(function() {

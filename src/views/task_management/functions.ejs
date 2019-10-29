@@ -160,79 +160,86 @@ function sendMaterialFlow() {
 		var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
 			ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
 		});
-		var materialFlowId = "MaterialFlow" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
-		var active = true;
-		ngsiConnection.v2.createEntity({
-			"id": materialFlowId,
-			"type": "Materialflow",
-			"specification": {
-				"type": "Text",
-				"value": urlencode($("#taskDescriptionTextArea").val())
-			},
-			"ownerId": {
-				"type": "Text",
-				"value": instanceUUID
-			},
-			"active": {
-				"type": "boolean",
-				"value": active
-			}
-		}).then(
-			(response) => {
-				// Entity created successfully
-				var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, $("#taskDescriptionTextArea").val());
-				$("#materialFlows").append(newMaterialFlowHTML);
-				$("#taskDescriptionTextArea").val("");							
-				showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");				
-				/*
-				// create MaterialflowSpecificationState entity next
-				var materialflowSpecificationStateId = "MaterialflowSpecificationState" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+		$.ajax({
+			type: "GET",
+			url: "./api/uuid",
+			dataType: "text",
+			success: function (data) {					
+				var materialFlowId = data;
+				var active = true;
 				ngsiConnection.v2.createEntity({
-					"id": materialflowSpecificationStateId,
-					"type": "MaterialflowSpecificationState",
-					"message": {
-						"type": "string",
-						"value": "Success",
-						"metadata": {}
+					"id": materialFlowId,
+					"type": "Materialflow",
+					"specification": {
+						"type": "Text",
+						"value": urlencode($("#taskDescriptionTextArea").val())
 					},
-					"refId": {
-						"type": "string",
-						"value": materialFlowId,
-						"metadata": {
-							"python": {
-								"type": "dataType",
-								"value": "unicode"
-							}
-						}
+					"ownerId": {
+						"type": "Text",
+						"value": <%- '"' + hmi_id + '"' %>
 					},
-					"state": {
-						"type": "number",
-						"value": 0,
-						"metadata": {
-							"python": {
-								"type": "dataType",
-								"value": "int"
-							}
-						}
+					"active": {
+						"type": "boolean",
+						"value": active
 					}
 				}).then(
-					(response) => {				
+					(response) => {
+						// Entity created successfully
 						var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, $("#taskDescriptionTextArea").val());
 						$("#materialFlows").append(newMaterialFlowHTML);
 						$("#taskDescriptionTextArea").val("");							
-						showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");
+						showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");				
+						/*
+						// create MaterialflowSpecificationState entity next
+						var materialflowSpecificationStateId = "MaterialflowSpecificationState" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+						ngsiConnection.v2.createEntity({
+							"id": materialflowSpecificationStateId,
+							"type": "MaterialflowSpecificationState",
+							"message": {
+								"type": "string",
+								"value": "Success",
+								"metadata": {}
+							},
+							"refId": {
+								"type": "string",
+								"value": materialFlowId,
+								"metadata": {
+									"python": {
+										"type": "dataType",
+										"value": "unicode"
+									}
+								}
+							},
+							"state": {
+								"type": "number",
+								"value": 0,
+								"metadata": {
+									"python": {
+										"type": "dataType",
+										"value": "int"
+									}
+								}
+							}
+						}).then(
+							(response) => {				
+								var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, $("#taskDescriptionTextArea").val());
+								$("#materialFlows").append(newMaterialFlowHTML);
+								$("#taskDescriptionTextArea").val("");							
+								showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");
+							}, (error) => {
+								console.log(error);
+								// Error creating the entity
+								showAndDismissAlert("error", "There was an error sending the material flow (" + error + ")!", "taskManagementAlert");
+							});
+						*/
 					}, (error) => {
 						console.log(error);
 						// Error creating the entity
 						showAndDismissAlert("error", "There was an error sending the material flow (" + error + ")!", "taskManagementAlert");
-					});
-				*/
-			}, (error) => {
-				console.log(error);
-				// Error creating the entity
-				showAndDismissAlert("error", "There was an error sending the material flow (" + error + ")!", "taskManagementAlert");
+					}
+				);
 			}
-		);
+		});			
 	}
 }
 
