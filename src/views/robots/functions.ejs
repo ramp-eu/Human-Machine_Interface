@@ -15,9 +15,9 @@ function updateRobotsTable(notification) {
    //console.log("Received Robot notif: " + JSON.stringify(notification));					   
    $.each(notification.data, function () {
 	   	if (!this.graph) {
-			//var d = decodeURIComponent(this.position_channel.value);
+			//var d = decodeURIComponent(this.current_motion.value);
 			//var dObj = JSON.parse(d.replace(/\'/g, "\""));
-			var dObj = this.position_channel.value;
+			var dObj = this.current_motion.value;
 			var ran_status = "unknown";
 			//if (dObj.ran_status.value == 0) ran_status = "waiting";
 			//else if (dObj.ran_status.value == 1) ran_status = "moving";
