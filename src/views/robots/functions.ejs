@@ -1,10 +1,10 @@
 function initRobotsTable(ngsiConnection) {
 	ngsiConnection.v2.listEntities({type: "ROBOT"}).then((response) => {
 		var entities = response.results;
-		$("#robotsTab").html("<table id=\"robotsTable\" class=\"table table-responsive table-striped\"><thead><tr><th scope=\"col\">ID</th><th scope=\"col\">RAN status</th><th scope=\"col\">Pos X</th><th scope=\"col\">Pos Y</th><th scope=\"col\">Theta</th></tr></thead><tbody id=\"robotsTbody\">");
+		$("#robotsTab").html("<table id=\"robotsTable\" style=\"width: 100%;\"><thead><tr><th scope=\"col\">ID</th><th scope=\"col\">RAN status</th><th scope=\"col\">Pos X</th><th scope=\"col\">Pos Y</th><th scope=\"col\">Theta</th></tr></thead><tbody id=\"robotsTbody\">");
 		$.each(entities, function(i, entity) {
 			if (!entity.graph) {
-				$("#robotsTbody").append("<tr id=\"robottr" + entity.id + "\"class=\"clickable-row\"></tr>");
+				$("#robotsTbody").append("<tr id=\"robottr" + entity.id + "\"class=\"clickable-row\" bgcolor=\"#FFFFFF\"></tr>");
 			}
 		});
 		$("#robotsTab").append("</tbody></table>");

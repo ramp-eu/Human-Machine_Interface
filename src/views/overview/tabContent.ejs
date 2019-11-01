@@ -5,16 +5,14 @@
 	<canvas id="overviewFloorplanOriginScale">
 		Sorry, your browser doesn't support the &lt;canvas&gt; element.
 	</canvas>
-	<div><input id="spOnOff" type="checkbox" data-toggle="toggle" data-on="S&P Graph On" data-off="S&P Graph Off" data-onstyle="success" data-size="mini" data-width="150">&nbsp;<span id="spTooltip"></span></div>
+	<div><input id="spOnOff" type="checkbox" data-toggle="toggle" data-on="S&P Graph On" data-off="S&P Graph Off" data-style="success" data-size="normal" data-width="150">&nbsp;<span id="spTooltip"></span></div>
 </section>
 
-<h3 style="border-bottom: 2px solid blue;">Robots:</h3>
-
-<table id="robotsOverviewTable" class="table table-responsive table-striped" style="width: 90%; margin-top: 20px; margin: 0px auto; float: none;">
+<table id="robotsOverviewTable" style="width: 100%; margin-top:50px;">
 	<thead>
 		<tr>
 			<th scope="col">&nbsp;</th>
-			<th scope="col">ID</th>
+			<th scope="col">Robot ID</th>
 			<th scope="col">RAN status</th>
 			<th scope="col">Pos X</th>
 			<th scope="col">Pos Y</th>
@@ -24,18 +22,16 @@
 	<tbody id="robotsOverviewTbody"></tbody>
 </table>
 
-<h3 style="border-bottom: 2px solid green;">Sensors:</h3>
-
-<table id="sensorsOverviewTable" class="table table-responsive table-striped" style="width: 90%; margin-top: 20px; margin: 0px auto; float: none;">
+<table id="sensorsOverviewTable" style="width: 100%; margin-top:50px;">
 	<thead>
 		<tr>
 			<th scope="col">&nbsp;</th>
-			<th scope="col">ID</th>
+			<th scope="col">Sensor ID</th>
 			<th scope="col">Type</th>			
 			<th scope="col">Value</th>				
-			<th scope="col">Pos X</th>
-			<th scope="col">Pos Y</th>
-			<th scope="col" style="text-align:center">Set position</th>
+			<!--<th scope="col">Pos X</th>-->
+			<!--<th scope="col">Pos Y</th>-->
+			<!--<th scope="col" style="text-align:center">Set position</th>-->
 		</tr>
 	</thead>
 	<tbody id="sensorsOverviewTbody"></tbody>

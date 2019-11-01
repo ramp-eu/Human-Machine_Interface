@@ -472,7 +472,7 @@ function updateRobotsOnOverview(notification) {
 		drawSensorsOnCanvas();
 		$("#robotsOverviewTbody").empty();
 		$.each(robotsOnOverview, function(key, value) {		
-			$("#robotsOverviewTbody").append("<tr><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.ran_status + "</td><td>" + value.x + " m</td><td>" + value.y + " m</td><td>" + Math.round(value.theta * (180/Math.PI) * 100) / 100 + "&#176;</td></tr>");
+			$("#robotsOverviewTbody").append("<tr bgcolor=\"white\"><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.ran_status + "</td><td>" + value.x + " m</td><td>" + value.y + " m</td><td>" + Math.round(value.theta * (180/Math.PI) * 100) / 100 + "&#176;</td></tr>");
 		});	
 	}
 }
@@ -527,7 +527,7 @@ function updateSensorsOnOverview(notification) {
 function updateSensorsTable() {
 	$("#sensorsOverviewTbody").empty();
 	$.each(sensorsOnOverview, function(key, value) {		
-		$("#sensorsOverviewTbody").append("<tr><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.type + "</td><td>" + value.value + "</td><td>" + value.x + " m</td><td>" + value.y + " m</td><td style=\"text-align:center\"><input type=\"radio\" name=\"sensorLocation\" id=\"selectedSensor_" + value.id + "\" value=\"selectedSensor_" + value.id + "\"></td></tr>");			
+		$("#sensorsOverviewTbody").append("<tr bgcolor=\"white\"><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.type + "</td><td>" + value.value + "</td><!--<td>" + value.x + " m</td><td>" + value.y + " m</td><td style=\"text-align:center\"><input type=\"radio\" name=\"sensorLocation\" id=\"selectedSensor_" + value.id + "\" value=\"selectedSensor_" + value.id + "\"></td>--></tr>");			
 	});
 }
 

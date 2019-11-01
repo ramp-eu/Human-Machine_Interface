@@ -2,7 +2,7 @@
 
 <div id="sensorsAlert"></div>
 
-<div class="well ownborder">
+<div>
     <h3>Create new HMI button</h3>	
 	<form>	
 		<div class="form-group">
@@ -43,28 +43,14 @@
 		</div>		
 		-->
 		<div class="form-group">						
-			<button class="btn btn-primary" id="createNewSensor">Create new button</button>
+			<button class="btn ownButton" id="createNewSensor">Create new button</button>
 		</div>		
 	</form>
 </div>
 
 <% } %>
 
-<div class="well ownborder">
-	<h3>Current HMI buttons</h3>
-	<table class="table table-responsive">
-		<thead>
-			<tr>
-				<!--<th scope="col">SensorAgent Id</th>-->
-				<!--
-				<th scope="col">Manufacturer</th>
-				<th scope="col">Measurement Type</th>
-				<th scope="col">Sensor Id</th>				
-				<th scope="col">Sensor Type</th>
-				-->
-				<th scope="col">&nbsp;</th>
-			</tr>
-		</thead>
-		<tbody id="currentOnOffSensors"></tbody>
-	</table>
+<div>
+	<!--<h2>Current HMI buttons</h2>-->
+	<div id="currentOnOffSensors"></div>
 </div>

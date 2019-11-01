@@ -87,7 +87,7 @@ function createNewSensor() {
 						}).then(
 							(response) => {
 								// Entity created successfully
-								var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, sensorId, userId) + "</tr>";
+								var onOffSensorHTML = "<span style=\"display: inline-block; margin:30px;\" id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, sensorId, userId) + "</span>";
 								$("#currentOnOffSensors").append(onOffSensorHTML);							
 								$("#new_sensor_name").val("");							
 								$("#new_sensor_id").val("");	
@@ -150,7 +150,7 @@ function initSensors(ngsiConnection) {
 					success: function (data) {					
 						$(data).each(function(i, item) {
 							if (item.ocb_id == ocbId && (<%- '"' + user.role + '"' %> == "admin" || (item.user_id == "all" || item.user_id == <%- '"' + user.userid + '"' %>))) {
-								var onOffSensorHTML = "<tr id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, item.text, item.user_id) + "</tr>";
+								var onOffSensorHTML = "<span style=\"display: inline-block; margin:30px;\" id=\"onOffSensor_" + ocbId + "\">" + getOnOffSensorRowHTML(ocbId, item.text, item.user_id) + "</span>";
 								$("#currentOnOffSensors").append(onOffSensorHTML);							
 							}
 						})
@@ -295,7 +295,7 @@ function updateSensors(notification) {
 						if (item.ocb_id == ocbId && (<%- '"' + user.role + '"' %> == "admin" || (item.user_id == "all" || item.user_id == <%- '"' + user.userid + '"' %>))) {						
 							var onOffSensorHTML = getOnOffSensorRowHTML(ocbId, item.text, item.user_id);
 							if (!$("#onOffSensor_" + ocbId).length) {
-								$("#currentOnOffSensors").append("<tr id=\"onOffSensor_" + ocbId + "\">" + onOffSensorHTML + "</tr>");
+								$("#currentOnOffSensors").append("<span style=\"display: inline-block; margin:30px;\" id=\"onOffSensor_" + ocbId + "\">" + onOffSensorHTML + "</span>");
 							}						
 						}
 					})
@@ -307,10 +307,10 @@ function updateSensors(notification) {
 }
 
 function getOnOffSensorRowHTML(ocbId, sensorId, assignedTo) {
-	var htmlStr = "<td><a href=\"#\" id=\"onOffSensorButton_" + ocbId + "\" class=\"hmi-button\">" + sensorId + "</a>";
+	var htmlStr = "<a href=\"#\" id=\"onOffSensorButton_" + ocbId + "\" class=\"hmi-button\">" + sensorId + "</a>";
 	<% if (user && user.role == "admin") { %> 
 		htmlStr += "&nbsp;(assigned to " + assignedTo + ")&nbsp;(<a id=\"removeOnOffSensorButton_" + ocbId + "\" class=\"removeOnOffSensorButton\" href=\"#\">delete</a>)";
 	<% } %>
-	htmlStr += "</td>";
+	htmlStr += "";
 	return htmlStr;
 }
