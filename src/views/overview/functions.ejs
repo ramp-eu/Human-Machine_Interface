@@ -438,7 +438,7 @@ function updateRobotsOnOverview(notification) {
 		
 	if (typeof floorPlanImage !== "undefined") {
 
-		var temp = 1;
+		/*var temp = 1;*/
 		$.each(notification.data, function () {		
 			var dObj = this.current_motion.value;
                         //console.log("DOBJ: "+ dObj);
@@ -455,16 +455,17 @@ function updateRobotsOnOverview(notification) {
 			var euler = new THREE.Euler().setFromQuaternion(quaternion);
 			var theta = euler.z;
 			var objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
-			if (objIndex == -1) {	
-				robotsOnOverview.push({index: temp, id: this.id, ran_status: ran_status, x: dObj.current_position.value.pose.value.position.value.x.value, y: dObj.current_position.value.pose.value.position.value.y.value, theta: theta});
+			if (objIndex == -1) {
+				var robotIndex = robotsOnOverview.length + 1;
+				robotsOnOverview.push({index: robotIndex, id: this.id, ran_status: ran_status, x: dObj.current_position.value.pose.value.position.value.x.value, y: dObj.current_position.value.pose.value.position.value.y.value, theta: theta});
 			} else {	
-				robotsOnOverview[objIndex].index = temp;
+				/*robotsOnOverview[objIndex].index = temp;*/
 				robotsOnOverview[objIndex].ran_status = ran_status;			
 				robotsOnOverview[objIndex].x = dObj.current_position.value.pose.value.position.value.x.value;		
 				robotsOnOverview[objIndex].y = dObj.current_position.value.pose.value.position.value.y.value;		
 				robotsOnOverview[objIndex].theta = theta;						
 			}
-			temp++;
+			/*temp++;*/
 		});
 
 		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
