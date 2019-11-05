@@ -115,6 +115,7 @@ a.hmi-button-disabled:active {/*on Click*/
     background-color: #da1f4d;
     border-color: #da1f4d;
     color: #FFF;
+	border: none;
 	border-radius: 0px;
     -webkit-border-radius: 0px;
     -moz-border-radius: 0px;
@@ -127,6 +128,7 @@ a.hmi-button-disabled:active {/*on Click*/
     background-color: #ba1a42;
     border-color: #ba1a42;
     color: #FFF;
+	border: none;
 	border-radius: 0px;
     -webkit-border-radius: 0px;
     -moz-border-radius: 0px;	

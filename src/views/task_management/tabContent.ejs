@@ -4,7 +4,7 @@
     <h3>Create a new material flow</h3>
 	<form>
 		<div class="form-group">
-			<label for="taskDescriptionTextArea">Task specification:</label>
+			<label for="taskDescriptionTextArea">Task specification</label>
 			<textarea class="form-control" id="taskDescriptionTextArea" rows="8"></textarea>
 		</div>
 		<div class="form-group">						
@@ -13,12 +13,12 @@
 	</form>
 </div>
 <div style="margin-top:30px"></div>
-<div>
-	<h3>Sent material flows:</h3>
-	<table class="table table-responsive">
+<div style="width: 100%;">
+	<h3>Sent material flows</h3>
+	<table style="width: 100%;">
 		<thead>
 			<tr>
-				<th scope="col">ID</th>
+				<th scope="col">Material Flow ID</th>
 				<th scope="col">State</th>
 				<th scope="col">Message</th>	  
 				<th scope="col">Active</th>		
@@ -30,17 +30,16 @@
 	</table>
 </div>
 <div style="margin-top:30px"></div>
-<div>
+<div style="width: 100%;">
 	<h3>Transport orders</h3>
-	<table id="transportOrdersTable" class="table table-responsive">
+	<table id="transportOrdersTable" style="width: 100%;">
 		<thead>
 			<tr>
 				<th scope="col">ID</th>				
 				<th scope="col">Pickup From</th>	
 				<th scope="col">Deliver To</th>
 				<th scope="col">Name</th>			
-				<th scope="col">Material Flow Id</th>	
-				<th scope="col">Owner Id</th>	
+				<th scope="col">Material Flow Id</th>		
 				<th scope="col">Task Info</th>	
 				<th scope="col">Updated</th>					
 				<th scope="col">Started</th>

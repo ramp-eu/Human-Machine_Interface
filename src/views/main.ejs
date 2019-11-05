@@ -32,6 +32,7 @@
 			var floorPlanImageToWebPageScale = 1;
 			var floorPlanImageXOffset = 0;
 			var floorPlanImageYOffset = 0;
+			var fileNameUpdateInterval;
 
 			var ocb_host = <%- '"' + ocb_host + '"' %>;	
 			var ocb_port = <%- '"' + ocb_port + '"' %>;	
@@ -39,7 +40,20 @@
 			var ngsi_proxy_port = <%- '"' + ngsi_proxy_port + '"' %>;		
 		
 			$(document).ready(function() {
-						
+					
+				var intervalFunc = function () {
+					if (document.getElementById('hiddenFileInput').files[0] !== undefined) {
+						$('#shownFileName').html(document.getElementById('hiddenFileInput').files[0].name);
+					}
+				};
+				$('#shownFileInput').on('click', function () {
+					$('#hiddenFileInput').click();
+					fileNameUpdateInterval = setInterval(intervalFunc, 1);
+					return false;
+				});
+				
+				$('#hiddenFileInput').hide();
+					
 				startSubscriptions();
 			
 				$('#spOnOff').change(function() {

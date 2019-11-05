@@ -123,7 +123,13 @@ function getMaterialFlowHTML(materialFlowId, state, message, active, task) {
 		noSelected = " SELECTED";	
 	}
 	var activeSelectHTML = "<select id=\"materialFlowActive_" + materialFlowId + "\" onchange=\"changeMaterialFlowActive(this)\"><option value=\"yes\"" + yesSelected + ">Yes</option><option value=\"no\"" + noSelected + ">No</option></select>";
-	return "<tr id=\"materialFlow_" + materialFlowId + "\" class=\"clickable-row\"><td>" + materialFlowId + "</td><td id=\"state_" + materialFlowId + "\">" + state + "</td><td id=\"message_" + materialFlowId + "\">" + message + "</td><td>" + activeSelectHTML + "</td><td><textarea id=\"task_" + materialFlowId + "\" rows=\"4\" readonly>" + task + "</textarea></td><td><button onclick=\"cancelMaterialFlow('" + materialFlowId + "')\">Delete</button></td></tr>";
+	var taskDescriptionStart = "";
+	if (task.length <= 40) {
+		taskDescriptionStart = task;
+	} else {
+		taskDescriptionStart = task.substring(0,39) + "...";
+	}
+	return "<tr id=\"materialFlow_" + materialFlowId + "\" bgcolor=\"white\"><td>" + materialFlowId + "</td><td id=\"state_" + materialFlowId + "\">" + state + "</td><td id=\"message_" + materialFlowId + "\">" + message + "</td><td>" + activeSelectHTML + "</td><td><span id=\"task_" + materialFlowId + "\" title=\"" + task + "\">" + taskDescriptionStart + "</span></td><td><button onclick=\"cancelMaterialFlow('" + materialFlowId + "')\">Delete</button></td></tr>";
 }
 
 function changeMaterialFlowActive(t) {
@@ -152,7 +158,7 @@ function changeMaterialFlowActive(t) {
 }
 
 function getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfo, updateTime, startTime) {
-	return "<tr id=\"transportOrder_" + id + "\" class=\"clickable-row\"><td>" + id + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + refOwnerId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
+	return "<tr id=\"transportOrder_" + id + "\" bgcolor=\"white\"><td>" + id + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
 }
 
 function sendMaterialFlow() {
