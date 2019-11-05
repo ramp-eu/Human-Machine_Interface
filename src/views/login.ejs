@@ -5,14 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title><%= __("title") %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/main.css">
+    <!--<link rel="stylesheet" href="/css/main.css">-->
+    <link rel="stylesheet" href="/css/style.css">	
 </head>
 <body>
 <div class="container">
     <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
+		    <div style="margin-top:100px;"></div>
             <div class="well">
-                <h1></span> <%= __("logging") %></h1>
+                <h1><%= __("logging") %></h1>
 
                 <% if (message.length > 0) { %>
                     <div class="alert alert-danger"><%= message %></div>
@@ -30,7 +32,7 @@
                         <input type="password" class="form-control" name="password">
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg"><%= __("login") %></button>
+                    <button type="submit" class="ownButton" style="width:100%; padding:10px;"><%= __("login") %></button>
                 </form>
 
                 <hr>
