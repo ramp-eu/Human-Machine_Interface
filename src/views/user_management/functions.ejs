@@ -128,7 +128,7 @@ function getUserHTML(id, userid, role, name) {
 		"<td><input type=\"text\" class=\"form-control\" id=\"name_" + id + "\" value=\"" + name + "\" required/></td>" +
 		"<td><input type=\"password\" class=\"form-control\" id=\"password_" + id + "\" value=\"\"/></td>" +
 		"<td><input type=\"password\" class=\"form-control\" id=\"confirm_pw_" + id + "\" value=\"\"/></td>" +
-		"<td><button type=\"button\" class=\"btn btn-primary btn-block\" onClick=\"updateUser(\'" + id + "\')\">Update</button></td><td><button type=\"button\" class=\"btn btn-primary btn-block\" onClick=\"deleteUser(\'" + id + "\')\"";
+		"<td><button type=\"button\" class=\"btn ownButton\" onClick=\"updateUser(\'" + id + "\')\">Update</button></td><td><button type=\"button\" class=\"btn ownButton\" onClick=\"deleteUser(\'" + id + "\')\"";
 	if (role == "admin") { 
 		//userHTML += " disabled";  // SHOULD DELETING ADMINS BE DISABLED? paju's comment: not yet needed, admin should generally be able to do everything (sane)
 	}														

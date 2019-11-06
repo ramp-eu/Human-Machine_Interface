@@ -6,11 +6,11 @@
         "h31": "Headline",
         "p1": "Paragraph of text."
     },
-    "login": "Log in",
+    "login": "Login",
     "logout": "Log out",
     "signup": "Sign up",
     "logging": "HMI login",
-    "userid": "User id",
+    "userid": "User ID",
     "pwd": "Password",
     "pwda": "Password again",
     "logout": "Log out",

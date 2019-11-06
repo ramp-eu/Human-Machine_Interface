@@ -51,7 +51,7 @@ th
 {
   font-family: "Open Sans";
   font-style: normal;
-  	font-style: bold;
+  font-style: bold;
   font-size: 15px;
   text-transform: uppercase;      
 }
@@ -148,13 +148,14 @@ a.disabled{
 }
 
 ul.nav-tabs {
-    padding-left:100px;	
-	border-bottom: 0px;
+    padding-left:100px;
+    border-bottom: 0px;
+    background-color: #ffffff;
 }
 
 ul.nav-tabs li a {
-  border-color: transparent;
-  background-color: transparent;
+  border-color: #ffffff;
+  background-color: #ffffff;
   /*margin-bottom: -3px;*/
   color: #111111;
   font-family: "Open Sans";
@@ -163,8 +164,8 @@ ul.nav-tabs li a {
 }
 
 ul.nav-tabs li a:hover {
-  border-color: transparent;
-  background-color: transparent;
+  border-color: #ffffff;
+  background-color: #ffffff;
   /*margin-bottom: -3px;*/
   border-bottom: 4px;
   border-bottom: 3px solid #d4d4d4;
@@ -187,8 +188,8 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
 
 .tab-content {
   background-color: #f3f3f3;
-  padding-left:100px;
-  padding-right:100px;
+  padding-left:50px;
+  padding-right:50px;
   padding-top: 40px;
   padding-bottom: 50px;
   /*margin-bottom: -3px;*/
@@ -196,4 +197,26 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
   font-family: "Open Sans";
   font-style: normal;
   font-size: 14px;  
+}
+.login-stripes {
+    right: 0;
+    left: 0;
+    margin-top:100px; margin-bottom:80px;
+    padding-top: 50px; padding-bottom: 50px;
+    background: url("/img/bg-inclined-lines.png");
+    background-repeat: repeat;
+}
+.header-text {
+    margin-top: 30px;
+    margin-left:20px;
+    margin-right:10px;
+    color: #ffffff;
+    font-family: "Open Sans";
+    font-style: normal;
+    font-size:13px;
+}
+.header {
+}
+.footer {
+    margin-top:80px; margin-bottom:80px;
 }

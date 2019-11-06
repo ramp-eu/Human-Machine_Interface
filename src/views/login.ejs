@@ -8,13 +8,18 @@
     <!--<link rel="stylesheet" href="/css/main.css">-->
     <link rel="stylesheet" href="/css/style.css">	
 </head>
-<body>
-<div class="container">
+<body style="background-color: #1A1737;">
+<div class="row" style=" padding-top: 80px;">
+    <div>
+        <img src="/img/logo-opil-login.png" alt="OPIL Logo" style="display: block; margin-left: auto; margin-right: auto; height: 95px;">
+    </div>
+</div>
+<div class="container" style="background-color: #1A1737;">
     <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
-		    <div style="margin-top:100px;"></div>
-            <div class="well">
-                <h1><%= __("logging") %></h1>
+		    <div style="margin-top:40px;"></div>
+            <div style="background-color: #1A1737;">
+                <h1 style="color: #ffffff"><%= __("login") %></h1>
 
                 <% if (message.length > 0) { %>
                     <div class="alert alert-danger"><%= message %></div>
@@ -24,18 +29,16 @@
 
                 <form action="/login" method="post">
                     <div class="form-group">
-                        <label><%= __("userid") %></label>
+                        <label style="color: #ffffff"><%= __("userid") %></label>
                         <input type="text" class="form-control" name="userid">
                     </div>
                     <div class="form-group">
-                        <label><%= __("pwd") %></label>
+                        <label style="color: #ffffff"><%= __("pwd") %></label>
                         <input type="password" class="form-control" name="password">
                     </div>
 
                     <button type="submit" class="ownButton" style="width:100%; padding:10px;"><%= __("login") %></button>
                 </form>
-
-                <hr>
 
                 <!--<p><%= __("Need an account?") %> <a href="/signup"><%= __("signup") %></a></p>-->
                 <!--<p><%= __("Forgot your password?") %> <a href="/change"><%= __("chgpwd") %></a></p>-->
@@ -49,6 +52,31 @@
             </div>
         </div>
     </div>
+</div>
+<div class="login-stripes">
+  <div class="container" style="margin-top:50px; margin-bottom:50px;">
+    <div class="row" style="background-color: #ffffff;">
+        <div class="col-lg-3"> </div> 
+        <div class="col-lg-6">
+            <div style="margin-top:50px; margin-bottom:30px;">
+                <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 24px;" align="center">
+                    Digital tools to accelerate productivity with robotics
+                </p>
+            </div>
+            <div style="margin-bottom:30px;">
+                <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px;" align="center">
+                    RAMP (Robotics Automation MarketPlace) is a B2B marketplace connecting especially small and medium-sized manufacturers with technology suppliers to improve the adaptation of robotics in factories.
+                </p>
+            </div>
+            <div style="margin-bottom:50px;">
+                <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 15px;" align="center">
+                    RAMP is currently being developed in DIH2 and L4MS projects under Horizon2020 framework. If you want receive an update when we are ready, leave your contacts here: <a target="_blank" href="http://www.ramp.eu">www.ramp.eu</a>
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-3"> </div> 
+    </div>
+  </div>
 </div>
 </body>
 </html>
