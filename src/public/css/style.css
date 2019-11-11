@@ -219,4 +219,10 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
 }
 .footer {
     margin-top:80px; margin-bottom:80px;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   background-color: #1A1737;
+   color: white;
+   text-align: center;
 }

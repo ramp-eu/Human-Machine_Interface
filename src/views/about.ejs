@@ -1,26 +1,13 @@
-<!doctype html>
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title><%= __("title") %></title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-<div class="container">
 
-    <div class="row text-center">
-        <h2>About</h2>
-        <!--<h3><%= __("index.h31") %></h3>-->
-        <!--<p><%= __("index.p1") %></p>-->
-
-    <p><a href="/login" class="btn btn-default"><%= __("login") %></a>
-    <!--<a href="/signup" class="btn btn-default"><%= __("signup") %></a></p>-->
-    <p></p>
-    <!--<p><a href="/?lang=<%= __("lnghref") %>"><%= __("lng") %></a></p>-->
+    <div>
+        <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 42px; color: #111111">About</p>
+        <p id="introduction-human-machine-interface-hmi" style="font-family: 'Open Sans'; font-weight: bold; font-size: 24px; color: #111111">Introduction Human Machine Interface (HMI)</h3>
+        <p id="user-management" style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px; color: #111111">User management</p>
+        <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 18px; color: #111111">By installing the HMI module, an user with administrator role is created as well. This user is able to define other users with different user roles. Specific tabs and infomration windows  of the user interface in the web browser can be restricted based on a user’s role. HTTP calls to the HMI web server and certain functions can be restricted as well. All the user data is stored in the local database. Additionally, HMI creates an entity to the OCB for HAN. This entity’s ID is the same unique ID as the user's in the local database.</p>
+        <p id="floorplan-management" style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px; color: #111111">Floorplan management</p>
+        <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 18px; color: #111111">From the user interface it is possible to upload to the system floorplan images in png or jpg formats. User is asked to give a name of the floorplan, scale of the image in centimetres per pixel and x- and y-offset values in relation to the robots map. Currently user interface shows the latest uploaded floorplan of the saved ones.</p>
+        <p id="task-management" style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px; color: #111111">Task management</p>
+        <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 18px; color: #111111">Task specifications at the moment are encoded by the user in written text snippets of the task specification language that are saved in the “TaskSpec” type of entities created to the OCB. Web application then subscribes and listens notifications from OCB’s “TaskSpecState” type of entities. User is able to cancel these task specifications and which entities are then removed from the OCB.</p>
+        <p id="viewing-robot-and-sensor-status" style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px; color: #111111">Viewing robot and sensor status</p>
+        <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 18px; color: #111111">User interface has its own views for following the robot status and sensor values information. Web application subscribes all type ‘ROBOT’ and type ‘SensorAgent’ entities. Robots view when notified: robot statuses, x- and y-positions and theta value. Sensors show when notified: sensor values in their own chart panel.</p>
     </div>
-
-</div>
-</body>
-</html>
