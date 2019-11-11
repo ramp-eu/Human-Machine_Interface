@@ -52,7 +52,7 @@ function initTransportOrders(ngsiConnection) {
 			var updateTime = entity.updateTime.value;
 			var startTime = entity.startTime.value;
 			var transportOrderHTML = getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfoStr, updateTime, startTime);
-			$("#transportOrders").append(transportOrderHTML);			
+			$("#transportOrders").prepend(transportOrderHTML);			
 		});
 	});					
 }
@@ -109,7 +109,7 @@ function updateTransportOrders(notification) {
 		if ($("#transportOrder_" + id).length) {
 			$("#transportOrder_" + id).replaceWith(transportOrderHTML);
 		} else {			
-			$("#transportOrders").append(transportOrderHTML);			
+			$("#transportOrders").prepend(transportOrderHTML);			
 		}			
 	});
 }
