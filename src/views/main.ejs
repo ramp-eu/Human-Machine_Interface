@@ -34,10 +34,10 @@
 			var floorPlanImageYOffset = 0;
 			var fileNameUpdateInterval;
 
-			var ocb_host = <%- '"' + ocb_host + '"' %>;	
-			var ocb_port = <%- '"' + ocb_port + '"' %>;	
-			var ngsi_proxy_host = <%- '"' + ngsi_proxy_host + '"' %>;	
-			var ngsi_proxy_port = <%- '"' + ngsi_proxy_port + '"' %>;		
+			var ocb_host = <%- '"' + ocb_host + '"' %>;
+			var ocb_port = <%- '"' + ocb_port + '"' %>;
+			var ngsi_proxy_host = <%- '"' + ngsi_proxy_host + '"' %>;
+			var ngsi_proxy_port = <%- '"' + ngsi_proxy_port + '"' %>;
 		
 			$(document).ready(function() {
 					
@@ -276,11 +276,15 @@
 				<div class="pull-left">
 					<img style="margin-top: 5px;" height=55px src="/img/logo-opil-header.png">
 					<span class="header-text">HMI version <%= version %></span>
+							
+                                <% if (link_btn_name && link_btn_name.length > 0 && link_btn_url && link_btn_url.length > 0) { %>
+                                        <a class="btn btn-default btn-sm" target="_blank" href=<%- '"' + link_btn_url + '"'%>><%= link_btn_name %></a>
+                                <% } %>
 				</div>
 				<div class="pull-right">
                                         <form action="/logout" method="post">
                                         <span class="header-text">Logged in as <%= user.name %></span>
-						&nbsp;<button type="submit" class="btn btn-default btn-sm" style="margin-top: 15px;"><%= __("logout") %></button>
+                                        &nbsp;<button type="submit" class="btn btn-default btn-sm" style="margin-top: 15px;"><%= __("logout") %></button>
 					</form>
 				</div>
 			</div>					
