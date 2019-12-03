@@ -18,7 +18,7 @@ services:
      - ocb_port=1026
      - ngsi_proxy_host=13.79.17.152
      - ngsi_proxy_port=3000
-     - link_btn_name=Open an External System
+     - link_btn_txt=Open an External System
      - link_btn_url=https://www.vttresearch.com/
     restart: always
     volumes:

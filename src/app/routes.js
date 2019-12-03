@@ -423,7 +423,7 @@ module.exports = function(app, passport) {
                     ocb_port : process.env.ocb_port,
                     ngsi_proxy_host : process.env.ngsi_proxy_host, 
                     ngsi_proxy_port : process.env.ngsi_proxy_port, 
-                    link_btn_name : process.env.link_btn_name, 
+                    link_btn_txt : process.env.link_btn_txt, 
                     link_btn_url : process.env.link_btn_url
                 });
             }
