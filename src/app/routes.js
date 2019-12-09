@@ -424,7 +424,8 @@ module.exports = function(app, passport) {
                     ngsi_proxy_host : process.env.ngsi_proxy_host, 
                     ngsi_proxy_port : process.env.ngsi_proxy_port, 
                     link_btn_txt : process.env.link_btn_txt, 
-                    link_btn_url : process.env.link_btn_url
+                    link_btn_url : process.env.link_btn_url,
+                    task_mgmnt : process.env.task_mgmnt
                 });
             }
             else res.status(404).send({ message: 'No HMI instance id found.' });

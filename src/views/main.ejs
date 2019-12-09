@@ -258,8 +258,12 @@
 			<% include ./generalFunctions.ejs %>			
 			<% include ./sp/functions.ejs %>				
 			<% include ./overview/functions.ejs %>		
-			<% include ./floorplan/functions.ejs %>		
-			<% include ./task_management/functions.ejs %>
+			<% include ./floorplan/functions.ejs %>	
+			<% if (task_mgmnt && task_mgmnt == "BPO") { %>
+                            <% include ./bpo/functions.ejs %>
+                        <% } else { %>
+                            <% include ./task_management/functions.ejs %>
+                        <% } %>
 			<% include ./robots/functions.ejs %>
 			<% include ./sensors/functions.ejs %>				
 			<% include ./sensor_data/functions.ejs %>		
@@ -291,8 +295,14 @@
 			<div id="generalAlert"></div>
 			<ul class="nav nav-tabs" style=" margin-top:10px;" role="tablist">
 				<li class="active"><a href="#overviewTab" role="tab" data-toggle="tab">Overview</a></li>
-				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan Management</a></li>	
-				<li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>						
+				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan Management</a></li>
+				
+				<% if (task_mgmnt && task_mgmnt == "BPO") { %>
+                                    <li><a href="#bpoTab" role="tab" data-toggle="tab">BPO</a></li>
+                                <% } else { %>
+                                    <li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>
+                                <% } %>
+										
 				<li><a href="#robotsTab" role="tab" data-toggle="tab">Robots</a></li>
 				<li><a href="#sensorsTab" role="tab" data-toggle="tab">Control</a></li>				
 				<li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>			
@@ -308,9 +318,17 @@
 				<div class="tab-pane" id="floorplansTab" style="margin-top:10px;">
 					<% include ./floorplan/tabContent.ejs %>
 				</div>
-				<div class="tab-pane" id="taskManagementTab" style="margin-top:0px;">
+				
+				<% if (task_mgmnt && task_mgmnt == "BPO") { %>
+				    <div class="tab-pane" id="bpoTab" style="margin-top:0px;">
+					<% include ./bpo/tabContent.ejs %>				
+                                    </div>
+				<% } else { %>
+                                    <div class="tab-pane" id="taskManagementTab" style="margin-top:0px;">
 					<% include ./task_management/tabContent.ejs %>				
-				</div>			
+                                    </div>			
+				<% } %>
+				
 				<div class="tab-pane" id="robotsTab" style="margin-top:-10px;">
 					<% include ./robots/tabContent.ejs %>			
 				</div>						
