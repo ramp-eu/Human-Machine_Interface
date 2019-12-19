@@ -59,11 +59,18 @@
 				$('#spOnOff').change(function() {
 					updateSPGraphOnCanvas();
 				});
-						
+
+                <% if (task_mgmnt && task_mgmnt == "BPO") { %>
+				$("#sendBPO").click(function() {
+					sendBPOInput();
+					return false;
+				});
+                <% } else { %>
 				$("#sendMaterialFlow").click(function() {
 					sendMaterialFlow();
 					return false;
-				});		
+				});
+                <% } %>
 				
 				<% if (user && user.role == "admin") { %>
 				$("#createNewSensor").click(function() {
@@ -124,8 +131,13 @@
 					
 								/* INITIALIZATIONS */				
 								initSensingAndPerception(ngsiConnection);
-								initMaterialFlows(ngsiConnection);						    
-								initTransportOrders(ngsiConnection);										
+                                                <% if (task_mgmnt && task_mgmnt == "BPO") { %>
+                                                                initBPOs(ngsiConnection);
+                                                                initBPOOutputs(ngsiConnection);
+                                                <% } else { %>
+								initMaterialFlows(ngsiConnection);
+								initTransportOrders(ngsiConnection);
+                                                <% } %>
 								initRobotsTable(ngsiConnection);									
 								initSensors(ngsiConnection);	
 								initSensorData(ngsiConnection);		
@@ -134,6 +146,35 @@
 								<% } %>
 
 								/* SUBSCRIPTIONS */
+                                                <% if (task_mgmnt && task_mgmnt == "BPO") { %>
+								ngsiConnection.v2.createSubscription({
+									"description": "Updating BPO Specification Outputs",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "BPOSpecificationOutput" } ] },
+									"notification": {
+										"callback": function (notification) {				   
+											updateBPOOutputs(notification);
+										}
+									},
+									//"expires": "2040-04-05T14:00:00.00Z",
+									//"throttling": 5
+								}).then(
+									(response) => {
+										//console.log("Created subscription: " + JSON.stringify(response));
+										$.ajax({
+											url: "./api/subscription",
+											type: "POST",
+											data: {
+												"subs_id": response.subscription.id
+											}
+										}).done(function(data) {
+										}).fail(function(xhr, status, err) {
+											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
+										});	
+									}, (error) => {
+										//console.log(error);
+									}
+								);
+                                                <% } else { %>
 								ngsiConnection.v2.createSubscription({
 									"description": "Updating material flow specifications",
 									"subject": { "entities": [ { "idPattern": ".*", "type": "MaterialflowSpecificationState" } ] },
@@ -188,7 +229,8 @@
 									}, (error) => {
 										//console.log(error);
 									}
-								);										
+								);
+                                                <% } %>										
 								
 								ngsiConnection.v2.createSubscription({
 									"description": "Updating robot data",

@@ -1,50 +1,41 @@
 <div id="taskManagementAlert"></div>
 
 <div>
-    <h3>Create a new material flow for BPO</h3>
+    <h3>Create a new BPO task specification</h3>
 	<form>
 		<div class="form-group">
 			<label for="taskDescriptionTextArea">Task specification</label>
 			<textarea class="form-control" id="taskDescriptionTextArea" rows="8"></textarea>
 		</div>
 		<div class="form-group">						
-			<button class="btn ownButton" id="sendMaterialFlow">Send material flow</button>
+			<button class="btn ownButton" id="sendBPO">Send task specification</button>
 		</div>
 	</form>
 </div>
 <div style="margin-top:30px"></div>
-<div style="width: 100%;">
-	<h3>Sent material flows</h3>
-	<table style="width: 100%;">
+<div>
+	<h3>Sent task specifications</h3>
+	<table>
 		<thead>
 			<tr>
-				<th scope="col">Material Flow ID</th>
-				<th scope="col">State</th>
-				<th scope="col">Message</th>	  
-				<th scope="col">Active</th>		
+				<th scope="col">Task specification ID</th>		
 				<th scope="col">Task Specification</th>					
 				<th scope="col">&nbsp;</th>
 			</tr>
 		</thead>
-		<tbody id="materialFlows"></tbody>
+		<tbody id="BPOSpecs"></tbody>
 	</table>
 </div>
 <div style="margin-top:30px"></div>
-<div style="width: 100%;">
-	<h3>Transport orders</h3>
-	<table id="transportOrdersTable" style="width: 100%;">
+<div>
+	<h3>BPO Specification Outputs</h3>
+	<table id="BPOSpecificationOutputTable">
 		<thead>
 			<tr>
-				<th scope="col">ID</th>				
-				<th scope="col">Pickup From</th>	
-				<th scope="col">Deliver To</th>
-				<th scope="col">Name</th>			
-				<th scope="col">Material Flow Id</th>		
-				<th scope="col">Task Info</th>	
-				<th scope="col">Updated</th>					
-				<th scope="col">Started</th>
+				<th scope="col">ID</th>		
+				<th scope="col">BPO Specification Output</th>
 			</tr>
 		</thead>
-		<tbody id="transportOrders"></tbody>
+		<tbody id="BPOSpecificationOutput"></tbody>
 	</table>
 </div>

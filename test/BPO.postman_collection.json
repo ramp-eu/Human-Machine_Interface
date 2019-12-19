@@ -1,0 +1,130 @@
+{
+	"info": {
+		"_postman_id": "82360535-c565-4df7-b5e1-7e8b38f22c27",
+		"name": "BPO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Delete entity",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "13.79.17.152:1026/v2/entities/BPOSpecification123456",
+					"host": [
+						"13",
+						"79",
+						"17",
+						"152"
+					],
+					"port": "1026",
+					"path": [
+						"v2",
+						"entities",
+						"BPOSpecification123456"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post BPOSpecificationOutput",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"BPOSpecification123456\",\n    \"type\": \"BPOSpecificationOutput\",\n    \"specification\": {\n\t\t\"type\":\"json\",\n\t\t\"value\":{\n\t\t\t\"path\": [\n\t\t\t\t\"FDA\",\n\t\t\t\t\"ADA\",\n\t\t\t\t\"AAA\",\n\t\t\t\t\"AAR\",\n\t\t\t\t\"ACR\",\n\t\t\t\t\"CCR\",\n\t\t\t\t\"CCC\"\n\t\t\t],\n\t\t\t\"time\": 67\n\t\t}\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://13.79.17.152:1026/v2/entities",
+					"protocol": "http",
+					"host": [
+						"13",
+						"79",
+						"17",
+						"152"
+					],
+					"port": "1026",
+					"path": [
+						"v2",
+						"entities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getBPOSpecificationInputs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://13.79.17.152:1026/v2/entities?type=BPOSpecificationInput",
+					"protocol": "http",
+					"host": [
+						"13",
+						"79",
+						"17",
+						"152"
+					],
+					"port": "1026",
+					"path": [
+						"v2",
+						"entities"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "BPOSpecificationInput"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getBPOSpecificationOutputs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://13.79.17.152:1026/v2/entities?type=BPOSpecificationOutput",
+					"protocol": "http",
+					"host": [
+						"13",
+						"79",
+						"17",
+						"152"
+					],
+					"port": "1026",
+					"path": [
+						"v2",
+						"entities"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "BPOSpecificationOutput"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

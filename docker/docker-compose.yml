@@ -22,6 +22,7 @@ services:
      - ngsi_proxy_port=3000
      - link_btn_txt=Open an External System
      - link_btn_url=https://www.vttresearch.com/
+     - task_mgmnt=BPO
     restart: always
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads

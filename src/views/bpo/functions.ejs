@@ -1,168 +1,57 @@
-function initMaterialFlows(ngsiConnection) {	
-	ngsiConnection.v2.listEntities({type: "Materialflow"}).then((response) => {
+function initBPOs(ngsiConnection) {	
+	ngsiConnection.v2.listEntities({type: "BPOSpecificationInput"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 			if (entity.id !== undefined && entity.specification !== undefined) {
-				var materialFlowId = entity.id;
-				var active = entity.active.value;
-				var task = urldecode(entity.specification.value);
-				ngsiConnection.v2.listEntities({type: "MaterialflowSpecificationState"}).then((response2) => {
-					var entities2 = response2.results;
-					var materialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, task);	
-					$.each(entities2, function(i, entity2) {
-						if (entity2.refId !== undefined && entity2.state !== undefined && entity2.message !== undefined && entity2.refId.value == materialFlowId) {		
-							var materialFlowState = entity2.state.value;
-							var materialFlowMessage = entity2.message.value;
-							materialFlowHTML = getMaterialFlowHTML(materialFlowId, materialFlowState, materialFlowMessage, active, task);
-						}
-					});
-					$("#materialFlows").append(materialFlowHTML);
-				});
+                            var id = entity.id;
+                            var spec = entity.specification.value;
+                            var BPOOutputHTML = getBPOHTML(id, JSON.stringify(spec));
+                            $("#BPOSpecs").append(BPOOutputHTML);
 			}
 		});
 	});
 }
 
-function initTransportOrders(ngsiConnection) {
-	ngsiConnection.v2.listEntities({type: "TransportOrderUpdate"}).then((response) => {
+function initBPOOutputs(ngsiConnection) {
+	ngsiConnection.v2.listEntities({type: "BPOSpecificationOutput"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 		    var id = entity.id;
-			var type = entity.type;
-			var pickupFrom = entity.pickupFrom.value;
-			var deliverTo = entity.deliverTo.value;
-			var name = entity.name.value;
-			var refMaterialflowUpdateId = entity.refMaterialflowUpdateId.value;
-			var refOwnerId = entity.refOwnerId.value;
-			var taskInfo = entity.taskInfo.value;
-			var taskInfoStr = "";
-			if (taskInfo == 0) {
-				taskInfoStr = "Idle";
-			} else if (taskInfo == 1) {
-				taskInfoStr = "WaitForStartTrigger";
-			} else if (taskInfo == 2) {
-				taskInfoStr = "MovingToPickupDestination";
-			} else if (taskInfo == 3) {
-				taskInfoStr = "WaitForLoading";
-			} else if (taskInfo == 4) {
-				taskInfoStr = "MovingToDeliveryDestination";
-			} else if (taskInfo == 5) {
-				taskInfoStr = "WaitForUnloading";
-			}				
-			var updateTime = entity.updateTime.value;
-			var startTime = entity.startTime.value;
-			var transportOrderHTML = getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfoStr, updateTime, startTime);
-			$("#transportOrders").prepend(transportOrderHTML);			
+                    var spec = entity.specification.value;
+                    var BPOOutputHTML = getBPOOutputHTML(id, spec);
+                    $("#BPOSpecificationOutput").prepend(BPOOutputHTML);			
 		});
 	});					
 }
 
-function updateMaterialFlows(notification) {							   
-	$.each(notification.data, function () {		
-		if (this.refId !== undefined && this.state !== undefined && this.message !== undefined) {	
-			var materialFlowId = this.refId.value
-			var materialFlowState = this.state.value;
-			var materialFlowMessage = this.message.value;	
-			if ($("#materialFlow_" + materialFlowId).length) {
-				var materialFlowStateStr = "";
-				if (materialFlowState > 0) {
-					materialFlowStateStr = "Ok (state code: " + materialFlowState + ")";
-				} else if (materialFlowState == 0) {
-					materialFlowStateStr = "Ok";
-				} else if (materialFlowState == -1) {
-					materialFlowStateStr = "Error";
-				}
-				$("#state_" + materialFlowId).html(materialFlowStateStr);
-				$("#message_" + materialFlowId).html(materialFlowMessage);
-			}
-		}			
-	});
-}
-
-function updateTransportOrders(notification) {							   
+function updateBPOOutputs(notification) {							   
 	$.each(notification.data, function () {
 		var id = this.id;
-		var type = this.type;
-		var pickupFrom = this.pickupFrom.value;
-		var deliverTo = this.deliverTo.value;
-		var name = this.name.value;
-		var refMaterialflowUpdateId = this.refMaterialflowUpdateId.value;
-		var refOwnerId = this.refOwnerId.value;
-		var taskInfo = this.taskInfo.value;
-		var taskInfoStr = "";
-		if (taskInfo == 0) {
-			taskInfoStr = "Idle";
-		} else if (taskInfo == 1) {
-			taskInfoStr = "WaitForStartTrigger";
-		} else if (taskInfo == 2) {
-			taskInfoStr = "MovingToPickupDestination";
-		} else if (taskInfo == 3) {
-			taskInfoStr = "WaitForLoading";
-		} else if (taskInfo == 4) {
-			taskInfoStr = "MovingToDeliveryDestination";
-		} else if (taskInfo == 5) {
-			taskInfoStr = "WaitForUnloading";
-		}		
-		var updateTime = this.updateTime.value;
-		var startTime = this.startTime.value;			
-		var transportOrderHTML = getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfoStr, updateTime, startTime);		
-		if ($("#transportOrder_" + id).length) {
-			$("#transportOrder_" + id).replaceWith(transportOrderHTML);
+		var spec = this.specification.value;			
+		var BPOOutputHTML = getBPOOutputHTML(id, spec);		
+		if ($("#BPOOutput_" + id).length) {
+			$("#BPOOutput_" + id).replaceWith(BPOOutputHTML);
 		} else {			
-			$("#transportOrders").prepend(transportOrderHTML);			
+			$("#BPOSpecificationOutput").prepend(BPOOutputHTML);			
 		}			
 	});
 }
 
-function getMaterialFlowHTML(materialFlowId, state, message, active, task) {
-	var yesSelected = "";
-	var noSelected = "";
-	if (active == true) {
-		yesSelected = " SELECTED";	
-	} else {
-		noSelected = " SELECTED";	
-	}
-	var activeSelectHTML = "<select id=\"materialFlowActive_" + materialFlowId + "\" onchange=\"changeMaterialFlowActive(this)\"><option value=\"yes\"" + yesSelected + ">Yes</option><option value=\"no\"" + noSelected + ">No</option></select>";
-	var taskDescriptionStart = "";
-	if (task.length <= 40) {
-		taskDescriptionStart = task;
-	} else {
-		taskDescriptionStart = task.substring(0,39) + "...";
-	}
-	return "<tr id=\"materialFlow_" + materialFlowId + "\" bgcolor=\"white\"><td>" + materialFlowId + "</td><td id=\"state_" + materialFlowId + "\">" + state + "</td><td id=\"message_" + materialFlowId + "\">" + message + "</td><td>" + activeSelectHTML + "</td><td><span id=\"task_" + materialFlowId + "\" title=\"" + task + "\">" + taskDescriptionStart + "</span></td><td><button onclick=\"cancelMaterialFlow('" + materialFlowId + "')\">Delete</button></td></tr>";
+function getBPOHTML(BPOSpecificationId, task) {
+    return "<tr id=\"BPOSpecification_" + BPOSpecificationId + "\" bgcolor=\"white\"><td>" + BPOSpecificationId + "</td><td><span id=\"task_" + BPOSpecificationId + "\" title=\"" + task + "\">" + task + "</span></td><td><button onclick=\"cancelBPO('" + BPOSpecificationId + "')\">Delete</button></td></tr>";
+
+//    return "<tr id=\"BPOSpecification_" + BPOSpecificationId + "\" bgcolor=\"white\"><td>" + BPOSpecificationId + "</td><td><pre>" + task + "<pre></td><td><button onclick=\"cancelBPO('" + BPOSpecificationId + "')\">Delete</button></td></tr>";
 }
 
-function changeMaterialFlowActive(t) {
-	var selectId = t.id;
-	var selectedOption = $("#" + selectId).val();
-	var materialFlowId = selectId.substr("materialFlowActive_".length);
-	var active = false;
-	if (selectedOption == "yes") {
-		active = true;
-	}
-	var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
-		ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
-	});	
-	ngsiConnection.v2.updateEntityAttributes({
-		"id": materialFlowId,		
-		"active": {
-			"type": "boolean",
-			"value": active
-		}							
-	}).then(
-		(response) => {
-		}, (error) => {	
-		}
-	);
-	return false;	
+function getBPOOutputHTML(id, spec) {
+	return "<tr id=\"BPOOutput_" + id + "\" bgcolor=\"white\"><td>" + id + "</td><td>" + JSON.stringify(spec) + "</td></tr>";
 }
 
-function getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfo, updateTime, startTime) {
-	return "<tr id=\"transportOrder_" + id + "\" bgcolor=\"white\"><td>" + id + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
-}
+function sendBPOInput() {
+	if ($.trim($("#taskDescriptionTextArea").val()) != "") {
+//console.log ($.trim($("#taskDescriptionTextArea").val()));
 
-function sendMaterialFlow() {
-	if ($.trim($("#taskDescriptionTextArea").val()) != "") {				
+//console.log(JSON.stringify(spec));
 		var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
 			ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
 		});
@@ -171,96 +60,51 @@ function sendMaterialFlow() {
 			url: "./api/uuid",
 			dataType: "text",
 			success: function (data) {					
-				var materialFlowId = data;
-				var active = true;
-				ngsiConnection.v2.createEntity({
-					"id": materialFlowId,
-					"type": "Materialflow",
-					"specification": {
-						"type": "Text",
-						"value": urlencode($("#taskDescriptionTextArea").val())
-					},
-					"ownerId": {
-						"type": "Text",
-						"value": <%- '"' + hmi_id + '"' %>
-					},
-					"active": {
-						"type": "boolean",
-						"value": active
-					}
-				}).then(
+				var BPOSpecificationId = data;
+                                var spec = new Object();
+                                spec["id"] = BPOSpecificationId;
+                                spec["type"] = "BPOSpecificationInput";
+//spec["specification"] = urlencode($.parseJSON($.trim($("#taskDescriptionTextArea").val())));
+                                spec["specification"] = { "type": "json",
+                        //"value": urlencode($.trim($("#taskDescriptionTextArea").val()))
+                                        "value": $.parseJSON($.trim($("#taskDescriptionTextArea").val()))
+                                };
+				ngsiConnection.v2.createEntity(
+					spec
+					//"id": BPOSpecificationId,
+					//"type": "BPOSpecificationInput",
+					//"specification": {"HALOO":"HUHHUH"}
+					//"specification": urlencode($("#taskDescriptionTextArea").val())
+				).then(
 					(response) => {
 						// Entity created successfully
-						var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, $("#taskDescriptionTextArea").val());
-						$("#materialFlows").append(newMaterialFlowHTML);
+						var newBPOHTML = getBPOHTML(BPOSpecificationId, $("#taskDescriptionTextArea").val());
+						$("#BPOSpecs").append(newBPOHTML);
 						$("#taskDescriptionTextArea").val("");							
-						showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");				
-						/*
-						// create MaterialflowSpecificationState entity next
-						var materialflowSpecificationStateId = "MaterialflowSpecificationState" + Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
-						ngsiConnection.v2.createEntity({
-							"id": materialflowSpecificationStateId,
-							"type": "MaterialflowSpecificationState",
-							"message": {
-								"type": "string",
-								"value": "Success",
-								"metadata": {}
-							},
-							"refId": {
-								"type": "string",
-								"value": materialFlowId,
-								"metadata": {
-									"python": {
-										"type": "dataType",
-										"value": "unicode"
-									}
-								}
-							},
-							"state": {
-								"type": "number",
-								"value": 0,
-								"metadata": {
-									"python": {
-										"type": "dataType",
-										"value": "int"
-									}
-								}
-							}
-						}).then(
-							(response) => {				
-								var newMaterialFlowHTML = getMaterialFlowHTML(materialFlowId, "&nbsp;", "&nbsp;", active, $("#taskDescriptionTextArea").val());
-								$("#materialFlows").append(newMaterialFlowHTML);
-								$("#taskDescriptionTextArea").val("");							
-								showAndDismissAlert("success", "Material flow sent succesfully!", "taskManagementAlert");
-							}, (error) => {
-								console.log(error);
-								// Error creating the entity
-								showAndDismissAlert("error", "There was an error sending the material flow (" + error + ")!", "taskManagementAlert");
-							});
-						*/
+						showAndDismissAlert("success", "BPO task specification sent succesfully!", "taskManagementAlert");
 					}, (error) => {
 						console.log(error);
 						// Error creating the entity
-						showAndDismissAlert("error", "There was an error sending the material flow (" + error + ")!", "taskManagementAlert");
+						showAndDismissAlert("error", "There was an error sending the task specification (" + error + ")!", "taskManagementAlert");
 					}
 				);
 			}
-		});			
+		});
 	}
 }
 
-function cancelMaterialFlow(materialFlowId) {
-	bootbox.confirm("Are you sure you want to delete the material flow?", function(result) {
+function cancelBPO(BPOSpecificationId) {
+	bootbox.confirm("Are you sure you want to delete the task specification?", function(result) {
 		if (result == true) {				
 			var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
 				ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
 			});
-			ngsiConnection.v2.deleteEntity(materialFlowId).then(
+			ngsiConnection.v2.deleteEntity(BPOSpecificationId).then(
 				(response) => {
-					$("#materialFlow_" + materialFlowId).remove();
-					showAndDismissAlert("success", "Material flow deleted succesfully!", "taskManagementAlert");
+					$("#BPOSpecification_" + BPOSpecificationId).remove();
+					showAndDismissAlert("success", "Task specification deleted succesfully!", "taskManagementAlert");
 				}, (error) => {
-					showAndDismissAlert("error", "There was an error deleting the material flow (" + error + ")!", "taskManagementAlert");
+					showAndDismissAlert("error", "There was an error deleting the task specification (" + error + ")!", "taskManagementAlert");
 				}
 			);			
 		}
