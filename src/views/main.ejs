@@ -53,7 +53,8 @@
 				});
 				
 				$('#hiddenFileInput').hide();
-					
+				$('#aboutTabLink').hide();
+				
 				startSubscriptions();
 			
 				$('#spOnOff').change(function() {
@@ -297,6 +298,10 @@
 				}
 			}
 			
+			function showAbout() {
+				$('.nav-tabs a[href="#aboutTab"]').tab('show');
+			}
+			
 			<% include ./generalFunctions.ejs %>			
 			<% include ./sp/functions.ejs %>				
 			<% include ./overview/functions.ejs %>		
@@ -332,9 +337,10 @@
 				<div style="margin-left: auto;">
                                         <form action="/logout" method="post">
 										<div style="display: flex">
-										<img style="margin-top: 5px;" height=70x src="/img/logo_height.png">
-                                        <span class="header-text" style="font-size:15px;">Logged in as <%= user.name %>
-                                        &nbsp;<font color="red">|</font><button type="submit" class="btn btn-sm btn-link" style="font-size:15px; color: white !important;"><%= __("logout") %></button></span>
+										<span class="header-text" style="font-size:15px; margin-top:15px;"><a class="aboutLink" href="#" onclick="showAbout()">&nbsp;&nbsp;&nbsp;About&nbsp;&nbsp;&nbsp;</a><font style="margin-left:3px; margin-right:10px; color: #da1f4d;">|</font>
+										<!--<img style="height: 70px" src="/img/logo_height.png">-->
+                                        Logged in as <%= user.name %><font style="margin-left:15px; color: #da1f4d;">|</font>
+                                        <button type="submit" class="btn btn-sm btn-link button-link-override" style="font-size:15px; margin-top:-2px; color: white !important;"><%= __("logout") %></button></span>
 					</div>
 					</form>
 				</div>
@@ -356,7 +362,7 @@
 				<% if (user && user.role == "admin") { %>  
 				<li><a href="#usersTab" role="tab" data-toggle="tab">User Management</a></li>
 				<% } %>
-				<li><a href="#aboutTab" role="tab" data-toggle="tab">About</a></li>
+				<li id="aboutTabLink"><a href="#aboutTab" role="tab" data-toggle="tab">About</a></li>
 			</ul>
 			<div class="tab-content">
 				<div class="tab-pane active" id="overviewTab" style="margin-top:10px;">

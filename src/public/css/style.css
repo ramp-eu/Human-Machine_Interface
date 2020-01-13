@@ -186,6 +186,30 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
   font-size: 15px;  
 }
 
+.aboutLink {
+  /*margin-bottom: -3px;*/
+  text-decoration: none;
+  color: white;
+  font-family: "Open Sans";
+  font-style: normal;
+  font-size: 15px;
+}
+
+.aboutLink:hover, 
+.aboutLink:active,
+.aboutLink:focus,
+.aboutLink:visited{
+  /*margin-bottom: -3px;*/
+  text-decoration: none;
+  border-bottom: 4px;
+  padding-bottom: 5px;
+  border-bottom: 3px solid #da1f4d;
+  color: white;
+  font-family: "Open Sans";
+  font-style: normal;
+  font-size: 15px;
+}
+
 .tab-content {
   background-color: #f3f3f3;
   padding-left:50px;
@@ -225,4 +249,24 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
    background-color: #1A1737;
    color: white;
    text-align: center;
+}
+
+.button-link-override:hover, 
+.button-link-override:active,
+.button-link-override:focus,
+.button-link-override:visited{
+    text-decoration: none !important;
+	border-bottom: 4px !important;
+	padding-bottom: 3px !important;
+	border-bottom: 3px solid #da1f4d !important;
+	color: white !important;
+	font-family: "Open Sans" !important;
+	font-style: normal !important;
+	font-size: 15px !important;
+	/*
+    background-color: #42A5F5 !important;
+    border-color: #42A5F5 !important;
+    background-image: none !important;
+    border: 0 !important;
+	*/
 }
