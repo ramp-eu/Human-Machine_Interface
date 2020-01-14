@@ -501,6 +501,7 @@ function updateSensorsOnOverview(notification) {
 								} else {
 									sensorsOnOverview[objIndex].id = item.text;			
 									sensorsOnOverview[objIndex].type = entity.sensorType.value;	
+									sensorsOnOverview[objIndex].value = sensorValue;	
 								}							
 							}
 						});
@@ -514,6 +515,7 @@ function updateSensorsOnOverview(notification) {
 				} else {
 					sensorsOnOverview[objIndex].id = entity.sensorID.value;			
 					sensorsOnOverview[objIndex].type = entity.sensorType.value;	
+					sensorsOnOverview[objIndex].value = sensorValue;						
 				}
 			    updateSensorsTable();
 			}
