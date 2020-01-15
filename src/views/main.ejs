@@ -54,7 +54,14 @@
 				
 				$('#hiddenFileInput').hide();
 				$('#aboutTabLink').hide();
-				
+			
+				$('#taskInfoFilter input').on('click', function () {
+					$('#transportOrders').find('tr').hide();	
+					$('#taskInfoFilter').find('input:checked').each(function () {
+						$('.' + $(this).attr('rel')).show();
+					});
+				});
+
 				startSubscriptions();
 			
 				$('#spOnOff').change(function() {

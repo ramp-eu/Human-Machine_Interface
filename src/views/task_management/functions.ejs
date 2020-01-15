@@ -52,7 +52,11 @@ function initTransportOrders(ngsiConnection) {
 			var updateTime = entity.updateTime.value;
 			var startTime = entity.startTime.value;
 			var transportOrderHTML = getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfoStr, updateTime, startTime);
-			$("#transportOrders").prepend(transportOrderHTML);			
+			if ($("#transportOrder_" + id).length) {
+				$("#transportOrder_" + id).replaceWith(transportOrderHTML);
+			} else {			
+				$("#transportOrders").prepend(transportOrderHTML);			
+			}	
 		});
 	});					
 }
@@ -110,7 +114,7 @@ function updateTransportOrders(notification) {
 			$("#transportOrder_" + id).replaceWith(transportOrderHTML);
 		} else {			
 			$("#transportOrders").prepend(transportOrderHTML);			
-		}			
+		}
 	});
 }
 
@@ -160,7 +164,9 @@ function changeMaterialFlowActive(t) {
 }
 
 function getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfo, updateTime, startTime) {
-	return "<tr id=\"transportOrder_" + id + "\" bgcolor=\"white\"><td>" + id + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
+	var taskInfoClass = "TASK_INFO_" + taskInfo;
+	console.log("taskInfoClass: " + taskInfoClass);
+	return "<tr id=\"transportOrder_" + id + "\" class=\"" + taskInfoClass + "\" bgcolor=\"white\"><td>" + id + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
 }
 
 function sendMaterialFlow() {
