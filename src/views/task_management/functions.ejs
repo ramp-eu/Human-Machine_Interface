@@ -123,13 +123,15 @@ function getMaterialFlowHTML(materialFlowId, state, message, active, task) {
 		noSelected = " SELECTED";	
 	}
 	var activeSelectHTML = "<select id=\"materialFlowActive_" + materialFlowId + "\" onchange=\"changeMaterialFlowActive(this)\"><option value=\"yes\"" + yesSelected + ">Yes</option><option value=\"no\"" + noSelected + ">No</option></select>";
+	/*
 	var taskDescriptionStart = "";
 	if (task.length <= 40) {
 		taskDescriptionStart = task;
 	} else {
 		taskDescriptionStart = task.substring(0,39) + "...";
 	}
-	return "<tr id=\"materialFlow_" + materialFlowId + "\" bgcolor=\"white\"><td>" + materialFlowId + "</td><td id=\"state_" + materialFlowId + "\">" + state + "</td><td id=\"message_" + materialFlowId + "\">" + message + "</td><td>" + activeSelectHTML + "</td><td><span id=\"task_" + materialFlowId + "\" title=\"" + task + "\">" + taskDescriptionStart + "</span></td><td><button onclick=\"cancelMaterialFlow('" + materialFlowId + "')\">Delete</button></td></tr>";
+	*/
+	return "<tr id=\"materialFlow_" + materialFlowId + "\" bgcolor=\"white\"><td>" + materialFlowId + "</td><td id=\"state_" + materialFlowId + "\">" + state + "</td><td id=\"message_" + materialFlowId + "\">" + message + "</td><td>" + activeSelectHTML + "</td><td><span id=\"task_" + materialFlowId + "\" title=\"" + task + "\">" + task + "</span></td><td><button onclick=\"cancelMaterialFlow('" + materialFlowId + "')\">Delete</button></td></tr>";
 }
 
 function changeMaterialFlowActive(t) {
