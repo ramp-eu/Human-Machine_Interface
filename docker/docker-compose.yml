@@ -15,14 +15,12 @@ services:
      - inituser=admin
      - initpw=admin
      - ocb_host=13.79.17.152
-#     - ocb_host=13.79.247.180
      - ocb_port=1026
      - ngsi_proxy_host=13.79.17.152
-#     - ngsi_proxy_host=13.79.247.180
      - ngsi_proxy_port=3000
      - link_btn_txt=Open an External System
      - link_btn_url=https://www.vttresearch.com/
-     - task_mgmnt=BPO
+#     - task_mgmnt=BPO
     restart: always
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads

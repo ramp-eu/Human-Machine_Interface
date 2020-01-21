@@ -12,7 +12,7 @@ exports.init = function(ocb_host, ocb_port) {
                 console.log(err);
                 resolve();
             }
-            else {
+            else if (buttons.length > 0) {
                 buttons.forEach(function(button) {
                     var entity = {
                         "id": button.ocb_id,
@@ -72,6 +72,10 @@ exports.init = function(ocb_host, ocb_port) {
                                 }
                     );
                 });
+            }
+            else {
+                console.log('... not any HMI buttons found from local MongoDB');
+                resolve();
             }
         });
     });

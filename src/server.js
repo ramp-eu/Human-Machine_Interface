@@ -18,6 +18,7 @@ var configDB = require('./config/database.js');
 var i18n = require('i18n-2');
 //var cors = require('cors')
 var inithmiinstance = require('./config/inithmiinstance.js');
+var initconfig = require('./config/initconfig.js');
 var inittestconns = require('./config/inittestconns.js');
 var inituser = require('./config/inituser.js');
 var initbuttons = require('./config/initbuttons.js');
@@ -33,6 +34,7 @@ require('./config/passport')(passport); // pass passport for configuration
 
 // HMI initiation
 inithmiinstance.init();
+initconfig.init(process.env.ocb_host, process.env.ocb_port, process.env.ngsi_proxy_host, process.env.ngsi_proxy_port);
 inittestconns.test(process.env.ocb_host, process.env.ocb_port, process.env.ngsi_proxy_host, process.env.ngsi_proxy_port);
 inituser.init(process.env.inituser, process.env.initpw);
 initbuttons.init(process.env.ocb_host, process.env.ocb_port);
@@ -89,7 +91,7 @@ gracefulShutdown(server,
         signals: 'SIGINT SIGTERM',
         timeout: 30000,
         development: false,
-        onShutdown: cleanup.delTaskSpecs,
+        onShutdown: cleanup.cleanOCB,
         finally: function() {
             console.log('Server gracefully shut down at ' + new Date().toISOString());
         }

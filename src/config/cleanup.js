@@ -1,15 +1,15 @@
 var Config = require('../app/models/config');
 var request = require('request');
 
-exports.delTaskSpecs = function(signal) {
+exports.cleanOCB = function(signal) {
 
     return new Promise((resolve) => {
         console.log('... called signal: ' + signal);
-        console.log('... deleting TaskSpecs & SensorAgent.HMI buttons');
+        console.log('... deleting SensorAgent.HMI buttons');
 
         Config.find().sort({ _id: -1 }).limit(1).find(function (err, data) {
 
-            var ocb_url = 'http://' + data[0].ocb_host + ':' + data[0].ocb_port + '/v2/entities?type=TaskSpec&type=SensorAgent';
+            var ocb_url = 'http://' + data[0].ocb_host + ':' + data[0].ocb_port + '/v2/entities?type=SensorAgent';
             var ocb_url2 = 'http://' + data[0].ocb_host + ':' + data[0].ocb_port + '/v2/op/update';
 
             request.get(ocb_url, function(err, resp, body) {
@@ -32,9 +32,9 @@ exports.delTaskSpecs = function(signal) {
                                 delete jsonarr[i].sensorType;
                                 delete jsonarr[i].units;
                             }
-                            else if (jsonarr[i].type == "TaskSpec") {
-                                delete jsonarr[i].TaskSpec;
-                            }
+                            //else if (jsonarr[i].type == "TaskSpec") {
+                            //    delete jsonarr[i].TaskSpec;
+                            //}
                             else {
                                 jsonarr.splice(i, 1);
                                 jsonarr2.splice(i, 1);
@@ -54,7 +54,7 @@ exports.delTaskSpecs = function(signal) {
                                             resolve();
                                         }
                                         else {
-                                            console.log("TaskSpecs & SensorAgent.HMI buttons emptied, response.statusCode " + re.statusCode);
+                                            console.log("SensorAgent.HMI buttons emptied, response.statusCode " + re.statusCode);
                                             request.post({url:ocb_url2,
                                                         json : true,
                                                         body : {"actionType": "delete", "entities": jsonarr}},
@@ -64,7 +64,7 @@ exports.delTaskSpecs = function(signal) {
                                                                 resolve();
                                                             }
                                                             else {
-                                                                console.log("TaskSpecs & SensorAgent.HMI buttons deleted, response.statusCode " + r.statusCode);
+                                                                console.log("SensorAgent.HMI buttons deleted, response.statusCode " + r.statusCode);
                                                                 resolve();
                                                             }
                                                         }
