@@ -31,24 +31,9 @@
 </div>
 <div style="margin-top:30px"></div>
 <div style="width: 100%;">
-	<h3>Transport orders</h3>
-	<table id="transportOrdersTable" style="width: 100%;">
-		<thead>
-			<tr>
-				<th scope="col">ID</th>				
-				<th scope="col">Pickup From</th>	
-				<th scope="col">Deliver To</th>
-				<th scope="col">Name</th>			
-				<th scope="col">Material Flow Id</th>		
-				<th scope="col">Task Info</th>	
-				<th scope="col">Updated</th>					
-				<th scope="col">Started</th>
-			</tr>
-		</thead>
-		<tbody id="transportOrders"></tbody>
-	</table>
+	
 	<div id="taskInfoFilter">
-		<strong>Select tasks to show:&nbsp;</strong>
+		<h3>Transport orders</h3>
 		<label class = "checkbox-inline">
                <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_Idle" checked />Idle
             </label>
@@ -67,5 +52,20 @@
             <label class = "checkbox-inline">
                <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_WaitForUnloading" checked />WaitForUnloading
             </label>	
-	</div>	
+	</div>		
+	<table id="transportOrdersTable" style="width: 100%;">
+		<thead>
+			<tr>
+				<th scope="col">ID</th>				
+				<th scope="col">Pickup From</th>	
+				<th scope="col">Deliver To</th>
+				<th scope="col">Name</th>			
+				<th scope="col">Material Flow Id</th>		
+				<th scope="col">Task Info</th>	
+				<th scope="col">Updated</th>					
+				<th scope="col">Started</th>
+			</tr>
+		</thead>
+		<tbody id="transportOrders"></tbody>
+	</table>
 </div>
