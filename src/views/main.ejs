@@ -239,7 +239,33 @@
 									}
 								);
                                                 <% } %>										
-								
+								ngsiConnection.v2.createSubscription({
+									"description": "Updating sensing and perception",
+									"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ] },
+									"notification": {
+										"callback": function (notification) {
+											initSensingAndPerception(ngsiConnection);  // check if sensing and perception has changed
+									   }
+									},
+									//"expires": "2040-04-05T14:00:00.00Z",
+									//"throttling": 5
+								}).then(
+									(response) => {
+										//console.log("Created subscription: " + JSON.stringify(response));
+										$.ajax({
+											url: "./api/subscription",
+											type: "POST",
+											data: {
+												"subs_id": response.subscription.id
+											}
+										}).done(function(data) {
+										}).fail(function(xhr, status, err) {
+											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
+										});	
+									}, (error) => {
+										//console.log(error);
+									}
+								);									
 								ngsiConnection.v2.createSubscription({
 									"description": "Updating robot data",
 									"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "current_motion" ] } },
