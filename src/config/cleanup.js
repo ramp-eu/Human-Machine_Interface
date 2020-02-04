@@ -120,6 +120,10 @@ exports.cleanOCB = function(signal) {
                                                 }
                                     );
                                 }
+                                else {
+                                    console.log('... Materialflows or SensorAgent.HMI buttons not found');
+                                    resolve();
+                                }
                             }
                         }
                         else {

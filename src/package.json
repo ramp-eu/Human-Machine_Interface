@@ -1,6 +1,6 @@
 {
   "name": "mod.sw.ahmi",
-  "version": "3.0.11-beta",
+  "version": "3.0.12-beta",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
