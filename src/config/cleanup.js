@@ -52,57 +52,78 @@ exports.cleanOCB = function(signal) {
     //https://fiware-orion.readthedocs.io/en/master/user/walkthrough_apiv2/index.html#batch-operations
     //  Orion's batch delete behaviour is that it empties only attrs of entity,
     // and deletes the entities only if they are empty
-                            request.post({url:ocb_url2,
-                                        json : true,
-                                        body : {"actionType": "DELETE", "entities": jsonarr2}},
-                                        function(er, re, bo) {
-                                            if (er) {
-                                                console.log(er);
-                                                resolve();
-                                            }
-                                            else {
-                                                console.log("SensorAgent.HMI buttons emptied, response.statusCode " + re.statusCode);
-                                                request.post({url:ocb_url2,
-                                                            json : true,
-                                                            body : {"actionType": "DELETE", "entities": jsonarr}},
-                                                            function(e, r, b) {
-                                                                if (e) {
-                                                                    console.log(e);
-                                                                    resolve();
-                                                                }
-                                                                else {
-                                                                    console.log("SensorAgent.HMI buttons deleted, response.statusCode " + r.statusCode);
-                                                                    
-                                                                    if (jsonarr3.length > 0) {
-                                                                        console.log('... setting Materialflow entities to non-active');
-                                                                        request.post({url:ocb_url2,
-                                                                                    json : true,
-                                                                                    body : {"actionType": "UPDATE", "entities": jsonarr3}},
-                                                                                    function(er, re, bo) {
-                                                                                        if (er) {
-                                                                                            console.log(er);
-                                                                                            resolve();
-                                                                                        }
-                                                                                        else {
-                                                                                            console.log("Materialflow entities set to non-active, response.statusCode " + re.statusCode);
-                                                                                            resolve();
-                                                                                        }
-                                                                                    }
-                                                                        );
-                                                                    }
-                                                                    else {
-                                                                        console.log('... Materialflow entities not found');
+                            if (jsonarr2.length > 0) {
+                                request.post({url:ocb_url2,
+                                            json : true,
+                                            body : {"actionType": "DELETE", "entities": jsonarr2}},
+                                            function(er, re, bo) {
+                                                if (er) {
+                                                    console.log(er);
+                                                    resolve();
+                                                }
+                                                else {
+                                                    console.log("SensorAgent.HMI buttons emptied, response.statusCode " + re.statusCode);
+                                                    request.post({url:ocb_url2,
+                                                                json : true,
+                                                                body : {"actionType": "DELETE", "entities": jsonarr}},
+                                                                function(e, r, b) {
+                                                                    if (e) {
+                                                                        console.log(e);
                                                                         resolve();
                                                                     }
+                                                                    else {
+                                                                        console.log("SensorAgent.HMI buttons deleted, response.statusCode " + r.statusCode);
+                                                                        
+                                                                        if (jsonarr3.length > 0) {
+                                                                            console.log('... setting Materialflow entities to non-active');
+                                                                            request.post({url:ocb_url2,
+                                                                                        json : true,
+                                                                                        body : {"actionType": "UPDATE", "entities": jsonarr3}},
+                                                                                        function(er, re, bo) {
+                                                                                            if (er) {
+                                                                                                console.log(er);
+                                                                                                resolve();
+                                                                                            }
+                                                                                            else {
+                                                                                                console.log("Materialflow entities set to non-active, response.statusCode " + re.statusCode);
+                                                                                                resolve();
+                                                                                            }
+                                                                                        }
+                                                                            );
+                                                                        }
+                                                                        else {
+                                                                            console.log('... Materialflow entities not found');
+                                                                            resolve();
+                                                                        }
+                                                                    }
                                                                 }
-                                                            }
-                                                );
+                                                    );
+                                                }
                                             }
-                                        }
-                            );
+                                );
+                            }
+                            else {
+                                if (jsonarr3.length > 0) {
+                                    console.log('... setting Materialflow entities to non-active');
+                                    request.post({url:ocb_url2,
+                                                json : true,
+                                                body : {"actionType": "UPDATE", "entities": jsonarr3}},
+                                                function(er, re, bo) {
+                                                    if (er) {
+                                                        console.log(er);
+                                                        resolve();
+                                                    }
+                                                    else {
+                                                        console.log("Materialflow entities set to non-active, response.statusCode " + re.statusCode);
+                                                        resolve();
+                                                    }
+                                                }
+                                    );
+                                }
+                            }
                         }
                         else {
-                            console.log('... SensorAgent.HMI buttons not found');
+                            console.log('... Materialflows or SensorAgent.HMI buttons not found');
                             resolve();
                         }
                     }
