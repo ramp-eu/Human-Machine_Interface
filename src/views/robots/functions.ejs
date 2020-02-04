@@ -32,7 +32,10 @@ function updateRobotsTable(notification) {
 			$("#robottr"+this.id).empty();
 			//console.log(dObj.agv_msg.value.current_position.value.theta.value);
 			var theta = getThetafromQuaternion(dObj.current_position.value.pose.value.orientation.value);
-			$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.value.pose.value.position.value.x.value + " mm</td><td>" + dObj.current_position.value.pose.value.position.value.y.value + " mm</td><td>" + Math.round(theta * (180/Math.PI) * 100) / 100 + "&#176;</td>");
+			var x = dObj.current_position.value.pose.value.position.value.x.value;
+			var y = dObj.current_position.value.pose.value.position.value.y.value;
+			
+			$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + x.toFixed(3) + " m</td><td>" + y.toFixed(3) + " m</td><td>" + Math.round(theta * (180/Math.PI) * 100) / 100 + "&#176;</td>");
 		}
 		// aste &#176;
 	});									
@@ -42,4 +45,5 @@ function getThetafromQuaternion(quaternion) {
 	var quaternion = new THREE.Quaternion().set(quaternion.x.value, quaternion.y.value, quaternion.z.value, quaternion.w.value);
 	var euler = new THREE.Euler().setFromQuaternion(quaternion);
 	var theta = euler.z;
+	return theta;
 }
