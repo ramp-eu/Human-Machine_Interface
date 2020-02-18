@@ -403,6 +403,22 @@ module.exports = function(app, passport) {
             res.send(data);
         });
     });
+    //secret for bash script: 2230670a-483f-11ea-9cf7-0242ac190004
+    app.get('/api/2230670a-483f-11ea-9cf7-0242ac190004/subscription', function(req, res, next) {
+
+        Subscription.find({}, function(err, data) {
+            if (err) res.send(err);
+            res.send(data);
+        });
+    });
+    app.delete('/api/2230670a-483f-11ea-9cf7-0242ac190004/subscription', function(req, res, next) {
+        Subscription.deleteMany({}, function(err, data) {
+            if (err) res.send(err);
+            if (data) res.send(data);
+            else res.status(404).send({ message: 'Subscriptions not found.' });
+        });
+     });
+
 
 // MAIN SECTION =========================
     
