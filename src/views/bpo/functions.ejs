@@ -55,41 +55,70 @@ function sendBPOInput() {
 		var ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
 			ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
 		});
-		$.ajax({
-			type: "GET",
-			url: "./api/uuid",
-			dataType: "text",
-			success: function (data) {					
-				var BPOSpecificationId = data;
-                                var spec = new Object();
-                                spec["id"] = BPOSpecificationId;
-                                spec["type"] = "BPOSpecificationInput";
-//spec["specification"] = urlencode($.parseJSON($.trim($("#taskDescriptionTextArea").val())));
-                                spec["specification"] = { "type": "json",
+                
+                var BPOSpecificationId = "BPO";
+                var spec = new Object();
+                spec["id"] = BPOSpecificationId;
+                spec["type"] = "BPOSpecificationInput";
+                //spec["specification"] = urlencode($.parseJSON($.trim($("#taskDescriptionTextArea").val())));
+                spec["specification"] = { "type": "json",
                         //"value": urlencode($.trim($("#taskDescriptionTextArea").val()))
-                                        "value": $.parseJSON($.trim($("#taskDescriptionTextArea").val()))
-                                };
-				ngsiConnection.v2.createEntity(
-					spec
-					//"id": BPOSpecificationId,
-					//"type": "BPOSpecificationInput",
-					//"specification": {"HALOO":"HUHHUH"}
-					//"specification": urlencode($("#taskDescriptionTextArea").val())
-				).then(
-					(response) => {
-						// Entity created successfully
-						var newBPOHTML = getBPOHTML(BPOSpecificationId, $("#taskDescriptionTextArea").val());
-						$("#BPOSpecs").append(newBPOHTML);
-						$("#taskDescriptionTextArea").val("");							
-						showAndDismissAlert("success", "BPO task specification sent succesfully!", "taskManagementAlert");
-					}, (error) => {
-						console.log(error);
-						// Error creating the entity
-						showAndDismissAlert("error", "There was an error sending the task specification (" + error + ")!", "taskManagementAlert");
-					}
-				);
-			}
-		});
+                        "value": $.parseJSON($.trim($("#taskDescriptionTextArea").val()))
+                };
+                ngsiConnection.v2.createEntity(
+                        spec
+                        //"id": BPOSpecificationId,
+                        //"type": "BPOSpecificationInput",
+                        //"specification": {"HALOO":"HUHHUH"}
+                        //"specification": urlencode($("#taskDescriptionTextArea").val())
+                ).then(
+                        (response) => {
+                                // Entity created successfully
+                                var newBPOHTML = getBPOHTML(BPOSpecificationId, $("#taskDescriptionTextArea").val());
+                                $("#BPOSpecs").append(newBPOHTML);
+                                $("#taskDescriptionTextArea").val("");							
+                                showAndDismissAlert("success", "BPO task specification sent succesfully!", "taskManagementAlert");
+                        }, (error) => {
+                                console.log(error);
+                                // Error creating the entity
+                                showAndDismissAlert("error", "There was an error sending the task specification (" + error + ")!", "taskManagementAlert");
+                        }
+                );
+// 		$.ajax({
+// 			type: "GET",
+// 			url: "./api/uuid",
+// 			dataType: "text",
+// 			success: function (data) {
+// 				var BPOSpecificationId = data;
+//                                 var spec = new Object();
+//                                 spec["id"] = BPOSpecificationId;
+//                                 spec["type"] = "BPOSpecificationInput";
+// //spec["specification"] = urlencode($.parseJSON($.trim($("#taskDescriptionTextArea").val())));
+//                                 spec["specification"] = { "type": "json",
+//                         //"value": urlencode($.trim($("#taskDescriptionTextArea").val()))
+//                                         "value": $.parseJSON($.trim($("#taskDescriptionTextArea").val()))
+//                                 };
+// 				ngsiConnection.v2.createEntity(
+// 					spec
+// 					//"id": BPOSpecificationId,
+// 					//"type": "BPOSpecificationInput",
+// 					//"specification": {"HALOO":"HUHHUH"}
+// 					//"specification": urlencode($("#taskDescriptionTextArea").val())
+// 				).then(
+// 					(response) => {
+// 						// Entity created successfully
+// 						var newBPOHTML = getBPOHTML(BPOSpecificationId, $("#taskDescriptionTextArea").val());
+// 						$("#BPOSpecs").append(newBPOHTML);
+// 						$("#taskDescriptionTextArea").val("");							
+// 						showAndDismissAlert("success", "BPO task specification sent succesfully!", "taskManagementAlert");
+// 					}, (error) => {
+// 						console.log(error);
+// 						// Error creating the entity
+// 						showAndDismissAlert("error", "There was an error sending the task specification (" + error + ")!", "taskManagementAlert");
+// 					}
+// 				);
+// 			}
+// 		});
 	}
 }
 
