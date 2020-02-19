@@ -157,7 +157,7 @@
                                                 <% if (task_mgmnt && task_mgmnt == "BPO") { %>
 								ngsiConnection.v2.createSubscription({
 									"description": "Updating BPO Specification Outputs",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "BPOSpecificationInput" } ],
+									"subject": { "entities": [ { "idPattern": ".*", "type": "BPOSpecification" } ],
                                                                             "condition": { "attrs": [ "results" ] }
 									},
 									"notification": {

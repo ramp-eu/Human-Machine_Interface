@@ -1,5 +1,5 @@
 function initBPOs(ngsiConnection) {	
-	ngsiConnection.v2.listEntities({type: "BPOSpecificationInput"}).then((response) => {
+	ngsiConnection.v2.listEntities({type: "BPOSpecification"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 			if (entity.id !== undefined && entity.specification !== undefined) {
@@ -57,7 +57,7 @@ function sendBPOInput() {
                 var BPOSpecificationId = "BPO";
                 var spec = new Object();
                 spec["id"] = BPOSpecificationId;
-                spec["type"] = "BPOSpecificationInput";
+                spec["type"] = "BPOSpecification";
                 //spec["specification"] = urlencode($.parseJSON($.trim($("#taskDescriptionTextArea").val())));
                 spec["specification"] = { "type": "json",
                         //"value": urlencode($.trim($("#taskDescriptionTextArea").val()))
@@ -134,7 +134,7 @@ function sendBPOInput() {
 // 				var BPOSpecificationId = data;
 //                                 var spec = new Object();
 //                                 spec["id"] = BPOSpecificationId;
-//                                 spec["type"] = "BPOSpecificationInput";
+//                                 spec["type"] = "BPOSpecification";
 // //spec["specification"] = urlencode($.parseJSON($.trim($("#taskDescriptionTextArea").val())));
 //                                 spec["specification"] = { "type": "json",
 //                         //"value": urlencode($.trim($("#taskDescriptionTextArea").val()))
@@ -143,7 +143,7 @@ function sendBPOInput() {
 // 				ngsiConnection.v2.createEntity(
 // 					spec
 // 					//"id": BPOSpecificationId,
-// 					//"type": "BPOSpecificationInput",
+// 					//"type": "BPOSpecification",
 // 					//"specification": {"HALOO":"HUHHUH"}
 // 					//"specification": urlencode($("#taskDescriptionTextArea").val())
 // 				).then(
