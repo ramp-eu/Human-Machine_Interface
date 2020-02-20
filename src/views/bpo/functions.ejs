@@ -1,5 +1,5 @@
 function initBPOs(ngsiConnection) {	
-	ngsiConnection.v2.listEntities({type: "BPOSpecification"}).then((response) => {
+	ngsiConnection.v2.listEntities({type: "BPOSpecificationInput"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 			if (entity.id !== undefined && entity.specification !== undefined) {
@@ -13,7 +13,7 @@ function initBPOs(ngsiConnection) {
 }
 
 function initBPOOutputs(ngsiConnection) {
-	ngsiConnection.v2.listEntities({type: "BPO"}).then((response) => {
+	ngsiConnection.v2.listEntities({type: "BPOSpecificationInput"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 		    var id = entity.id;
@@ -57,7 +57,7 @@ function sendBPOInput() {
                 var BPOSpecificationId = "BPO";
                 var spec = new Object();
                 spec["id"] = BPOSpecificationId;
-                spec["type"] = "BPOSpecification";
+                spec["type"] = "BPOSpecificationInput";
                 //spec["specification"] = urlencode($.parseJSON($.trim($("#taskDescriptionTextArea").val())));
                 spec["specification"] = { "type": "json",
                         //"value": urlencode($.trim($("#taskDescriptionTextArea").val()))
@@ -173,6 +173,7 @@ function cancelBPO(BPOSpecificationId) {
 			ngsiConnection.v2.deleteEntity(BPOSpecificationId).then(
 				(response) => {
 					$("#BPOSpecification_" + BPOSpecificationId).remove();
+					$("#BPOSpecificationOutput").empty();
 					showAndDismissAlert("success", "Task specification deleted succesfully!", "taskManagementAlert");
 				}, (error) => {
 					showAndDismissAlert("error", "There was an error deleting the task specification (" + error + ")!", "taskManagementAlert");
