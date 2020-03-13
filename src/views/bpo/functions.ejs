@@ -13,7 +13,7 @@ function initBPOs(ngsiConnection) {
 }
 
 function initBPOOutputs(ngsiConnection) {
-	ngsiConnection.v2.listEntities({type: "BPOSpecificationInput"}).then((response) => {
+	ngsiConnection.v2.listEntities({id: "bpo", type: "ROBOT"}).then((response) => {
 		var entities = response.results;
 		$.each(entities, function(i, entity) {
 		    var id = entity.id;
@@ -27,13 +27,18 @@ function initBPOOutputs(ngsiConnection) {
 function updateBPOOutputs(notification) {							   
 	$.each(notification.data, function () {
 		var id = this.id;
-		var res = this.results.value;			
-		var BPOOutputHTML = getBPOOutputHTML(id, res);		
-		if ($("#BPOOutput_" + id).length) {
-			$("#BPOOutput_" + id).replaceWith(BPOOutputHTML);
-		} else {			
-			$("#BPOSpecificationOutput").prepend(BPOOutputHTML);			
-		}			
+		var res;			
+		var BPOOutputHTML;
+		if (id == "bpo") {
+                    //console.log("NOTIFIED: " + JSON.stringify(this));
+                    res = this.results.value;			
+                    BPOOutputHTML = getBPOOutputHTML(id, res);		
+                    if ($("#BPOOutput_" + id).length) {
+                            $("#BPOOutput_" + id).replaceWith(BPOOutputHTML);
+                    } else {			
+                            $("#BPOSpecificationOutput").prepend(BPOOutputHTML);			
+                    }
+		}
 	});
 }
 
