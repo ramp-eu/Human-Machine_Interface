@@ -115,6 +115,10 @@ function updateTransportOrders(notification) {
 		} else {			
 			$("#transportOrders").prepend(transportOrderHTML);			
 		}
+		$('#transportOrders').find('tr').hide();	
+		$('#taskInfoFilter').find('input:checked').each(function () {
+                    $('.' + $(this).attr('rel')).show();
+                });
 	});
 }
 
