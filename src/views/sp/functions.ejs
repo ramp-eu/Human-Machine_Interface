@@ -1,21 +1,21 @@
-var sensingAndPerceptionEdges = new Array();
-var sensingAndPerceptionEdgesTooltips = new Array();
-var sensingAndPerceptionVertices = new Array();
-var sensingAndPerceptionVerticesTooltips = new Array();
-var sensingAndPerceptionAnnotations = new Array();
-var sensingAndPerceptionAnnotationsTooltips = new Array();
+let sensingAndPerceptionEdges = new Array();
+let sensingAndPerceptionEdgesTooltips = new Array();
+let sensingAndPerceptionVertices = new Array();
+let sensingAndPerceptionVerticesTooltips = new Array();
+let sensingAndPerceptionAnnotations = new Array();
+let sensingAndPerceptionAnnotationsTooltips = new Array();
 
 function initSensingAndPerception(ngsiConnection) {	
 	ngsiConnection.v2.listEntities({type: "ROBOT"}).then((response) => {
-		var entities = response.results;
+		let entities = response.results;
 		$.each(entities, function(i, entity) {
 			if (entity.graph) {
-				var edges = entity.graph.value.edges.value;
-				var vertices = entity.graph.value.vertices.value;
+				let edges = entity.graph.value.edges.value;
+				let vertices = entity.graph.value.vertices.value;
 				for (i=0; i < edges.length; i++) {
-					var edge = edges[i];
-					var destVertexUUID = edge.value.uuid_dest.value;
-					var srcVertexUUID = edge.value.uuid_src.value;
+					let edge = edges[i];
+					let destVertexUUID = edge.value.uuid_dest.value;
+					let srcVertexUUID = edge.value.uuid_src.value;
 					$.each(vertices, function (i, vertex) {
 						if (vertex.value.uuid.value == destVertexUUID) {
 							edge.value.uuid_dest.value = vertex.value;
@@ -34,4 +34,33 @@ function initSensingAndPerception(ngsiConnection) {
 			}
 		});
 	});
+}
+
+function updateSensingAndPerception(notification) {
+  $.each(notification.data, function () {
+    if (this.graph) {
+      let edges = this.graph.value.edges.value;
+      let vertices = this.graph.value.vertices.value;
+      for (i=0; i < edges.length; i++) {
+        let edge = edges[i];
+        let destVertexUUID = edge.value.uuid_dest.value;
+        let srcVertexUUID = edge.value.uuid_src.value;
+        $.each(vertices, function (i, vertex) {
+          if (vertex.value.uuid.value == destVertexUUID) {
+            edge.value.uuid_dest.value = vertex.value;
+          }
+          if (vertex.value.uuid.value == srcVertexUUID) {
+            edge.value.uuid_src.value = vertex.value;
+          }
+        });
+        edges[i] = edge;
+      }
+      sensingAndPerceptionEdges = edges;
+      sensingAndPerceptionVertices = vertices;
+    }
+    if (this.annotations) {
+      sensingAndPerceptionAnnotations = this.annotations.value.annotations.value;
+    }
+  });
+  updateSPGraphOnCanvas();
 }

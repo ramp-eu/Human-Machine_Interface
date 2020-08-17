@@ -240,11 +240,13 @@
 								);
                                                 <% } %>										
 								ngsiConnection.v2.createSubscription({
+                                                                  // check if sensing and perception has changed
 									"description": "Updating sensing and perception",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ] },
+									"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "graph","annotations" ] }  },
 									"notification": {
 										"callback": function (notification) {
-											initSensingAndPerception(ngsiConnection);  // check if sensing and perception has changed
+                                                                                        updateSensingAndPerception(notification);
+											//initSensingAndPerception(ngsiConnection);
 									   }
 									},
 									//"expires": "2040-04-05T14:00:00.00Z",
