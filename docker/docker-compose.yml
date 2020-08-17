@@ -9,8 +9,10 @@ services:
       #- mongo_db:/data/db:Z
   app:
     container_name: hminode
-    #build: .
-    image: l4ms/opil.sw.hmi:latest
+#    build: .
+#    image: docker.ramp.eu/opil/opil.sw.hmi:latest
+#    image: l4ms/opil.sw.hmi:latest
+    image: registry.gitlab.com/opil_group/mod.sw.ahmi:latest
     environment:
      - inituser=admin
      - initpw=admin
@@ -22,12 +24,12 @@ services:
      - ngsi_proxy_port=3000
      - link_btn_txt=Open an External System
      - link_btn_url=https://www.vttresearch.com/
- #    - task_mgmnt=BPO
+#     - task_mgmnt=BPO
     restart: always
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads
       #WINDOWS
-      #- node_dir:/usr/src/app/public/uploads:Z                
+      #- node_dir:/usr/src/app/public/uploads:Z
     ports:
       - "80:8081"
     depends_on:

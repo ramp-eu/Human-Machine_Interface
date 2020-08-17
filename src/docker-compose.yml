@@ -1,4 +1,4 @@
-version: "3"
+version: "3.1"
 services:
   mongodb:
     image: mongo:3.6
@@ -27,7 +27,7 @@ services:
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads
       #WINDOWS
-      #- node_dir:/usr/src/app/public/uploads:Z                
+      #- node_dir:/usr/src/app/public/uploads:Z
     ports:
       - "80:8081"
     depends_on:
