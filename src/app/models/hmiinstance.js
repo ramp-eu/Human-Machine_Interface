@@ -1,9 +1,9 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var hmiinstanceSchema = mongoose.Schema({
-    hmi_id     : String,
-    created     : Date,
-    updated     : Date
+const hmiinstanceSchema = new mongoose.Schema({
+  hmi_id: String,
+  created: Date,
+  updated: Date,
 });
 
 module.exports = mongoose.model('Hmiinstance', hmiinstanceSchema);
