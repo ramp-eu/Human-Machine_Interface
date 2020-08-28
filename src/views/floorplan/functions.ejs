@@ -15,9 +15,14 @@ function submitForm() {
 		}).done(function( data ) {
 			//console.log("Output:");
 			//console.log( data );
+			/*
 			floorPlanImageScale = $("#floorplanScaleInput").val();
 			floorPlanImageXOffset = $("#floorplanXOffsetInput").val();
 			floorPlanImageYOffset = $("#floorplanYOffsetInput").val();
+			*/
+			floorPlanImageScale = data.scale;
+			floorPlanImageXOffset = data.xoffset;
+			floorPlanImageYOffset = data.yoffset;
 			$("#fileinfo").find("input[type=text], input[type=file], input[type=number], textarea").val("");
 			floorPlanImage = new Image();
 			floorPlanImage.onload = function() {		
