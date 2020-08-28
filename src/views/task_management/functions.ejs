@@ -169,7 +169,7 @@ function changeMaterialFlowActive(t) {
 
 function getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfo, updateTime, startTime) {
 	var taskInfoClass = "TASK_INFO_" + taskInfo;
-	console.log("taskInfoClass: " + taskInfoClass);
+	//console.log("taskInfoClass: " + taskInfoClass);
 	return "<tr id=\"transportOrder_" + id + "\" class=\"" + taskInfoClass + "\" bgcolor=\"white\"><td>" + id + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
 }
 

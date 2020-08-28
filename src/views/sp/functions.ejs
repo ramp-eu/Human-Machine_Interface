@@ -1,51 +1,48 @@
-let sensingAndPerceptionEdges = new Array();
-let sensingAndPerceptionEdgesTooltips = new Array();
-let sensingAndPerceptionVertices = new Array();
-let sensingAndPerceptionVerticesTooltips = new Array();
-let sensingAndPerceptionAnnotations = new Array();
-let sensingAndPerceptionAnnotationsTooltips = new Array();
+let sensingAndPerceptionEdges = [];
+let sensingAndPerceptionVertices = [];
+let sensingAndPerceptionAnnotations = [];
 
-function initSensingAndPerception(ngsiConnection) {	
-	ngsiConnection.v2.listEntities({type: "ROBOT"}).then((response) => {
-		let entities = response.results;
-		$.each(entities, function(i, entity) {
-			if (entity.graph) {
-				let edges = entity.graph.value.edges.value;
-				let vertices = entity.graph.value.vertices.value;
-				for (i=0; i < edges.length; i++) {
-					let edge = edges[i];
-					let destVertexUUID = edge.value.uuid_dest.value;
-					let srcVertexUUID = edge.value.uuid_src.value;
-					$.each(vertices, function (i, vertex) {
-						if (vertex.value.uuid.value == destVertexUUID) {
-							edge.value.uuid_dest.value = vertex.value;
-						}
-						if (vertex.value.uuid.value == srcVertexUUID) {
-							edge.value.uuid_src.value = vertex.value;
-						}
-					});
-					edges[i] = edge;
-				}
-				sensingAndPerceptionEdges = edges;
-				sensingAndPerceptionVertices = vertices;
-			}
-			if (entity.annotations) {
-				sensingAndPerceptionAnnotations = entity.annotations.value.annotations.value;
-			}
-		});
-	});
+function initSensingAndPerception(ngsiConnection) {
+  ngsiConnection.v2.listEntities({type: 'ROBOT'}).then((response) => {
+    const entities = response.results;
+    $.each(entities, function(i, entity) {
+      if (entity.graph) {
+        const edges = entity.graph.value.edges.value;
+        const vertices = entity.graph.value.vertices.value;
+        for (i=0; i < edges.length; i++) {
+          const edge = edges[i];
+          const destVertexUUID = edge.value.uuid_dest.value;
+          const srcVertexUUID = edge.value.uuid_src.value;
+          $.each(vertices, function(i, vertex) {
+            if (vertex.value.uuid.value == destVertexUUID) {
+              edge.value.uuid_dest.value = vertex.value;
+            }
+            if (vertex.value.uuid.value == srcVertexUUID) {
+              edge.value.uuid_src.value = vertex.value;
+            }
+          });
+          edges[i] = edge;
+        }
+        sensingAndPerceptionEdges = edges;
+        sensingAndPerceptionVertices = vertices;
+      }
+      if (entity.annotations) {
+        sensingAndPerceptionAnnotations = entity.annotations.value.annotations.value;
+      }
+    });
+  });
 }
 
 function updateSensingAndPerception(notification) {
-  $.each(notification.data, function () {
+  $.each(notification.data, function() {
     if (this.graph) {
-      let edges = this.graph.value.edges.value;
-      let vertices = this.graph.value.vertices.value;
+      const edges = this.graph.value.edges.value;
+      const vertices = this.graph.value.vertices.value;
       for (i=0; i < edges.length; i++) {
-        let edge = edges[i];
-        let destVertexUUID = edge.value.uuid_dest.value;
-        let srcVertexUUID = edge.value.uuid_src.value;
-        $.each(vertices, function (i, vertex) {
+        const edge = edges[i];
+        const destVertexUUID = edge.value.uuid_dest.value;
+        const srcVertexUUID = edge.value.uuid_src.value;
+        $.each(vertices, function(i, vertex) {
           if (vertex.value.uuid.value == destVertexUUID) {
             edge.value.uuid_dest.value = vertex.value;
           }

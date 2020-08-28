@@ -44,8 +44,8 @@ function submitSettings() {
 		});
 		$("#generalAlert").html("");
 		showAndDismissAlert("success", "Settings saved!", "generalAlert");
-		console.log("Output:");
-		console.log(data);
+		//console.log("Output:");
+		//console.log(data);
 		//location.reload(true);
 		window.setTimeout(function(){window.location.reload(true)}, 3000);		
 	}).fail(function(xhr, status, err){

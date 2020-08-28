@@ -2,7 +2,7 @@ function submitForm() {
 	if ($("#shownFileName").html() == "") {
 		showAndDismissAlert("danger", "Floor plan file is not selected.", "floorplanAlert");	
 	} else {
-		console.log("submit event");
+		//console.log("submit event");
 		var fd = new FormData(document.getElementById("fileinfo"));
 		fd.append("label", "WEBUPLOAD");
 		$.ajax({
@@ -13,8 +13,8 @@ function submitForm() {
 			contentType: false,   // tell jQuery not to set contentType
 			enctype: 'multipart/form-data'
 		}).done(function( data ) {
-			console.log("Output:");
-			console.log( data );
+			//console.log("Output:");
+			//console.log( data );
 			floorPlanImageScale = $("#floorplanScaleInput").val();
 			floorPlanImageXOffset = $("#floorplanXOffsetInput").val();
 			floorPlanImageYOffset = $("#floorplanYOffsetInput").val();

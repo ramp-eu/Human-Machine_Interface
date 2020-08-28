@@ -2,6 +2,7 @@ var robotsOnOverview = new Array();
 var sensorsOnOverview = new Array();
 
 function drawImageOnCanvas(img, targetCanvas) {
+  $(targetCanvas).off('mousemove');
 	var canvas = $(targetCanvas)[0];
 	var ctx = canvas.getContext("2d");
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -26,24 +27,27 @@ function drawImageOnCanvas(img, targetCanvas) {
 	
 		var xOriginMeters = floorPlanImageXOffset * floorPlanImageScale * -1;
 		var yOriginMeters = floorPlanImageYOffset * floorPlanImageScale * -1;
+                let sensingAndPerceptionEdgesTooltips = [];
+                let sensingAndPerceptionVerticesTooltips = [];
+                let sensingAndPerceptionAnnotationsTooltips = [];
 		
 		$.each(sensingAndPerceptionEdges, function (i, edge) {
 			var xSrc = ((edge.value.uuid_src.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
-			var ySrc = (floorPlanImage.height - ((edge.value.uuid_src.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;			
+			var ySrc = (floorPlanImage.height - ((edge.value.uuid_src.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;	
 			var xDest = ((edge.value.uuid_dest.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
 			var yDest = (floorPlanImage.height - ((edge.value.uuid_dest.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
 			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';			
 			ctx.beginPath();
 			ctx.moveTo(xSrc, ySrc);
 			ctx.lineTo(xDest, yDest);
-			ctx.stroke();		 
+			ctx.stroke();
 			sensingAndPerceptionEdgesTooltips.push({
 				xSrc: xSrc,
 				ySrc: ySrc,
 				xDest: xDest,
 				yDest: yDest,
 				tip: "Edge: " + edge.value.name.value + " (UUID: " + edge.value.uuid.value + ")"
-			});		
+			});
 		});
 
 		$.each(sensingAndPerceptionVertices, function (i, vertex) {
@@ -82,10 +86,8 @@ function drawImageOnCanvas(img, targetCanvas) {
 				});
 			}
 		});
-		
 
 		$(targetCanvas).mousemove(function(e) {
-
 			var canvasOffset = $(targetCanvas).offset();
 			var offsetX = canvasOffset.left;
 			var offsetY = canvasOffset.top - $(window).scrollTop();
@@ -435,7 +437,7 @@ function updateSPGraphOnCanvas() {
 }
 
 function updateRobotsOnOverview(notification) {
-		
+        //console.log("Received Robot notif: " + JSON.stringify(notification));
 	if (typeof floorPlanImage !== "undefined") {
 
 		/*var temp = 1;*/

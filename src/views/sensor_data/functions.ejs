@@ -190,7 +190,7 @@ function initSensorData(ngsiConnection) {
 }
 
 function updateSensorData(notification) {						
-	console.log("Received notification: " + JSON.stringify(notification));					   
+	//console.log("Received notification: " + JSON.stringify(notification));					   
 	$.each(notification.data, function () {		
 		var chart = sensorDataCharts.get(this.sensorID.value);							
 		var sensorCurrentValue = "";
