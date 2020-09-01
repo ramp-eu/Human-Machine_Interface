@@ -1,106 +1,90 @@
 <!doctype html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title><%= __("title") %></title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <!--<link rel="stylesheet" href="/css/main.css">-->
-    <link rel="stylesheet" href="/css/style.css">	
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>HMI</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/style.css">	
 </head>
 <body style="background-color: #1A1737;">
 <div class="row" style=" padding-top: 80px;">
-    <div>
-        <img src="/img/logo-opil-login.png" alt="OPIL Logo" style="display: block; margin-left: auto; margin-right: auto; height: 95px;">
-    </div>
+  <div>
+    <img src="/img/logo-opil-login.png" alt="OPIL Logo" style="display: block; margin-left: auto; margin-right: auto; height: 95px;">
+  </div>
 </div>
 <div class="container" style="background-color: #1A1737;">
-    <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
-		    <div style="margin-top:40px;"></div>
-            <div style="background-color: #1A1737;">
-                <h1 style="color: #ffffff"><%= __("login") %></h1>
-
-                <% if (message.length > 0) { %>
-                    <div class="alert alert-danger"><%= message %></div>
-                <% } else if (messagepos.length > 0) { %>
-                    <div class="alert alert-success"><%= messagepos %></div>
-                <% } %>
-
-                <form action="/login" method="post">
-                    <div class="form-group">
-                        <label style="color: #ffffff"><%= __("userid") %></label>
-                        <input type="text" class="form-control" name="userid">
-                    </div>
-                    <div class="form-group">
-                        <label style="color: #ffffff"><%= __("pwd") %></label>
-                        <input type="password" class="form-control" name="password">
-                    </div>
-
-                    <button type="submit" class="ownButton" style="width:100%; padding:10px;"><%= __("login") %></button>
-                </form>
-
-                <!--<p><%= __("Need an account?") %> <a href="/signup"><%= __("signup") %></a></p>-->
-                <!--<p><%= __("Forgot your password?") %> <a href="/change"><%= __("chgpwd") %></a></p>-->
-                <!--<p><%= __("Or go") %> <a href="/"><%= __("home") %></a>.</p>-->
-
-                <!--
-                <div class="text-center">
-                    <a href="/login?lang=<%= __("lnghref") %>"><%= __("lng") %></a>
-                </div>
-				-->
-            </div>
-        </div>
+  <div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+      <div style="margin-top:40px;"></div>
+      <div style="background-color: #1A1737;">
+        <h1 style="color: #ffffff">Login</h1>
+        <% if (message.length > 0) { %>
+        <div class="alert alert-danger"><%= message %></div>
+        <% } %>
+        <form action="/login" method="post">
+          <div class="form-group">
+            <label style="color: #ffffff">User ID</label>
+            <input type="text" class="form-control" name="userid">
+          </div>
+          <div class="form-group">
+            <label style="color: #ffffff">Password</label>
+            <input type="password" class="form-control" name="password">
+          </div>
+          <button type="submit" class="ownButton" style="width:100%; padding:10px;">Login</button>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 <div class="login-stripes">
   <div class="container" style="margin-top:50px; margin-bottom:50px;">
     <div class="row" style="background-color: #ffffff;">
-        <div class="col-lg-3"> </div> 
-        <div class="col-lg-6">
-            <div style="margin-top:50px; margin-bottom:30px;">
-                <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 24px;" align="center">
-                    Digital tools to accelerate productivity with robotics
-                </p>
-            </div>
-            <div style="margin-bottom:30px;">
-                <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px;" align="center">
-                    RAMP (Robotics Automation MarketPlace) is a B2B marketplace connecting especially small and medium-sized manufacturers with technology suppliers to improve the adaptation of robotics in factories.
-                </p>
-            </div>
-            <div style="margin-bottom:50px;">
-                <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 15px;" align="center">
-                    RAMP is currently being developed in DIH2 and L4MS projects under Horizon2020 framework. If you want receive an update when we are ready, leave your contacts here: <a target="_blank" href="http://www.ramp.eu">www.ramp.eu</a>
-                </p>
-            </div>
+      <div class="col-lg-3"> </div> 
+      <div class="col-lg-6">
+        <div style="margin-top:50px; margin-bottom:30px;">
+          <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 24px;" align="center">
+            Digital tools to accelerate productivity with robotics
+          </p>
         </div>
-        <div class="col-lg-3"> </div> 
+        <div style="margin-bottom:30px;">
+          <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px;" align="center">
+            RAMP (Robotics Automation MarketPlace) is a B2B marketplace connecting especially small and medium-sized manufacturers with technology suppliers to improve the adaptation of robotics in factories.
+          </p>
+        </div>
+        <div style="margin-bottom:50px;">
+          <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 15px;" align="center">
+            RAMP is currently being developed in DIH2 and L4MS projects under Horizon2020 framework. If you want receive an update when we are ready, leave your contacts here: <a target="_blank" href="http://www.ramp.eu">www.ramp.eu</a>
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-3"> </div> 
     </div>
   </div>
 </div>
 <div class="footer">
-    <img src="/img/logo-ramp-white-footer.png" alt="RAMP Logo" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 30px; height: 40px;">
-    <div style="margin-bottom:30px;">
-        <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px;">
-            RAMP (Robotics and Automation MarketPlace) accelerates productivity with robotics.
-        </p>
-        <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 15px;">
-            Developed in Horizon2020 funded projects. <a target="_blank" href="http://www.ramp.eu">www.ramp.eu</a>
-        </p>
-    </div>
-    <div style="margin-bottom: 30px;">
-        <img src="/img/eu_flag_white_low.png" alt="EU Flag" style="display: float; margin-left: auto; margin-right: 40px; height: 40px;">
-        <img src="/img/logo-dih-white-footer.png" alt="DIH Logo" style="display: float; margin-left: auto; margin-right: 40px; height: 50px;">
-        <img src="/img/logo-l4ms-white-footer.png" alt="L4MS Logo" style="display: float; margin-left: auto; margin-right: 40px; height: 35px;">
-    </div>
-    <div>
-        <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 13px; color: #484361">
-            This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 767642.
-        </p>
-        <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 13px; color: #484361">
-            &copy; 2017-2019 L4MS. All rights reserved.
-        </p>
-    </div>
+  <img src="/img/logo-ramp-white-footer.png" alt="RAMP Logo" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 30px; height: 40px;">
+  <div style="margin-bottom:30px;">
+    <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px;">
+      RAMP (Robotics and Automation MarketPlace) accelerates productivity with robotics.
+    </p>
+    <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 15px;">
+      Developed in Horizon2020 funded projects. <a target="_blank" href="http://www.ramp.eu">www.ramp.eu</a>
+    </p>
+  </div>
+  <div style="margin-bottom: 30px;">
+    <img src="/img/eu_flag_white_low.png" alt="EU Flag" style="display: float; margin-left: auto; margin-right: 40px; height: 40px;">
+    <img src="/img/logo-dih-white-footer.png" alt="DIH Logo" style="display: float; margin-left: auto; margin-right: 40px; height: 50px;">
+    <img src="/img/logo-l4ms-white-footer.png" alt="L4MS Logo" style="display: float; margin-left: auto; margin-right: 40px; height: 35px;">
+  </div>
+  <div>
+    <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 13px; color: #484361">
+      This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 767642.
+    </p>
+    <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 13px; color: #484361">
+      &copy; 2017-2019 L4MS. All rights reserved.
+    </p>
+  </div>
 </div>
 </body>
 </html>

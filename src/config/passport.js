@@ -38,68 +38,15 @@ module.exports = function(passport) {
         }
         // if no user is found, return the message
         if (!user) {
-          return done(null, false, req.flash('loginMessage',
-              req.i18n.__('Login failed.')),
-          );
+          return done(null, false, req.flash('loginMessage', 'Login failed.'));
         }
         if (!user.validPassword(password)) {
-          return done(null, false, req.flash('loginMessage',
-              req.i18n.__('Login failed.')),
-          );
+          return done(null, false, req.flash('loginMessage', 'Login failed.'));
         } else {
           // all is well, return user
           return done(null, user);
         }
       });
-    });
-  }));
-
-  passport.use('local-signup', new LocalStrategy({
-    // by default, local strategy uses username and password, we could override
-    // with some
-    usernameField: 'userid',
-    passwordField: 'password',
-    passReqToCallback: true,
-    // allows us to pass in the req from our route (lets us check if
-    // a user is logged in or not)
-  },
-  function(req, userid, password, done) {
-    // asynchronous
-    process.nextTick(function() {
-      // if the user is not already logged in:
-      if (!req.user) {
-        User.findOne({'userid': userid}, function(err, user) {
-          // if there are any errors, return the error
-          if (err) {
-            return done(err);
-          }
-
-          // check to see if theres already a user with that userid
-          if (user) {
-            return done(null, false, req.flash('signupMessage',
-                req.i18n.__('This user id is already registered.')));
-          } else {
-            // create the user
-            const newUser = new User();
-            newUser.userid = userid;
-            newUser.password = newUser.generateHash(password);
-            newUser.role = req.body.role;
-            newUser.name = req.body.name;
-
-            newUser.save(function(err) {
-              if (err) {
-                return done(err);
-              }
-
-              return done(null, newUser);
-            });
-          }
-        });
-      } else {
-        // user is logged in and already has a local account. Ignore signup.
-        // (You should log out before trying to create a new account, user!)
-        return done(null, req.user);
-      }
     });
   }));
 };

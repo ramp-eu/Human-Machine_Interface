@@ -15,7 +15,6 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 
 const configDB = require('./config/database.js');
-const i18n = require('i18n-2');
 const inithmiinstance = require('./config/inithmiinstance.js');
 const initconfig = require('./config/initconfig.js');
 const inittestconns = require('./config/inittestconns.js');
@@ -50,24 +49,6 @@ app.use(morgan('combined', { // log only error responses
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.json()); // get information from html forms
 app.use(bodyParser.urlencoded({extended: true}));
-
-i18n.expressBind(app, {
-  locales: ['en'],
-  defaultLocale: 'en',
-  extension: '.json',
-  cookieName: 'locale',
-  devMode: false,
-});
-
-app.use(function(req, res, next) {
-  if (req.query.lang) {
-    req.i18n.setLocaleFromQuery();
-    res.cookie('locale', req.query.lang);
-  } else {
-    req.i18n.setLocaleFromCookie();
-  }
-  next();
-});
 
 app.set('view engine', 'ejs'); // set up ejs for templating
 

@@ -25,39 +25,20 @@ function checkMagicNumbers(magic) {
 module.exports = function(app, passport) {
   // show the home page
   app.get('/', function(req, res) {
-    // res.render('index.ejs');
-    res.render('login.ejs', {
-      message: req.flash('loginMessage'), messagepos: ''});
+    res.render('login.ejs', {message: ''});
   });
   // show the app version
   app.get('/version', function(req, res) {
     res.send(pjson.version);
   });
-  // show the test page
-  //     app.get('/test', isLoggedIn, function(req, res) {
-  //     //app.get('/test', function(req, res) {
-  //         if (req.user && req.user.role === "admin")
-  //             res.redirect('/admin');
-  //         else if (req.user && req.user.role === "user")
-  //             res.redirect('/somewhere');
-  //         else res.render('test.ejs', {
-  //             user : req.user
-  //         });
-  //     });
-
-  // app.get('/main', isLoggedIn, function(req, res) {
-  //    res.render('main.ejs');
-  // });
 
   // get new UUID/v4
   app.get('/api/uuid', function(req, res) {
     res.send(uuidv4());
   });
+
   // FLOORPLAN SECTION =======================================================
 
-  //     app.get('/floorplan', function(req, res) {
-  //         res.render('floorplan.ejs');
-  //     });
   app.get('/api/fp', isLoggedIn, function(req, res, next) {
     // app.get('/api/fp', function(req, res, next) {
     Floorplan.find({}, function(err, data) {
@@ -416,27 +397,13 @@ module.exports = function(app, passport) {
   // show the login form
   app.get('/login', function(req, res) {
     res.render('login.ejs', {
-      message: req.flash('loginMessage'), messagepos: ''});
+      message: req.flash('loginMessage')});
   });
 
   // process the login form
   app.post('/login', passport.authenticate('local-login', {
     successRedirect: '/main',
     failureRedirect: '/login',
-    failureFlash: true,
-  }));
-
-  // SIGNUP =================================
-  // show the signup form
-  app.get('/signup', function(req, res) {
-    res.render('signup.ejs', {message: req.flash('signupMessage')});
-  });
-
-  // process the signup form
-  app.post('/signup', passport.authenticate('local-signup', {
-    // successRedirect : '/verify',
-    successRedirect: '/main',
-    failureRedirect: '/signup',
     failureFlash: true,
   }));
 };
