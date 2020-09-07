@@ -89,28 +89,13 @@ function updateUser(id) {
 		showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
 	} else if ($("#password_" + id).val() != $("#confirm_pw_" + id).val()) {
 		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
-//Not needed anymore (OCB connection). Left here commented out for possible later use
-		/*	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");*/				
-//	}
-//Not needed anymore (OCB connection). Left here commented out for possible later use
-//	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-//		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to update users.", "usersAlert");				
 	} else {
 	
-	userData = "userid=" + encodeURIComponent($("#userid_" + id).val()) + "&role=" + encodeURIComponent($("#role_" + id).val());
-//	if ($("#name_" + id).val() != "") {
-		userData += "&name=" + encodeURIComponent($("#name_" + id).val());
-//	}
-//	if ($("#password_" + id).val() != "") {
-		userData += "&password=" + encodeURIComponent($("#password_" + id).val());
-//	}
-//	if ($("#password_" + id).val() != "" && $("#password_" + id).val() != $("#confirm_pw_" + id).val()) {
-//		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
-		
-//		$("#newUserOCBHost").val($("#ocb_host").val());
-//		$("#newUserOCBPort").val($("#ocb_port").val());
-		$.ajax({
+	  userData = "userid=" + encodeURIComponent($("#userid_" + id).val()) + "&role=" + encodeURIComponent($("#role_" + id).val());
+	  userData += "&name=" + encodeURIComponent($("#name_" + id).val());
+	  userData += "&password=" + encodeURIComponent($("#password_" + id).val());
+
+	  $.ajax({
 			url: "./api/user/" + id,
 			type: "PUT",
 			data: userData
@@ -130,7 +115,11 @@ function getUserHTML(id, userid, role, name) {
         if (userid == "admin" && role == "admin") { 
           userHTML += " disabled";
 	}	
-		userHTML += "/></td><td><select class=\"form-control\" id=\"role_" + id + "\"><option value=\"admin\"";
+	userHTML += "/></td><td><select class=\"form-control\" id=\"role_" + id + "\"";
+	if (userid == "admin") {
+	  userHTML += " disabled";
+        }
+	userHTML += "><option value=\"admin\"";
 	if (role == "admin") {
 		userHTML += " selected";
 	}
