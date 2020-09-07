@@ -38,6 +38,7 @@
 			var ocb_port = <%- '"' + ocb_port + '"' %>;
 			var ngsi_proxy_host = <%- '"' + ngsi_proxy_host + '"' %>;
 			var ngsi_proxy_port = <%- '"' + ngsi_proxy_port + '"' %>;
+                        var ngsiConnection = null;
 		
 			$(document).ready(function() {
 					
@@ -89,7 +90,6 @@
 			});
 			
 			function startSubscriptions() {
-				var ngsiConnection = null;
 				if (ocb_host != "" && ocb_port != "" && ngsi_proxy_host != "" && ngsi_proxy_port != "") {
 					ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
 						ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port

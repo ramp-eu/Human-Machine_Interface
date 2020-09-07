@@ -120,7 +120,9 @@ function initSensors(ngsiConnection) {
 		type: "GET",
 		url: "./api/user",
 		dataType: "json",
-		success: function (data) {					
+		success: function (data) {
+		  $("#new_sensor_assign_to_select").empty();
+		  $("#new_sensor_assign_to_select").append("<option value=\"all\">All</option>");
 			$(data).each(function(i, item) {
 				if (item.role == "user") {
 					$("#new_sensor_assign_to_select").append("<option value=\"" + item.userid + "\">" + item.name + "</option>");					
