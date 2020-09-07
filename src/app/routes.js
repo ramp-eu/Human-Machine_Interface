@@ -154,7 +154,7 @@ module.exports = function(app, passport) {
     User.findByIdAndDelete(req.params.id, {password: 0},
         function(err, data) {
           if (err) return next(err);
-          if (data.userid) {
+          if (data) {
             data.password = null;
             res.send(data);
           } else res.status(404).send({message: 'User not found.'});
