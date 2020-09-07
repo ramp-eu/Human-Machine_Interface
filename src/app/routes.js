@@ -165,8 +165,7 @@ module.exports = function(app, passport) {
     User.findById(req.params.id, function(err, user) {
       if (err) return next(err);
       if (user) {
-        user.userid = req.params.id;
-        // user.userid     = user.userid;
+        user.userid = req.body.userid;
         user.password = user.generateHash(req.body.password);
         user.role = req.body.role;
         user.name = req.body.name;

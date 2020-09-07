@@ -84,19 +84,30 @@ function deleteUser(id) {
 }
 
 function updateUser(id) {
-	var userData = "userid=" + encodeURIComponent($("#userid_" + id).val()) + "&role=" + encodeURIComponent($("#role_" + id).val());
-	if ($("#name_" + id).val() != "") {
-		userData += "&name=" + encodeURIComponent($("#name_" + id).val());
-	}
-	if ($("#password_" + id).val() != "") {
-		userData += "&password=" + encodeURIComponent($("#password_" + id).val());
-	}
-	if ($("#password_" + id).val() != "" && $("#password_" + id).val() != $("#confirm_pw_" + id).val()) {
+  var userData = "";
+	if ($("#userid_" + id).val() == "" || $("#name_" + id).val() == "" || $("#password_" + id).val() == "" || $("#confirm_pw_" + id).val() == "") {
+		showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
+	} else if ($("#password_" + id).val() != $("#confirm_pw_" + id).val()) {
 		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
+//Not needed anymore (OCB connection). Left here commented out for possible later use
+		/*	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
+		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");*/				
+//	}
 //Not needed anymore (OCB connection). Left here commented out for possible later use
 //	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
 //		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to update users.", "usersAlert");				
-	} else {				
+	} else {
+	
+	userData = "userid=" + encodeURIComponent($("#userid_" + id).val()) + "&role=" + encodeURIComponent($("#role_" + id).val());
+//	if ($("#name_" + id).val() != "") {
+		userData += "&name=" + encodeURIComponent($("#name_" + id).val());
+//	}
+//	if ($("#password_" + id).val() != "") {
+		userData += "&password=" + encodeURIComponent($("#password_" + id).val());
+//	}
+//	if ($("#password_" + id).val() != "" && $("#password_" + id).val() != $("#confirm_pw_" + id).val()) {
+//		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
+		
 //		$("#newUserOCBHost").val($("#ocb_host").val());
 //		$("#newUserOCBPort").val($("#ocb_port").val());
 		$.ajax({
@@ -115,8 +126,11 @@ function updateUser(id) {
 
 function getUserHTML(id, userid, role, name) {
 	var userHTML = "<tr id=\"updateUser_" + id + "\">" +	
-		"<td><input type=\"text\" class=\"form-control\" id=\"userid_" + id + "\" value=\"" + userid + "\"/></td>" +
-		"<td><select class=\"form-control\" id=\"role_" + id + "\"><option value=\"admin\"";
+		"<td><input type=\"text\" class=\"form-control\" id=\"userid_" + id + "\" value=\"" + userid + "\" required";
+        if (userid == "admin" && role == "admin") { 
+          userHTML += " disabled";
+	}	
+		userHTML += "/></td><td><select class=\"form-control\" id=\"role_" + id + "\"><option value=\"admin\"";
 	if (role == "admin") {
 		userHTML += " selected";
 	}
@@ -126,11 +140,11 @@ function getUserHTML(id, userid, role, name) {
 	}						
 	userHTML += ">User</option></select></td>" +													
 		"<td><input type=\"text\" class=\"form-control\" id=\"name_" + id + "\" value=\"" + name + "\" required/></td>" +
-		"<td><input type=\"password\" class=\"form-control\" id=\"password_" + id + "\" value=\"\"/></td>" +
-		"<td><input type=\"password\" class=\"form-control\" id=\"confirm_pw_" + id + "\" value=\"\"/></td>" +
+		"<td><input type=\"password\" class=\"form-control\" id=\"password_" + id + "\" value=\"\" required/></td>" +
+		"<td><input type=\"password\" class=\"form-control\" id=\"confirm_pw_" + id + "\" value=\"\" required/></td>" +
 		"<td><button type=\"button\" class=\"btn ownButton\" onClick=\"updateUser(\'" + id + "\')\">Update</button></td><td><button type=\"button\" class=\"btn ownButton\" onClick=\"deleteUser(\'" + id + "\')\"";
-	if (role == "admin") { 
-		//userHTML += " disabled";  // SHOULD DELETING ADMINS BE DISABLED? paju's comment: not yet needed, admin should generally be able to do everything (sane)
+	if (userid == "admin" && role == "admin") { 
+		userHTML += " disabled";
 	}														
 	userHTML += ">Delete</button></td></tr>";	
 	return userHTML;

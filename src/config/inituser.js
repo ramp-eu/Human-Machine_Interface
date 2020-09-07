@@ -21,7 +21,7 @@ exports.init = function(id, pw) {
         newUser.userid = id;
         newUser.password = newUser.generateHash(pw);
         newUser.role = 'admin';
-        newUser.name = 'admin';
+        newUser.name = 'Administrator';
 
         newUser.save(function(err) {
           if (err) console.log(err);
