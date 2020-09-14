@@ -1,142 +1,130 @@
 function initUsers() {
-	$.ajax({
-		type: "GET",
-		url: "./api/user",
-		dataType: "json",
-		success: function (data) {					
-			$(data).each(function(i, item) {
-				if (item.role == "admin" || item.role == "user") {
-					var usersHTML = getUserHTML(item._id, item.userid, item.role, item.name);
-					$("#usersTable").append(usersHTML);						
-				}
-			})
-		}
-	});	
+  $.ajax({
+    type: "GET",
+    url: "./api/user",
+    dataType: "json",
+    success: function (data) {
+      $(data).each(function(i, item) {
+        if (item.role == "admin" || item.role == "user") {
+          var usersHTML = getUserHTML(item._id, item.userid, item.role, item.name);
+          $("#usersTable").append(usersHTML);
+        }
+      })
+    }
+  });
 }
 
 function addNewUser() {
-	if ($("#newUserUserId").val() == "" || $("#newUserName").val() == "" || $("#newUserPassword").val() == "" || $("#newUserConfirmPw").val() == "") {
-		showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
-	} else if ($("#newUserPassword").val() != $("#newUserConfirmPw").val()) {
-		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
-//Not needed anymore (OCB connection). Left here commented out for possible later use
-		/*	} else if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-		showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");*/				
-	} else {				
-//		$("#newUserOCBHost").val($("#ocb_host").val());
-//		$("#newUserOCBPort").val($("#ocb_port").val());
-		$.ajax({
-			url: "./api/user",
-			type: "POST",
-			data: $("#newUser").serialize()
-		}).done(function(data) {
-			$("#newUserUserId").val("");
-			$("#newUserRole").val("user");
-			$("#newUserName").val("");
-			$("#newUserPassword").val("");
-			$("#newUserConfirmPw").val("");	
-			$.ajax({
-				type: "GET",
-				url: "./api/user",
-				dataType: "json",
-				success: function (data2) {		
-					$("#usersTable").empty();
-					$(data2).each(function(i, item) {
-						if (item.role == "admin" || item.role == "user") {
-							var userHTML = getUserHTML(item._id, item.userid, item.role, item.name);
-							$("#usersTable").append(userHTML);
-						}
-					})
-					showAndDismissAlert("success", "New user added!", "usersAlert");
-					initSensors(ngsiConnection);
-				}
-			});						
-		}).fail(function(xhr, status, err) {
-			showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-		});
-	}
-	return false;
+  if ($("#newUserUserId").val() == "" || $("#newUserName").val() == "" || $("#newUserPassword").val() == "" || $("#newUserConfirmPw").val() == "") {
+    showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
+  } else if ($("#newUserPassword").val() != $("#newUserConfirmPw").val()) {
+    showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
+  } else {
+    $.ajax({
+      url: "./api/user",
+      type: "POST",
+      data: $("#newUser").serialize()
+    }).done(function(data) {
+      $("#newUserUserId").val("");
+      $("#newUserRole").val("user");
+      $("#newUserName").val("");
+      $("#newUserPassword").val("");
+      $("#newUserConfirmPw").val("");
+      $.ajax({
+        type: "GET",
+        url: "./api/user",
+        dataType: "json",
+        success: function (data2) {
+          $("#usersTable").empty();
+          $(data2).each(function(i, item) {
+            if (item.role == "admin" || item.role == "user") {
+              var userHTML = getUserHTML(item._id, item.userid, item.role, item.name);
+              $("#usersTable").append(userHTML);
+            }
+          })
+          showAndDismissAlert("success", "New user added!", "usersAlert");
+          initSensors(ngsiConnection);
+        }
+      });
+    }).fail(function(xhr, status, err) {
+      showAndDismissAlert("danger", xhr.responseText, "usersAlert");
+    });
+  }
+  return false;
 }
 
-function deleteUser(id) {			
-	bootbox.confirm("Are you sure you want to delete the user?", function(result) {
-		if (result == true) {
-//Not needed anymore (OCB connection). Left here commented out for possible later use
-//			if ($("#ocb_host").val() == "" || $("#ocb_port").val() == "") {
-//				showAndDismissAlert("danger", "OCB Host and OCB Port need to be defined in the Settings tab to be able to add users.", "usersAlert");				
-//			} else {							
-				$.ajax({
-//					url: "./api/user/" + id + "/" + $("#ocb_host").val() + "/" + $("#ocb_port").val(),
-					url: "./api/user/" + id,
-					type: 'DELETE',
-					success: function(result) {
-						$("#updateUser_" + id).remove();
-						showAndDismissAlert("success", "User deleted succesfully!", "usersAlert");
-                                                initSensors(ngsiConnection);
-					},
-					error: function(xhr, status, error) {
-						var err = eval("(" + xhr.responseText + ")");
-						showAndDismissAlert("danger", err.Message, "usersAlert");	
-					}
-				});
-// See up			}
-		}
-	});
-	return false;			
+function deleteUser(id) {
+  bootbox.confirm("Are you sure you want to delete the user?", function(result) {
+    if (result == true) {
+      $.ajax({
+        url: "./api/user/" + id,
+        type: 'DELETE',
+        success: function(result) {
+          $("#updateUser_" + id).remove();
+          showAndDismissAlert("success", "User deleted succesfully!", "usersAlert");
+          initSensors(ngsiConnection);
+        },
+        error: function(xhr, status, error) {
+          var err = eval("(" + xhr.responseText + ")");
+          showAndDismissAlert("danger", err.Message, "usersAlert");
+        }
+      });
+    }
+  });
+  return false;
 }
 
 function updateUser(id) {
   var userData = "";
-	if ($("#userid_" + id).val() == "" || $("#name_" + id).val() == "" || $("#password_" + id).val() == "" || $("#confirm_pw_" + id).val() == "") {
-		showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
-	} else if ($("#password_" + id).val() != $("#confirm_pw_" + id).val()) {
-		showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
-	} else {
-	
-	  userData = "userid=" + encodeURIComponent($("#userid_" + id).val()) + "&role=" + encodeURIComponent($("#role_" + id).val());
-	  userData += "&name=" + encodeURIComponent($("#name_" + id).val());
-	  userData += "&password=" + encodeURIComponent($("#password_" + id).val());
+  if ($("#userid_" + id).val() == "" || $("#name_" + id).val() == "" || $("#password_" + id).val() == "" || $("#confirm_pw_" + id).val() == "") {
+    showAndDismissAlert("danger", "All fields are required for adding a new user.", "usersAlert");
+  } else if ($("#password_" + id).val() != $("#confirm_pw_" + id).val()) {
+    showAndDismissAlert("danger", "Password and password again are not the same.", "usersAlert");
+  } else {
+    userData = "userid=" + encodeURIComponent($("#userid_" + id).val()) + "&role=" + encodeURIComponent($("#role_" + id).val());
+    userData += "&name=" + encodeURIComponent($("#name_" + id).val());
+    userData += "&password=" + encodeURIComponent($("#password_" + id).val());
 
-	  $.ajax({
-			url: "./api/user/" + id,
-			type: "PUT",
-			data: userData
-		}).done(function(data) {							
-			showAndDismissAlert("success", "User updated!", "usersAlert");
-		}).fail(function(xhr, status, err) {
-			showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-		});				
-	}
-	return false;
-	
+    $.ajax({
+      url: "./api/user/" + id,
+      type: "PUT",
+      data: userData
+    }).done(function(data) {
+      showAndDismissAlert("success", "User updated!", "usersAlert");
+    }).fail(function(xhr, status, err) {
+      showAndDismissAlert("danger", xhr.responseText, "usersAlert");
+    });
+  }
+  return false;
 }
 
 function getUserHTML(id, userid, role, name) {
-	var userHTML = "<tr id=\"updateUser_" + id + "\">" +	
-		"<td><input type=\"text\" class=\"form-control\" id=\"userid_" + id + "\" value=\"" + userid + "\" required";
-        if (userid == "admin" && role == "admin") { 
-          userHTML += " disabled";
-	}	
-	userHTML += "/></td><td><select class=\"form-control\" id=\"role_" + id + "\"";
-	if (userid == "admin") {
-	  userHTML += " disabled";
-        }
-	userHTML += "><option value=\"admin\"";
-	if (role == "admin") {
-		userHTML += " selected";
-	}
-	userHTML += ">Admin</option><option value=\"user\"";
-	if (role == "user") {
-		userHTML += " selected";
-	}						
-	userHTML += ">User</option></select></td>" +													
-		"<td><input type=\"text\" class=\"form-control\" id=\"name_" + id + "\" value=\"" + name + "\" required/></td>" +
-		"<td><input type=\"password\" class=\"form-control\" id=\"password_" + id + "\" value=\"\" required/></td>" +
-		"<td><input type=\"password\" class=\"form-control\" id=\"confirm_pw_" + id + "\" value=\"\" required/></td>" +
-		"<td><button type=\"button\" class=\"btn ownButton\" onClick=\"updateUser(\'" + id + "\')\">Update</button></td><td><button type=\"button\" class=\"btn ownButton\" onClick=\"deleteUser(\'" + id + "\')\"";
-	if (userid == "admin" && role == "admin") { 
-		userHTML += " disabled";
-	}														
-	userHTML += ">Delete</button></td></tr>";	
-	return userHTML;
+  var userHTML = "<tr id=\"updateUser_" + id + "\">" +
+    "<td><input type=\"text\" class=\"form-control\" id=\"userid_" + id + "\" value=\"" + userid + "\" required";
+  if (userid == "admin" && role == "admin") {
+    userHTML += " disabled";
+  }
+  userHTML += "/></td><td><select class=\"form-control\" id=\"role_" + id + "\"";
+  if (userid == "admin") {
+    userHTML += " disabled";
+  }
+  userHTML += "><option value=\"admin\"";
+  if (role == "admin") {
+    userHTML += " selected";
+  }
+  userHTML += ">Admin</option><option value=\"user\"";
+  if (role == "user") {
+    userHTML += " selected";
+  }
+  userHTML += ">User</option></select></td>" +
+    "<td><input type=\"text\" class=\"form-control\" id=\"name_" + id + "\" value=\"" + name + "\" required/></td>" +
+    "<td><input type=\"password\" class=\"form-control\" id=\"password_" + id + "\" value=\"\" required/></td>" +
+    "<td><input type=\"password\" class=\"form-control\" id=\"confirm_pw_" + id + "\" value=\"\" required/></td>" +
+    "<td><button type=\"button\" class=\"btn ownButton\" onClick=\"updateUser(\'" + id +
+      "\')\">Update</button></td><td><button type=\"button\" class=\"btn ownButton\" onClick=\"deleteUser(\'" + id + "\')\"";
+  if (userid == "admin" && role == "admin") {
+    userHTML += " disabled";
+  }
+  userHTML += ">Delete</button></td></tr>";
+  return userHTML;
 }

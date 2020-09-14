@@ -1,464 +1,438 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta name="description" content="">
-		<meta name="author" content="">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-		<title>HMI</title>
+    <title>HMI</title>
 
-		<link rel="stylesheet" href="/css/bootstrap.min.css">
-		<!-- Optional theme -->
-        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">	
-        <link rel="stylesheet" href="/css/style.css">			
-        <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">			
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">
 
+    <script src="/js/NGSI.min.js"></script>
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/bootbox.min.js"></script>
+    <script src="/js/Chart.bundle.min.js"></script>
+    <script src="/js/bootstrap-toggle.min.js"></script>
+    <script src="/js/hammer.min.js"></script>
+    <script src="/js/chartjs-plugin-streaming.min.js"></script>
+    <script src="/js/chartjs-plugin-zoom.min.js"></script>
+    <script src="/js/three.min.js"></script>
+    <script>
+      var floorPlanImage;
+      var floorPlanImageScale = 1;
+      var floorPlanImageToWebPageScale = 1;
+      var floorPlanImageXOffset = 0;
+      var floorPlanImageYOffset = 0;
+      var fileNameUpdateInterval;
+      var ocb_host = <%- '"' + ocb_host + '"' %>;
+      var ocb_port = <%- '"' + ocb_port + '"' %>;
+      var ngsi_proxy_host = <%- '"' + ngsi_proxy_host + '"' %>;
+      var ngsi_proxy_port = <%- '"' + ngsi_proxy_port + '"' %>;
+      var ngsiConnection = null;
 
-		<script src="/js/NGSI.min.js"></script> 
-		<script src="/js/jquery-3.3.1.min.js"></script> 		
-		<script src="/js/bootstrap.min.js"></script> 	
-		<script src="/js/bootbox.min.js"></script> 			
-		<script src="/js/Chart.bundle.min.js"></script>
-		<script src="/js/bootstrap-toggle.min.js"></script>
-		<script src="/js/hammer.min.js"></script>		
-		<script src="/js/chartjs-plugin-streaming.min.js"></script>		
-		<script src="/js/chartjs-plugin-zoom.min.js"></script>
-		<script src="/js/three.min.js"></script>		
-		<script>
-		
-			var floorPlanImage;
-			var floorPlanImageScale = 1;
-			var floorPlanImageToWebPageScale = 1;
-			var floorPlanImageXOffset = 0;
-			var floorPlanImageYOffset = 0;
-			var fileNameUpdateInterval;
+      $(document).ready(function() {
+        var intervalFunc = function () {
+          if (document.getElementById('hiddenFileInput').files[0] !== undefined) {
+            $('#shownFileName').html(document.getElementById('hiddenFileInput').files[0].name);
+          }
+        };
+        $('#shownFileInput').on('click', function () {
+          $('#hiddenFileInput').click();
+          fileNameUpdateInterval = setInterval(intervalFunc, 1);
+          return false;
+        });
+        $('#hiddenFileInput').hide();
+        $('#aboutTabLink').hide();
+        $('#taskInfoFilter input').on('click', function () {
+          $('#transportOrders').find('tr').hide();
+          $('#taskInfoFilter').find('input:checked').each(function () {
+            $('.' + $(this).attr('rel')).show();
+          });
+        });
+        startSubscriptions();
+        $('#spOnOff').change(function() {
+          updateSPGraphOnCanvas();
+        });
 
-			var ocb_host = <%- '"' + ocb_host + '"' %>;
-			var ocb_port = <%- '"' + ocb_port + '"' %>;
-			var ngsi_proxy_host = <%- '"' + ngsi_proxy_host + '"' %>;
-			var ngsi_proxy_port = <%- '"' + ngsi_proxy_port + '"' %>;
-                        var ngsiConnection = null;
-		
-			$(document).ready(function() {
-					
-				var intervalFunc = function () {
-					if (document.getElementById('hiddenFileInput').files[0] !== undefined) {
-						$('#shownFileName').html(document.getElementById('hiddenFileInput').files[0].name);
-					}
-				};
-				$('#shownFileInput').on('click', function () {
-					$('#hiddenFileInput').click();
-					fileNameUpdateInterval = setInterval(intervalFunc, 1);
-					return false;
-				});
-				
-				$('#hiddenFileInput').hide();
-				$('#aboutTabLink').hide();
-			
-				$('#taskInfoFilter input').on('click', function () {
-					$('#transportOrders').find('tr').hide();	
-					$('#taskInfoFilter').find('input:checked').each(function () {
-						$('.' + $(this).attr('rel')).show();
-					});
-				});
+        <% if (task_mgmnt && task_mgmnt == "BPO") { %>
+          $("#sendBPO").click(function() {
+            sendBPOInput();
+            return false;
+          });
+        <% } else { %>
+          $("#sendMaterialFlow").click(function() {
+            sendMaterialFlow();
+            return false;
+          });
+        <% } %>
+        <% if (user && user.role == "admin") { %>
+          $("#createNewSensor").click(function() {
+            createNewSensor();
+            return false;
+          });
+        <% } %>
+      });
 
-				startSubscriptions();
-			
-				$('#spOnOff').change(function() {
-					updateSPGraphOnCanvas();
-				});
+      function startSubscriptions() {
+        if (ocb_host != "" && ocb_port != "" && ngsi_proxy_host != "" && ngsi_proxy_port != "") {
+          ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
+            ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
+          });
+          ngsiConnection.getServerDetails().then(
+            (response) => {
+            }, (error) => {
+              $("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. Cannot connect to OCB.<% if (user && user.role == "admin") { %> Check configuration.<% } %></div>");
+          });
+        } else {
+          $("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. Cannot connect to OCB.<% if (user && user.role == "admin") { %> Check configuration.<% } %></div>");
+        }
+        if (ngsiConnection == null) {
+          $("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. OCB is not configured.<% if (user && user.role == "admin") { %> Configure OCB in System Settings.<% } %></div>");
+        } else {
+          $.ajax({
+            type: "GET",
+            url: "./api/fp",
+            dataType: "json",
+            success: function (data) {
+              var created = "";
+              var imgURL = "";
+              var name = "";
+              var xoffset = "";
+              var yoffset = "";
+              $(data).each(function(i, item) {
+                if (item.created > created) {
+                  created = item.created;
+                  imgURL = item.imgurl;
+                  name = item.name;
+                  floorPlanImageScale = item.scale;
+                  floorPlanImageXOffset = item.xoffset;
+                  floorPlanImageYOffset = item.yoffset;
+                }
+              })
+              if (imgURL != "") {
+                floorPlanImage = new Image();
+                floorPlanImage.onload = function() {
+                  drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");
+                  drawImageOnCanvas(floorPlanImage, "#floorplan");
+                  $("#floorplanInfo").html("<p><strong>floor plan:</strong> " +
+                      name + ", <strong>scale:</strong> " +
+                      floorPlanImageScale +
+                      " m/px, <strong>x-offset:</strong> " +
+                      floorPlanImageXOffset +
+                      " px, <strong>y-offset:</strong> " +
+                      floorPlanImageYOffset + " px</p>");
+                };
+                floorPlanImage.src = imgURL;
+              }
 
+              if (ngsiConnection != null) {
+                /* INITIALIZATIONS */
+                initSensingAndPerception(ngsiConnection);
                 <% if (task_mgmnt && task_mgmnt == "BPO") { %>
-				$("#sendBPO").click(function() {
-					sendBPOInput();
-					return false;
-				});
+                  initBPOs(ngsiConnection);
+                  initBPOOutputs(ngsiConnection);
                 <% } else { %>
-				$("#sendMaterialFlow").click(function() {
-					sendMaterialFlow();
-					return false;
-				});
+                  initMaterialFlows(ngsiConnection);
+                  initTransportOrders(ngsiConnection);
                 <% } %>
-				
-				<% if (user && user.role == "admin") { %>
-				$("#createNewSensor").click(function() {
-					createNewSensor();
-					return false;
-				});
-				<% } %>
-			});
-			
-			function startSubscriptions() {
-				if (ocb_host != "" && ocb_port != "" && ngsi_proxy_host != "" && ngsi_proxy_port != "") {
-					ngsiConnection = new NGSI.Connection("http://" + ocb_host + ":" + ocb_port, {
-						ngsi_proxy_url: "http://" + ngsi_proxy_host + ":" + ngsi_proxy_port
-					});
-					ngsiConnection.getServerDetails().then(
-					(response) => {
-					}, (error) => {
-						$("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. Cannot connect to OCB.<% if (user && user.role == "admin") { %> Check configuration.<% } %></div>");
-					});										
-				} else {
-					$("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. Cannot connect to OCB.<% if (user && user.role == "admin") { %> Check configuration.<% } %></div>");				
-				}
-				if (ngsiConnection == null) {
-					$("#generalAlert").html("<div class=\"alert alert-warning\" style=\"margin-top:10px\">Error. OCB is not configured.<% if (user && user.role == "admin") { %> Configure OCB in System Settings.<% } %></div>");
-				} else {
-					$.ajax({
-						type: "GET",
-						url: "./api/fp",
-						dataType: "json",
-						success: function (data) {					
-							var created = "";
-							var imgURL = "";
-							var name = "";
-							var xoffset = "";
-							var yoffset = "";
-							$(data).each(function(i, item) {						
-								if (item.created > created) {						
-									created = item.created;
-									imgURL = item.imgurl;
-									name = item.name;
-									floorPlanImageScale = item.scale;
-									floorPlanImageXOffset = item.xoffset;
-									floorPlanImageYOffset = item.yoffset;
-								}						
-							})
-							if (imgURL != "") {
-								floorPlanImage = new Image();
-								floorPlanImage.onload = function() {		
-									drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
-									drawImageOnCanvas(floorPlanImage, "#floorplan");
-									$("#floorplanInfo").html("<p><strong>floor plan:</strong> " + name + ", <strong>scale:</strong> " + floorPlanImageScale + " m/px, <strong>x-offset:</strong> " + floorPlanImageXOffset + " px, <strong>y-offset:</strong> " + floorPlanImageYOffset + " px</p>");
-								};
-								floorPlanImage.src = imgURL;	
-							}
-													
-							if (ngsiConnection != null) {
-					
-								/* INITIALIZATIONS */				
-								initSensingAndPerception(ngsiConnection);
-                                                <% if (task_mgmnt && task_mgmnt == "BPO") { %>
-                                                                initBPOs(ngsiConnection);
-                                                                initBPOOutputs(ngsiConnection);
-                                                <% } else { %>
-								initMaterialFlows(ngsiConnection);
-								initTransportOrders(ngsiConnection);
-                                                <% } %>
-								initRobotsTable(ngsiConnection);									
-								initSensors(ngsiConnection);	
-								initSensorData(ngsiConnection);		
-								<% if (user && user.role == "admin") { %>
-									initUsers();
-								<% } %>
+                initRobotsTable(ngsiConnection);
+                initSensors(ngsiConnection);
+                initSensorData(ngsiConnection);
+                <% if (user && user.role == "admin") { %>
+                  initUsers();
+                <% } %>
 
-								/* SUBSCRIPTIONS */
-                                                <% if (task_mgmnt && task_mgmnt == "BPO") { %>
-								ngsiConnection.v2.createSubscription({
-									"description": "Updating BPO Specification Outputs",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ] , "condition": { "attrs": [ "results" ] } },
-									"notification": {
-										"callback": function (notification) {				   
-											updateBPOOutputs(notification);
-										}
-									},
-									//"expires": "2040-04-05T14:00:00.00Z",
-									//"throttling": 5
-								}).then(
-									(response) => {
-										//console.log("Created subscription: " + JSON.stringify(response));
-										$.ajax({
-											url: "./api/subscription",
-											type: "POST",
-											data: {
-												"subs_id": response.subscription.id
-											}
-										}).done(function(data) {
-										}).fail(function(xhr, status, err) {
-											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-										});	
-									}, (error) => {
-										//console.log(error);
-									}
-								);
-                                                <% } else { %>
-								ngsiConnection.v2.createSubscription({
-									"description": "Updating material flow specifications",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "MaterialflowSpecificationState" } ] },
-									"notification": {
-										"callback": function (notification) {				   
-											updateMaterialFlows(notification);
-										}
-									},
-									//"expires": "2040-04-05T14:00:00.00Z",
-									//"throttling": 5
-								}).then(
-									(response) => {
-										//console.log("Created subscription: " + JSON.stringify(response));
-										$.ajax({
-											url: "./api/subscription",
-											type: "POST",
-											data: {
-												"subs_id": response.subscription.id
-											}
-										}).done(function(data) {
-										}).fail(function(xhr, status, err) {
-											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-										});			
-									}, (error) => {
-										//console.log(error);
-									}
-								);		
+                /* SUBSCRIPTIONS */
+                <% if (task_mgmnt && task_mgmnt == "BPO") { %>
+                  ngsiConnection.v2.createSubscription({
+                    "description": "Updating BPO Specification Outputs",
+                    "subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ] ,
+                    "condition": { "attrs": [ "results" ] } },
+                    "notification": {
+                      "callback": function (notification) {
+                        updateBPOOutputs(notification);
+                      }
+                    },
+                    //"expires": "2040-04-05T14:00:00.00Z",
+                    //"throttling": 5
+                  }).then((response) => {
+                          //console.log("Created subscription: " + JSON.stringify(response));
+                          $.ajax({
+                            url: "./api/subscription",
+                            type: "POST",
+                            data: { "subs_id": response.subscription.id }
+                          }).done(function(data) {
+                                  }).fail(function(xhr, status, err) {
+                                    showAndDismissAlert("danger", xhr.responseText, "usersAlert");
+                                  });
+                      }, (error) => {
+                            //console.log(error);
+                          }
+                  );
+                <% } else { %>
+                  ngsiConnection.v2.createSubscription({
+                      "description": "Updating material flow specifications",
+                      "subject": { "entities": [ { "idPattern": ".*", "type": "MaterialflowSpecificationState" } ] },
+                      "notification": {
+                        "callback": function (notification) {
+                          updateMaterialFlows(notification);
+                        }
+                      },
+                      //"expires": "2040-04-05T14:00:00.00Z",
+                      //"throttling": 5
+                  }).then((response) => {
+                          //console.log("Created subscription: " + JSON.stringify(response));
+                          $.ajax({
+                            url: "./api/subscription",
+                            type: "POST",
+                            data: { "subs_id": response.subscription.id }
+                          }).done(function(data) {
+                                  }).fail(function(xhr, status, err) {
+                                    showAndDismissAlert("danger", xhr.responseText, "usersAlert");
+                                  });
+                    }, (error) => {
+                          //console.log(error);
+                        }
+                  );
+                  ngsiConnection.v2.createSubscription({
+                    "description": "Updating transport orders",
+                    "subject": { "entities": [ { "idPattern": ".*", "type": "TransportOrderUpdate" } ] },
+                    "notification": {
+                      "callback": function (notification) {
+                        updateTransportOrders(notification);
+                      }
+                    },
+                    //"expires": "2040-04-05T14:00:00.00Z",
+                    //"throttling": 5
+                  }).then((response) => {
+                    //console.log("Created subscription: " + JSON.stringify(response));
+                    $.ajax({
+                      url: "./api/subscription",
+                      type: "POST",
+                      data: { "subs_id": response.subscription.id }
+                    }).done(function(data) {
+                            }).fail(function(xhr, status, err) {
+                              showAndDismissAlert("danger", xhr.responseText, "usersAlert");
+                            });
+                  }, (error) => {
+                        //console.log(error);
+                      }
+                  );
+                <% } %>
+                ngsiConnection.v2.createSubscription({
+                  // check if sensing and perception has changed
+                  "description": "Updating sensing and perception",
+                  "subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ],
+                              "condition": { "attrs": [ "graph","annotations" ] }  },
+                  "notification": {
+                    "callback": function (notification) {
+                      updateSensingAndPerception(notification);
+                    }
+                  },
+                  //"expires": "2040-04-05T14:00:00.00Z",
+                  //"throttling": 5
+                }).then((response) => {
+                  //console.log("Created subscription: " + JSON.stringify(response));
+                  $.ajax({
+                    url: "./api/subscription",
+                    type: "POST",
+                    data: { "subs_id": response.subscription.id }
+                  }).done(function(data) {
+                  }).fail(function(xhr, status, err) {
+                    showAndDismissAlert("danger", xhr.responseText, "usersAlert");
+                  });
+                }, (error) => {
+                      //console.log(error);
+                    }
+                );
+                ngsiConnection.v2.createSubscription({
+                  "description": "Updating robot data",
+                  "subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ],
+                              "condition": { "attrs": [ "current_motion" ] } },
+                  "notification": {
+                    "callback": function (notification) {
+                      updateRobotsOnOverview(notification);
+                      updateRobotsTable(notification);
+                    },
+                    "attrs": [ "current_motion" ]
+                  },
+                  //"expires": "2040-04-05T14:00:00.00Z",
+                  //"throttling": 5
+                }).then((response) => {
+                  //console.log("Created subscription: " + JSON.stringify(response));
+                  $.ajax({
+                    url: "./api/subscription",
+                    type: "POST",
+                    data: { "subs_id": response.subscription.id }
+                  }).done(function(data) {
+                  }).fail(function(xhr, status, err) {
+                    showAndDismissAlert("danger", xhr.responseText, "usersAlert");
+                  });
+                }, (error) => {
+                      //console.log(error);
+                    }
+                );
+                ngsiConnection.v2.createSubscription({
+                  "description": "Updating sensor data",
+                  "subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ] },
+                  "notification": {
+                    "callback": function (notification) {
+                      updateSensorsOnOverview(notification);
+                      updateSensors(notification);
+                      updateSensorData(notification);
+                    }
+                  },
+                  //"expires": "2040-04-05T14:00:00.00Z",
+                  //"throttling": 5
+                }).then((response) => {
+                  //console.log("Created subscription: " + JSON.stringify(response));
+                  $.ajax({
+                    url: "./api/subscription",
+                    type: "POST",
+                    data: { "subs_id": response.subscription.id }
+                  }).done(function(data) {
+                  }).fail(function(xhr, status, err) {
+                    showAndDismissAlert("danger", xhr.responseText, "usersAlert");
+                  });
+                }, (error) => {
+                      //console.log(error);
+                    }
+                );
+              }
+            }
+          });
+        }
+      }
 
-								ngsiConnection.v2.createSubscription({
-									"description": "Updating transport orders",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "TransportOrderUpdate" } ] },
-									"notification": {
-										"callback": function (notification) {				   
-											updateTransportOrders(notification);
-										}
-									},
-									//"expires": "2040-04-05T14:00:00.00Z",
-									//"throttling": 5
-								}).then(
-									(response) => {
-										//console.log("Created subscription: " + JSON.stringify(response));
-										$.ajax({
-											url: "./api/subscription",
-											type: "POST",
-											data: {
-												"subs_id": response.subscription.id
-											}
-										}).done(function(data) {
-										}).fail(function(xhr, status, err) {
-											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-										});	
-									}, (error) => {
-										//console.log(error);
-									}
-								);
-                                                <% } %>										
-								ngsiConnection.v2.createSubscription({
-                                                                  // check if sensing and perception has changed
-									"description": "Updating sensing and perception",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "graph","annotations" ] }  },
-									"notification": {
-										"callback": function (notification) {
-                                                                                        updateSensingAndPerception(notification);
-											//initSensingAndPerception(ngsiConnection);
-									   }
-									},
-									//"expires": "2040-04-05T14:00:00.00Z",
-									//"throttling": 5
-								}).then(
-									(response) => {
-										//console.log("Created subscription: " + JSON.stringify(response));
-										$.ajax({
-											url: "./api/subscription",
-											type: "POST",
-											data: {
-												"subs_id": response.subscription.id
-											}
-										}).done(function(data) {
-										}).fail(function(xhr, status, err) {
-											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-										});	
-									}, (error) => {
-										//console.log(error);
-									}
-								);									
-								ngsiConnection.v2.createSubscription({
-									"description": "Updating robot data",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "ROBOT" } ], "condition": { "attrs": [ "current_motion" ] } },
-									"notification": {
-										"callback": function (notification) {
-											updateRobotsOnOverview(notification);
-											updateRobotsTable(notification);
-									   },
-									   "attrs": [ "current_motion" ]
-									},
-									//"expires": "2040-04-05T14:00:00.00Z",
-									//"throttling": 5
-								}).then(
-									(response) => {
-										//console.log("Created subscription: " + JSON.stringify(response));
-										$.ajax({
-											url: "./api/subscription",
-											type: "POST",
-											data: {
-												"subs_id": response.subscription.id
-											}
-										}).done(function(data) {
-										}).fail(function(xhr, status, err) {
-											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-										});											
-									}, (error) => {
-										//console.log(error);
-									}
-								);
-								
-								ngsiConnection.v2.createSubscription({
-									"description": "Updating sensor data",
-									"subject": { "entities": [ { "idPattern": ".*", "type": "SensorAgent" } ] },
-									"notification": {
-										"callback": function (notification) {
-											updateSensorsOnOverview(notification);
-											updateSensors(notification);	
-											updateSensorData(notification);					
-										}
-									},
-									//"expires": "2040-04-05T14:00:00.00Z",
-									//"throttling": 5
-								}).then(
-									(response) => {
-										//console.log("Created subscription: " + JSON.stringify(response));
-										$.ajax({
-											url: "./api/subscription",
-											type: "POST",
-											data: {
-												"subs_id": response.subscription.id
-											}
-										}).done(function(data) {
-										}).fail(function(xhr, status, err) {
-											showAndDismissAlert("danger", xhr.responseText, "usersAlert");				
-										});											
-									}, (error) => {
-										//console.log(error);
-									}
-								);							
-							}
-						}
-					});
-				}
-			}
-			
-			function showAbout() {
-				$('.nav-tabs a[href="#aboutTab"]').tab('show');
-			}
-			
-			<% include ./generalFunctions.ejs %>			
-			<% include ./sp/functions.ejs %>				
-			<% include ./overview/functions.ejs %>		
-			<% include ./floorplan/functions.ejs %>	
-			<% if (task_mgmnt && task_mgmnt == "BPO") { %>
-                            <% include ./bpo/functions.ejs %>
-                        <% } else { %>
-                            <% include ./task_management/functions.ejs %>
-                        <% } %>
-			<% include ./robots/functions.ejs %>
-			<% include ./sensors/functions.ejs %>				
-			<% include ./sensor_data/functions.ejs %>		
-			<% if (user && user.role == "admin") { %>	
-				<% include ./user_management/functions.ejs %>
-			<% } %>		
-		</script>
-	
-	</head>
+      function showAbout() {
+        $('.nav-tabs a[href="#aboutTab"]').tab('show');
+      }
 
-	<body style="background-color: #1A1737;">
-		<div class="container">
-			<div class="header clearfix" style="display: flex; align-items: center;">
-				<div style="margin-right:auto">
-					<div style="display: flex;">
-						<img style="margin-top: 5px;" height=55px src="/img/logo-opil-header.png">
-						<span class="header-text">HMI version <%= version %></span>
-							
-                                <% if (link_btn_txt && link_btn_txt.length > 0 && link_btn_url && link_btn_url.length > 0) { %>
-                                        <span class="header-btn"><a class="btn btn-default btn-sm" target="_blank" href=<%- '"' + link_btn_url + '"'%>><%= link_btn_txt %></a></span>
-                                <% } %>
-					</div>
-				</div>
-				<div style="margin-left: auto;">
-                                        <form action="/logout" method="post">
-										<div style="display: flex">
-										<span class="header-text" style="font-size:15px; margin-top:15px;"><a class="aboutLink" href="#" onclick="showAbout()">&nbsp;&nbsp;&nbsp;About&nbsp;&nbsp;&nbsp;</a><font style="margin-left:3px; margin-right:10px; color: #da1f4d;">|</font>
-										<!--<img style="height: 70px" src="/img/logo_height.png">-->
-                                        Logged in as <%= user.name %><font style="margin-left:15px; color: #da1f4d;">|</font>
-                                        <button type="submit" class="btn btn-sm btn-link button-link-override" style="font-size:15px; margin-top:-2px; color: white !important;">Log out</button></span>
-					</div>
-					</form>
-				</div>
-			</div>					
-			<div id="generalAlert"></div>
-			<ul class="nav nav-tabs" style=" margin-top:10px;" role="tablist">
-				<li class="active"><a href="#overviewTab" role="tab" data-toggle="tab">Overview</a></li>
-				<li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan Management</a></li>
-				
-				<% if (task_mgmnt && task_mgmnt == "BPO") { %>
-                                    <li><a href="#bpoTab" role="tab" data-toggle="tab">BPO</a></li>
-                                <% } else { %>
-                                    <li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>
-                                <% } %>
-										
-				<li><a href="#robotsTab" role="tab" data-toggle="tab">Robots</a></li>
-				<li><a href="#sensorsTab" role="tab" data-toggle="tab">Control</a></li>				
-				<li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>			
-				<% if (user && user.role == "admin") { %>  
-				<li><a href="#usersTab" role="tab" data-toggle="tab">User Management</a></li>
-				<% } %>
-				<li id="aboutTabLink"><a href="#aboutTab" role="tab" data-toggle="tab">About</a></li>
-			</ul>
-			<div class="tab-content">
-				<div class="tab-pane active" id="overviewTab" style="margin-top:10px;">
-					<% include ./overview/tabContent.ejs %>					
-				</div>
-				<div class="tab-pane" id="floorplansTab" style="margin-top:10px;">
-					<% include ./floorplan/tabContent.ejs %>
-				</div>
-				
-				<% if (task_mgmnt && task_mgmnt == "BPO") { %>
-				    <div class="tab-pane" id="bpoTab" style="margin-top:0px;">
-					<% include ./bpo/tabContent.ejs %>				
-                                    </div>
-				<% } else { %>
-                                    <div class="tab-pane" id="taskManagementTab" style="margin-top:0px;">
-					<% include ./task_management/tabContent.ejs %>				
-                                    </div>			
-				<% } %>
-				
-				<div class="tab-pane" id="robotsTab" style="margin-top:-10px;">
-					<% include ./robots/tabContent.ejs %>			
-				</div>						
-				<div class="tab-pane" id="sensorsTab" style="margin-top:10px;">
-					<% include ./sensors/tabContent.ejs %>
-				</div> 					
-				<div class="tab-pane" id="sensorDataTab" style="margin-top:10px;">
-					<% include ./sensor_data/tabContent.ejs %>
-				</div> 			
-				<% if (user && user.role == "admin") { %>  			
-					<div class="tab-pane" id="usersTab" style="margin-top:0px;">
-						<% include ./user_management/tabContent.ejs %>
-					</div>
-                <% } %>							
-				<div class="tab-pane" id="aboutTab" style="margin-top:10px;">
-					<% include ./about.ejs %>
-				</div>
-			</div>	
-		</div>
-<div class="footer">
-    <img src="/img/logo-ramp-white-footer.png" alt="RAMP Logo" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 30px; height: 40px;">
-    <div style="margin-bottom:30px;">
+      <% include ./generalFunctions.ejs %>
+      <% include ./sp/functions.ejs %>
+      <% include ./overview/functions.ejs %>
+      <% include ./floorplan/functions.ejs %>
+      <% if (task_mgmnt && task_mgmnt == "BPO") { %>
+        <% include ./bpo/functions.ejs %>
+      <% } else { %>
+        <% include ./task_management/functions.ejs %>
+      <% } %>
+      <% include ./robots/functions.ejs %>
+      <% include ./sensors/functions.ejs %>
+      <% include ./sensor_data/functions.ejs %>
+      <% if (user && user.role == "admin") { %>
+        <% include ./user_management/functions.ejs %>
+      <% } %>
+    </script>
+  </head>
+
+  <body style="background-color: #1A1737;">
+    <div class="container">
+      <div class="header clearfix" style="display: flex; align-items: center;">
+        <div style="margin-right:auto">
+          <div style="display: flex;">
+            <img style="margin-top: 5px;" height=55px src="/img/logo-opil-header.png">
+            <span class="header-text">HMI version <%= version %></span>
+            <% if (link_btn_txt && link_btn_txt.length > 0 && link_btn_url && link_btn_url.length > 0) { %>
+              <span class="header-btn"><a class="btn btn-default btn-sm" target="_blank" href=<%- '"' + link_btn_url + '"'%>><%= link_btn_txt %></a></span>
+            <% } %>
+          </div>
+        </div>
+        <div style="margin-left: auto;">
+          <form action="/logout" method="post">
+            <div style="display: flex">
+              <span class="header-text" style="font-size:15px; margin-top:15px;"><a class="aboutLink" href="#" onclick="showAbout()">&nbsp;&nbsp;&nbsp;About&nbsp;&nbsp;&nbsp;</a><font style="margin-left:3px; margin-right:10px; color: #da1f4d;">|</font>
+                <!--<img style="height: 70px" src="/img/logo_height.png">-->
+                Logged in as <%= user.name %><font style="margin-left:15px; color: #da1f4d;">|</font>
+              <button type="submit" class="btn btn-sm btn-link button-link-override" style="font-size:15px; margin-top:-2px; color: white !important;">Log out</button></span>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div id="generalAlert"></div>
+      <ul class="nav nav-tabs" style=" margin-top:10px;" role="tablist">
+        <li class="active"><a href="#overviewTab" role="tab" data-toggle="tab">Overview</a></li>
+        <li><a href="#floorplansTab" role="tab" data-toggle="tab">Floor Plan Management</a></li>
+        <% if (task_mgmnt && task_mgmnt == "BPO") { %>
+          <li><a href="#bpoTab" role="tab" data-toggle="tab">BPO</a></li>
+        <% } else { %>
+          <li><a href="#taskManagementTab" role="tab" data-toggle="tab">Task Management</a></li>
+        <% } %>
+        <li><a href="#robotsTab" role="tab" data-toggle="tab">Robots</a></li>
+        <li><a href="#sensorsTab" role="tab" data-toggle="tab">Control</a></li>
+        <li><a href="#sensorDataTab" role="tab" data-toggle="tab">Sensor Data</a></li>
+        <% if (user && user.role == "admin") { %>
+          <li><a href="#usersTab" role="tab" data-toggle="tab">User Management</a></li>
+        <% } %>
+        <li id="aboutTabLink"><a href="#aboutTab" role="tab" data-toggle="tab">About</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="overviewTab" style="margin-top:10px;">
+          <% include ./overview/tabContent.ejs %>
+        </div>
+        <div class="tab-pane" id="floorplansTab" style="margin-top:10px;">
+          <% include ./floorplan/tabContent.ejs %>
+        </div>
+        <% if (task_mgmnt && task_mgmnt == "BPO") { %>
+          <div class="tab-pane" id="bpoTab" style="margin-top:0px;">
+            <% include ./bpo/tabContent.ejs %>
+        <% } else { %>
+          <div class="tab-pane" id="taskManagementTab" style="margin-top:0px;">
+            <% include ./task_management/tabContent.ejs %>
+        <% } %>
+        </div>
+        <div class="tab-pane" id="robotsTab" style="margin-top:-10px;">
+          <% include ./robots/tabContent.ejs %>
+        </div>
+        <div class="tab-pane" id="sensorsTab" style="margin-top:10px;">
+          <% include ./sensors/tabContent.ejs %>
+        </div>
+        <div class="tab-pane" id="sensorDataTab" style="margin-top:10px;">
+            <% include ./sensor_data/tabContent.ejs %>
+        </div>
+        <% if (user && user.role == "admin") { %>
+          <div class="tab-pane" id="usersTab" style="margin-top:0px;">
+            <% include ./user_management/tabContent.ejs %>
+          </div>
+        <% } %>
+        <div class="tab-pane" id="aboutTab" style="margin-top:10px;">
+          <% include ./about.ejs %>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <img src="/img/logo-ramp-white-footer.png" alt="RAMP Logo" style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 30px; height: 40px;">
+      <div style="margin-bottom:30px;">
         <p style="font-family: 'Open Sans'; font-weight: bold; font-size: 18px;">
             RAMP (Robotics and Automation MarketPlace) accelerates productivity with robotics.
         </p>
         <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 15px;">
             Developed in Horizon2020 funded projects. <a target="_blank" href="http://www.ramp.eu">www.ramp.eu</a>
         </p>
-    </div>
-    <div style="margin-bottom: 30px;">
+      </div>
+      <div style="margin-bottom: 30px;">
         <img src="/img/eu_flag_white_low.png" alt="EU Flag" style="display: float; margin-left: auto; margin-right: 40px; height: 40px;">
         <img src="/img/logo-dih-white-footer.png" alt="DIH Logo" style="display: float; margin-left: auto; margin-right: 40px; height: 50px;">
         <img src="/img/logo-l4ms-white-footer.png" alt="L4MS Logo" style="display: float; margin-left: auto; margin-right: 40px; height: 35px;">
-    </div>
-    <div>
+      </div>
+      <div>
         <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 13px; color: #484361">
             This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 767642.
         </p>
         <p style="font-family: 'Open Sans'; font-weight: regular; font-size: 13px; color: #484361">
             &copy; 2017-2019 L4MS. All rights reserved.
         </p>
+      </div>
     </div>
-</div>
-	</body>
+
+  </body>
 </html>
