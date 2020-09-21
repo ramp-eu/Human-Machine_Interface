@@ -1,64 +1,38 @@
 <section style="overflow-x: auto; overflow-y: auto;">
-	<canvas id="overviewFloorplan" onmousedown="setSensorLocation(event)" style="margin-top:20px; <!--width: 100%; height: auto-->">
-		Sorry, your browser doesn't support the &lt;canvas&gt; element.
-	</canvas>
-	<canvas id="overviewFloorplanOriginScale">
-		Sorry, your browser doesn't support the &lt;canvas&gt; element.
-	</canvas>
-	<div><input id="spOnOff" type="checkbox" data-toggle="toggle" data-on="S&P Graph On" data-off="S&P Graph Off" data-style="success" data-size="normal" data-width="150">&nbsp;<span id="spTooltip"></span></div>
+  <canvas id="overviewFloorplan" onmousedown="setSensorLocation(event)" style="margin-top:20px; <!--width: 100%; height: auto-->">
+    Sorry, your browser doesn't support the &lt;canvas&gt; element.
+  </canvas>
+  <canvas id="overviewFloorplanOriginScale">
+    Sorry, your browser doesn't support the &lt;canvas&gt; element.
+  </canvas>
+  <div><input id="spOnOff" type="checkbox" data-toggle="toggle" data-on="S&P Graph On" data-off="S&P Graph Off" data-style="success" data-size="normal" data-width="150">&nbsp;<span id="spTooltip"></span></div>
 </section>
 
 <table id="robotsOverviewTable" style="width: 100%; margin-top:50px;">
-	<thead>
-		<tr>
-			<th scope="col">&nbsp;</th>
-			<th scope="col">Robot ID</th>
-			<th scope="col">RAN status</th>
-			<th scope="col">Pos X</th>
-			<th scope="col">Pos Y</th>
-			<th scope="col">Theta</th>
-		</tr>
-	</thead>
-	<tbody id="robotsOverviewTbody"></tbody>
+  <thead>
+    <tr>
+      <th scope="col">&nbsp;</th>
+      <th scope="col">Robot ID</th>
+      <th scope="col">RAN status</th>
+      <th scope="col">Pos X</th>
+      <th scope="col">Pos Y</th>
+      <th scope="col">Theta</th>
+    </tr>
+  </thead>
+  <tbody id="robotsOverviewTbody"></tbody>
 </table>
 
 <table id="sensorsOverviewTable" style="width: 100%; margin-top:50px;">
-	<thead>
-		<tr>
-			<th scope="col">&nbsp;</th>
-			<th scope="col">Sensor ID</th>
-			<th scope="col">Type</th>			
-			<th scope="col">Value</th>				
-			<!--<th scope="col">Pos X</th>-->
-			<!--<th scope="col">Pos Y</th>-->
-			<!--<th scope="col" style="text-align:center">Set position</th>-->
-		</tr>
-	</thead>
-	<tbody id="sensorsOverviewTbody"></tbody>
-</table>
-
-<!--
-<h3>System messages</h3>
-<table id="overviewTable" class="table table-responsive">
   <thead>
-	<tr>
-	  <th scope="col">ID</th>
-	  <th scope="col">Message</th>					 
-	</tr>
+    <tr>
+      <th scope="col">&nbsp;</th>
+      <th scope="col">Sensor ID</th>
+      <th scope="col">Type</th>
+      <th scope="col">Value</th>
+      <!--<th scope="col">Pos X</th>-->
+      <!--<th scope="col">Pos Y</th>-->
+      <!--<th scope="col" style="text-align:center">Set position</th>-->
+    </tr>
   </thead>
-  <tbody>
-	<tr>
-	  <td>AGV 2345</td>
-	  <td>Battery low</td>					  
-	</tr>
-	<tr>
-	  <td>Kalle</td>
-	  <td>Started lunch</td>						  
-	</tr>
-	<tr>
-	  <td>AGV 2224</td>
-	  <td>Charging complete</td>
-	</tr>						
-  </tbody>
+  <tbody id="sensorsOverviewTbody"></tbody>
 </table>
--->	

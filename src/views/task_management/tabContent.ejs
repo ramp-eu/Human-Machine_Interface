@@ -1,71 +1,70 @@
 <div id="taskManagementAlert"></div>
 
 <div>
-    <h3>Create a new material flow</h3>
-	<form>
-		<div class="form-group">
-			<label for="taskDescriptionTextArea">Task specification</label>
-			<textarea class="form-control" id="taskDescriptionTextArea" rows="8"></textarea>
-		</div>
-		<div class="form-group">						
-			<button class="btn ownButton" id="sendMaterialFlow">Send material flow</button>
-		</div>
-	</form>
+  <h3>Create a new material flow</h3>
+  <form>
+    <div class="form-group">
+      <label for="taskDescriptionTextArea">Task specification</label>
+      <textarea class="form-control" id="taskDescriptionTextArea" rows="8"></textarea>
+    </div>
+    <div class="form-group">
+      <button class="btn ownButton" id="sendMaterialFlow">Send material flow</button>
+    </div>
+  </form>
 </div>
 <div style="margin-top:30px"></div>
 <div style="width: 100%;">
-	<h3>Sent material flows</h3>
-	<table style="width: 100%;">
-		<thead>
-			<tr>
-				<th scope="col">Material Flow ID</th>
-				<th scope="col">State</th>
-				<th scope="col">Message</th>	  
-				<th scope="col">Active</th>		
-				<th scope="col">Task Specification</th>					
-				<th scope="col">&nbsp;</th>
-			</tr>
-		</thead>
-		<tbody id="materialFlows"></tbody>
-	</table>
+  <h3>Sent material flows</h3>
+  <table style="width: 100%;">
+    <thead>
+      <tr>
+        <th scope="col">Material Flow ID</th>
+        <th scope="col">State</th>
+        <th scope="col">Message</th>
+        <th scope="col">Active</th>
+        <th scope="col">Task Specification</th>
+        <th scope="col">&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody id="materialFlows"></tbody>
+  </table>
 </div>
 <div style="margin-top:30px"></div>
 <div style="width: 100%;">
-	
-	<div id="taskInfoFilter">
-		<h3>Transport orders</h3>
-		<label class = "checkbox-inline">
-               <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_Idle" checked />Idle
-            </label>
-            <label class = "checkbox-inline">
-               <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_WaitForStartTrigger" checked />WaitForStartTrigger
-            </label>
-            <label class = "checkbox-inline">
-               <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_MovingToPickupDestination" checked />MovingToPickupDestination
-            </label>
-            <label class = "checkbox-inline">
-               <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_WaitForLoading" checked />WaitForLoading
-            </label>
-            <label class = "checkbox-inline">
-               <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_MovingToDeliveryDestination" checked />MovingToDeliveryDestination
-            </label>
-            <label class = "checkbox-inline">
-               <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_WaitForUnloading" checked />WaitForUnloading
-            </label>	
-	</div>		
-	<table id="transportOrdersTable" style="width: 100%;">
-		<thead>
-			<tr>
-				<th scope="col">ID</th>				
-				<th scope="col">Pickup From</th>	
-				<th scope="col">Deliver To</th>
-				<th scope="col">Name</th>			
-				<th scope="col">Material Flow Id</th>		
-				<th scope="col">Task Info</th>	
-				<th scope="col">Updated</th>					
-				<th scope="col">Started</th>
-			</tr>
-		</thead>
-		<tbody id="transportOrders"></tbody>
-	</table>
+  <div id="taskInfoFilter">
+    <h3>Transport orders</h3>
+    <label class = "checkbox-inline">
+      <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_Idle" checked />Idle
+    </label>
+    <label class = "checkbox-inline">
+      <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_WaitForStartTrigger" checked />WaitForStartTrigger
+    </label>
+    <label class = "checkbox-inline">
+      <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_MovingToPickupDestination" checked />MovingToPickupDestination
+    </label>
+    <label class = "checkbox-inline">
+      <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_WaitForLoading" checked />WaitForLoading
+    </label>
+    <label class = "checkbox-inline">
+      <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_MovingToDeliveryDestination" checked />MovingToDeliveryDestination
+    </label>
+    <label class = "checkbox-inline">
+      <input type="checkbox" class="taskInfoFilterCheckbox" rel="TASK_INFO_WaitForUnloading" checked />WaitForUnloading
+    </label>
+  </div>
+  <table id="transportOrdersTable" style="width: 100%;">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Pickup From</th>
+        <th scope="col">Deliver To</th>
+        <th scope="col">Name</th>
+        <th scope="col">Material Flow Id</th>
+        <th scope="col">Task Info</th>
+        <th scope="col">Updated</th>
+        <th scope="col">Started</th>
+      </tr>
+    </thead>
+    <tbody id="transportOrders"></tbody>
+  </table>
 </div>

@@ -1,49 +1,47 @@
 function initRobotsTable(ngsiConnection) {
-	ngsiConnection.v2.listEntities({type: "ROBOT"}).then((response) => {
-		var entities = response.results;
-		$("#robotsTab").html("<table id=\"robotsTable\" style=\"width: 100%;\"><thead><tr><th scope=\"col\">ID</th><th scope=\"col\">RAN status</th><th scope=\"col\">Pos X</th><th scope=\"col\">Pos Y</th><th scope=\"col\">Theta</th></tr></thead><tbody id=\"robotsTbody\">");
-		$.each(entities, function(i, entity) {
-			if (!entity.graph) {
-				var dObj = entity.current_motion.value;
-				var ran_status = "unknown";
-				var theta = getThetafromQuaternion(dObj.current_position.value.pose.value.orientation.value);
-				$("#robotsTbody").append("<tr id=\"robottr" + entity.id + "\" class=\"clickable-row\" bgcolor=\"#FFFFFF\"><td>" + entity.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.value.pose.value.position.value.x.value + " mm</td><td>" + dObj.current_position.value.pose.value.position.value.y.value + " mm</td><td>" + Math.round(theta * (180/Math.PI) * 100) / 100 + "&#176;</td></tr>");
-			}
-		});
-		$("#robotsTab").append("</tbody></table>");
-	});
+  ngsiConnection.v2.listEntities({type: "ROBOT"}).then((response) => {
+    var entities = response.results;
+    $("#robotsTab").html("<table id=\"robotsTable\" style=\"width: 100%;\"><thead><tr><th scope=\"col\">ID</th><th scope=\"col\">RAN status</th><th scope=\"col\">Pos X</th><th scope=\"col\">Pos Y</th><th scope=\"col\">Theta</th></tr></thead><tbody id=\"robotsTbody\">");
+    $.each(entities, function(i, entity) {
+      if (!entity.graph) {
+        var dObj = entity.current_motion.value;
+        var ran_status = "unknown";
+        var theta = getThetafromQuaternion(dObj.current_position.value.pose.value.orientation.value);
+        $("#robotsTbody").append("<tr id=\"robottr" + entity.id + "\" class=\"clickable-row\" bgcolor=\"#FFFFFF\"><td>" + entity.id + "</td><td>" + ran_status + "</td><td>" + dObj.current_position.value.pose.value.position.value.x.value + " mm</td><td>" + dObj.current_position.value.pose.value.position.value.y.value + " mm</td><td>" + Math.round(theta * (180/Math.PI) * 100) / 100 + "&#176;</td></tr>");
+      }
+    });
+    $("#robotsTab").append("</tbody></table>");
+  });
 }
 
 function updateRobotsTable(notification) {
-   //console.log("Received Robot notif: " + JSON.stringify(notification));					   
-   $.each(notification.data, function () {
-	   	if (!this.graph) {
-			//var d = decodeURIComponent(this.current_motion.value);
-			//var dObj = JSON.parse(d.replace(/\'/g, "\""));
-			var dObj = this.current_motion.value;
-			//console.log("DOBJ: "+ dObj);
-			//console.log("stringify DOBJ: "+ JSON.stringify(dObj));
-			var ran_status = "unknown";
-			//if (dObj.ran_status.value == 0) ran_status = "waiting";
-			//else if (dObj.ran_status.value == 1) ran_status = "moving";
-			//else if (dObj.ran_status.value == 2) ran_status = "acting";
-			//if ($("#robottr"+this.id).length < 1) 
-			//    $("#robotsTbody").append("<tr id=\"robottr" + this.id + "\"class=\"clickable-row\"></tr>");
-			$("#robottr"+this.id).empty();
-			//console.log(dObj.agv_msg.value.current_position.value.theta.value);
-			var theta = getThetafromQuaternion(dObj.current_position.value.pose.value.orientation.value);
-			var x = dObj.current_position.value.pose.value.position.value.x.value;
-			var y = dObj.current_position.value.pose.value.position.value.y.value;
-			
-			$("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + x.toFixed(3) + " m</td><td>" + y.toFixed(3) + " m</td><td>" + Math.round(theta * (180/Math.PI) * 100) / 100 + "&#176;</td>");
-		}
-		// aste &#176;
-	});									
+  //console.log("Received Robot notif: " + JSON.stringify(notification));
+  $.each(notification.data, function () {
+    if (!this.graph) {
+      //var d = decodeURIComponent(this.current_motion.value);
+      //var dObj = JSON.parse(d.replace(/\'/g, "\""));
+      var dObj = this.current_motion.value;
+      //console.log("DOBJ: "+ dObj);
+      //console.log("stringify DOBJ: "+ JSON.stringify(dObj));
+      var ran_status = "unknown";
+      //if (dObj.ran_status.value == 0) ran_status = "waiting";
+      //else if (dObj.ran_status.value == 1) ran_status = "moving";
+      //else if (dObj.ran_status.value == 2) ran_status = "acting";
+      //if ($("#robottr"+this.id).length < 1)
+      //    $("#robotsTbody").append("<tr id=\"robottr" + this.id + "\"class=\"clickable-row\"></tr>");
+      $("#robottr"+this.id).empty();
+      //console.log(dObj.agv_msg.value.current_position.value.theta.value);
+      var theta = getThetafromQuaternion(dObj.current_position.value.pose.value.orientation.value);
+      var x = dObj.current_position.value.pose.value.position.value.x.value;
+      var y = dObj.current_position.value.pose.value.position.value.y.value;
+      $("#robottr"+this.id).append("<td>" + this.id + "</td><td>" + ran_status + "</td><td>" + x.toFixed(3) + " m</td><td>" + y.toFixed(3) + " m</td><td>" + Math.round(theta * (180/Math.PI) * 100) / 100 + "&#176;</td>");
+    }
+  });
 }
 
 function getThetafromQuaternion(quaternion) {
-	var quaternion = new THREE.Quaternion().set(quaternion.x.value, quaternion.y.value, quaternion.z.value, quaternion.w.value);
-	var euler = new THREE.Euler().setFromQuaternion(quaternion);
-	var theta = euler.z;
-	return theta;
+  var quaternion = new THREE.Quaternion().set(quaternion.x.value, quaternion.y.value, quaternion.z.value, quaternion.w.value);
+  var euler = new THREE.Euler().setFromQuaternion(quaternion);
+  var theta = euler.z;
+  return theta;
 }

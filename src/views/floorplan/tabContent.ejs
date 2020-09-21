@@ -1,43 +1,43 @@
 <div id="floorplanAlert"></div>
 
-<div id="newFloorPlan">					
-	<div class="row">
-		<form method="post" class="form-horizontal" id="fileinfo" name="fileinfo" onsubmit="return submitForm();">
-			<div class="form-group col-sm-3" style="margin-left:5px; margin-right:5px;">
-				<label for="floorplan" class="control-label">&nbsp;</label><br>
-				<!--<input type="file" accept=".jpg, .png, .jpeg, .gif" class="custom-file-input ownButton" name="floorplan" required />-->
-				<input id="hiddenFileInput" type="file" accept=".jpg, .png, .jpeg, .gif" size="4" name="floorplan"/>
-				<input id="shownFileInput" type="button" class="ownButton" style="padding:6px; padding-left:12px; padding-right:12px;" value="Select floor plan"/>
-				<span id="shownFileName" class="margin-10 bold-10"></span>	
-				<p><small>Allowed file formats: jpeg, gif, png</small></p>
-			</div>
-			<div class="form-group col-sm-2" style="margin-right:5px;">
-				<label for="name" class="control-label">Floor plan name</label>
-				<input type="text" class="form-control" name="name" required />
-			</div>
-			<div class="form-group col-sm-2" style="margin-right:5px;">
-				<label for="scale" class="control-label">Scale (m/px)</label>
-				<input type="number" min="0" step="any" class="form-control" id="floorplanScaleInput" name="scale" required />
-			</div>
-			<div class="form-group col-sm-2" style="margin-right:5px;">
-				<label for="xoffset" class="control-label">X-offset (px)</label>
-				<input type="number" class="form-control" id="floorplanXOffsetInput" name="xoffset" required />
-			</div>
-			<div class="form-group col-sm-2" style="margin-right:5px;">
-				<label for="yoffset" class="control-label">Y-offset (px)</label>
-				<input type="number" class="form-control" id="floorplanYOffsetInput" name="yoffset" required />
-			</div>	
-			<div class="form-group col-sm-1">
-				<label>&nbsp;</label>							
-				<input type="submit" class="ownButton" style="margin-top:5px; padding:6px; padding-left:12px; padding-right:12px;" value="Upload" />
-			</div>
-		</form>
-	</div>
+<div id="newFloorPlan">
+  <div class="row">
+    <form method="post" class="form-horizontal" id="fileinfo" name="fileinfo" onsubmit="return submitForm();">
+      <div class="form-group col-sm-3" style="margin-left:5px; margin-right:5px;">
+        <label for="floorplan" class="control-label">&nbsp;</label><br>
+        <!--<input type="file" accept=".jpg, .png, .jpeg, .gif" class="custom-file-input ownButton" name="floorplan" required />-->
+        <input id="hiddenFileInput" type="file" accept=".jpg, .png, .jpeg, .gif" size="4" name="floorplan" />
+        <input id="shownFileInput" type="button" class="ownButton" style="padding:6px; padding-left:12px; padding-right:12px;" value="Select floor plan" />
+        <span id="shownFileName" class="margin-10 bold-10"></span>
+        <p><small>Allowed file formats: jpeg, gif, png</small></p>
+      </div>
+      <div class="form-group col-sm-2" style="margin-right:5px;">
+        <label for="name" class="control-label">Floor plan name</label>
+        <input type="text" class="form-control" name="name" required />
+      </div>
+      <div class="form-group col-sm-2" style="margin-right:5px;">
+        <label for="scale" class="control-label">Scale (m/px)</label>
+        <input type="number" min="0" step="any" class="form-control" id="floorplanScaleInput" name="scale" required />
+      </div>
+      <div class="form-group col-sm-2" style="margin-right:5px;">
+        <label for="xoffset" class="control-label">X-offset (px)</label>
+        <input type="number" class="form-control" id="floorplanXOffsetInput" name="xoffset" required />
+      </div>
+      <div class="form-group col-sm-2" style="margin-right:5px;">
+        <label for="yoffset" class="control-label">Y-offset (px)</label>
+        <input type="number" class="form-control" id="floorplanYOffsetInput" name="yoffset" required />
+      </div>
+      <div class="form-group col-sm-1">
+        <label>&nbsp;</label>
+        <input type="submit" class="ownButton" style="margin-top:5px; padding:6px; padding-left:12px; padding-right:12px;" value="Upload" />
+      </div>
+    </form>
+  </div>
 </div>
 
 <section style="overflow-x: auto; overflow-y: auto;">
-	<canvas id="floorplan" style="margin-top:20px; <!--width: 100%; height: auto-->">
-		Sorry, your browser doesn't support the &lt;canvas&gt; element.
-	</canvas>
-	<div id="floorplanInfo" class="text-center"></div>
+  <canvas id="floorplan" style="margin-top:20px; <!--width: 100%; height: auto-->">
+    Sorry, your browser doesn't support the &lt;canvas&gt; element.
+  </canvas>
+  <div id="floorplanInfo" class="text-center"></div>
 </section>

@@ -3,314 +3,260 @@ var sensorsOnOverview = new Array();
 
 function drawImageOnCanvas(img, targetCanvas) {
   $(targetCanvas).off('mousemove');
-	var canvas = $(targetCanvas)[0];
-	var ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var canvas = $(targetCanvas)[0];
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	var parentWidth = $(targetCanvas).parent().outerWidth();
-	$(targetCanvas).attr('width', parentWidth-30);
-	//var parentHeight = $(targetCanvas).parent().outerHeight();
-	//$(targetCanvas).attr('height', parentHeight);			
-	//$(targetCanvas).attr('height', 720);				
-	//floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
-	floorPlanImageToWebPageScale = canvas.width / img.width;
-	$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);	
-	// get the top left position of the image
-	var x = (canvas.width / 2) - (img.width / 2) * floorPlanImageToWebPageScale;
-	//var y = (canvas.height / 2) - (img.height / 2) * floorPlanImageToWebPageScale;			
-	var y = 0; // no need to center the floor plan vertically
-	//$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);  // resize the canvas smaller if the image is also smaller
-	ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);	
-	
-	
-	if ($("#spOnOff").prop('checked')) {
-	
-		var xOriginMeters = floorPlanImageXOffset * floorPlanImageScale * -1;
-		var yOriginMeters = floorPlanImageYOffset * floorPlanImageScale * -1;
-                let sensingAndPerceptionEdgesTooltips = [];
-                let sensingAndPerceptionVerticesTooltips = [];
-                let sensingAndPerceptionAnnotationsTooltips = [];
-		
-		$.each(sensingAndPerceptionEdges, function (i, edge) {
-			var xSrc = ((edge.value.uuid_src.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
-			var ySrc = (floorPlanImage.height - ((edge.value.uuid_src.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;	
-			var xDest = ((edge.value.uuid_dest.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
-			var yDest = (floorPlanImage.height - ((edge.value.uuid_dest.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';			
-			ctx.beginPath();
-			ctx.moveTo(xSrc, ySrc);
-			ctx.lineTo(xDest, yDest);
-			ctx.stroke();
-			sensingAndPerceptionEdgesTooltips.push({
-				xSrc: xSrc,
-				ySrc: ySrc,
-				xDest: xDest,
-				yDest: yDest,
-				tip: "Edge: " + edge.value.name.value + " (UUID: " + edge.value.uuid.value + ")"
-			});
-		});
+  var parentWidth = $(targetCanvas).parent().outerWidth();
+  $(targetCanvas).attr('width', parentWidth-30);
+  //var parentHeight = $(targetCanvas).parent().outerHeight();
+  //$(targetCanvas).attr('height', parentHeight);
+  //$(targetCanvas).attr('height', 720);
+  //floorPlanImageToWebPageScale = Math.min(canvas.width / img.width, canvas.height / img.height);
+  floorPlanImageToWebPageScale = canvas.width / img.width;
+  $(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);
+  // get the top left position of the image
+  var x = (canvas.width / 2) - (img.width / 2) * floorPlanImageToWebPageScale;
+  //var y = (canvas.height / 2) - (img.height / 2) * floorPlanImageToWebPageScale;
+  var y = 0; // no need to center the floor plan vertically
+  //$(targetCanvas).attr('height', img.height * floorPlanImageToWebPageScale);  // resize the canvas smaller if the image is also smaller
+  ctx.drawImage(img, x, y, img.width * floorPlanImageToWebPageScale, img.height * floorPlanImageToWebPageScale);
 
-		$.each(sensingAndPerceptionVertices, function (i, vertex) {
-			var x = ((vertex.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
-			var y = (floorPlanImage.height - ((vertex.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';		
-			ctx.fillRect(x-3, y-3, 6, 6);
-			sensingAndPerceptionVerticesTooltips.push({
-				x: x-3,
-				y: y-3,
-				tip: "Vertex: " + vertex.value.name.value + " (UUID: " + vertex.value.uuid.value + ")"
-			});
-		});
-		
-		$.each(sensingAndPerceptionAnnotations, function (i, annotation) {			
-			var uuid = annotation.value.uuid.value;
-			var name = annotation.value.name.value;
-			var theta = annotation.value.theta.value;
-			var distance = annotation.value.distance.value;
-			var headXMeters = annotation.value.x.value;			
-			var headYMeters = annotation.value.y.value;
-			var tailXMeters = headXMeters-distance*Math.cos(theta*Math.PI/180);
-			var tailYMeters = headYMeters-distance*Math.sin(theta*Math.PI/180);		
-			var tailX = ((tailXMeters - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
-			var tailY = (floorPlanImage.height - ((tailYMeters - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
-			var headX = ((headXMeters - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
-			var headY = (floorPlanImage.height - ((headYMeters - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;			
-			if (distance > 0.1) {
-				drawArrow(ctx, {x: tailX, y: tailY}, {x: headX, y: headY}, 10);
-				sensingAndPerceptionAnnotationsTooltips.push({
-					xSrc: tailX,
-					ySrc: tailY,
-					xDest: headX,
-					yDest: headY,
-					tip: "Annotation: " + name + " (UUID: " + uuid + ")"
-				});
-			}
-		});
+  if ($("#spOnOff").prop('checked')) {
+    var xOriginMeters = floorPlanImageXOffset * floorPlanImageScale * -1;
+    var yOriginMeters = floorPlanImageYOffset * floorPlanImageScale * -1;
+    let sensingAndPerceptionEdgesTooltips = [];
+    let sensingAndPerceptionVerticesTooltips = [];
+    let sensingAndPerceptionAnnotationsTooltips = [];
 
-		$(targetCanvas).mousemove(function(e) {
-			var canvasOffset = $(targetCanvas).offset();
-			var offsetX = canvasOffset.left;
-			var offsetY = canvasOffset.top - $(window).scrollTop();
-			
-			mouseX = parseInt(e.clientX-offsetX);
-			mouseY = parseInt(e.clientY-offsetY);
-
-			var hit = false;
-			
-			// check if mouse cursor on a vertex
-			for (var i = 0; i < sensingAndPerceptionVerticesTooltips.length; i++) {
-				var tooltip = sensingAndPerceptionVerticesTooltips[i];				
-				var tolerance = 4;
-				var dx = mouseX - tooltip.x;
-				var dy = mouseY - tooltip.y;
-				if (dx * dx + dy * dy < tolerance*tolerance) {
-					$("#spTooltip").html(tooltip.tip);
-					hit = true;
-				}
-			}
-			if (!hit) {
-				// check if mouse cursor on an edge
-				for (var i = 0; i < sensingAndPerceptionEdgesTooltips.length; i++) {
-					var tooltip = sensingAndPerceptionEdgesTooltips[i];				
-					var line = { x0: tooltip.xSrc, y0: tooltip.ySrc, x1: tooltip.xDest, y1: tooltip.yDest };
-					var tolerance = 3;
-					if ((line.x0 < line.x1 && mouseX >= line.x0 && mouseX <= line.x1) ||
-							(line.x1 < line.x0 && mouseX >= line.x1 && mouseX <= line.x0) ||
-							(line.x0 == line.x1 && line.y0 < line.y1 && mouseY >= line.y0 && mouseY <= line.y1) ||
-							(line.x0 == line.x1 && line.y1 < line.y0 && mouseY >= line.y1 && mouseY <= line.y0)) {
-						var linepoint = linepointNearestMouse(line, mouseX, mouseY);	
-						var dx = mouseX - linepoint.x;
-						var dy = mouseY - linepoint.y;
-						var distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
-						if (distance < tolerance) {
-							$("#spTooltip").html(tooltip.tip);
-							hit = true;
-						}
-					}
-				}				
-			}
-			if (!hit) {
-				// check if mouse cursor on an annotation
-				for (var i = 0; i < sensingAndPerceptionAnnotationsTooltips.length; i++) {
-					var tooltip = sensingAndPerceptionAnnotationsTooltips[i];				
-					var line = { x0: tooltip.xSrc, y0: tooltip.ySrc, x1: tooltip.xDest, y1: tooltip.yDest };
-					var tolerance = 10;
-					if ((line.x0 < line.x1 && mouseX >= line.x0 && mouseX <= line.x1) ||
-							(line.x1 < line.x0 && mouseX >= line.x1 && mouseX <= line.x0) ||
-							(line.x0 == line.x1 && line.y0 < line.y1 && mouseY >= line.y0 && mouseY <= line.y1) ||
-							(line.x0 == line.x1 && line.y1 < line.y0 && mouseY >= line.y1 && mouseY <= line.y0)) {
-						var linepoint = linepointNearestMouse(line, mouseX, mouseY);	
-						var dx = mouseX - linepoint.x;
-						var dy = mouseY - linepoint.y;
-						var distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
-						if (distance < tolerance) {
-							$("#spTooltip").html(tooltip.tip);
-							hit = true;
-						}
-					}
-				}				
-			}			
-				
-			// mouse cursor not on a vertex or and edge
-			if (!hit) {
-				$("#spTooltip").html("");
-			}				
-		});
-	} else {
-		$(targetCanvas).off('mousemove');
-	}
-	
-    var originScaleCanvas = $("#overviewFloorplanOriginScale")[0];
-	var ctx2 = originScaleCanvas.getContext("2d");
-	$("#overviewFloorplanOriginScale").attr('width', parentWidth-30);		
-	$("#overviewFloorplanOriginScale").attr('height', 12);	
-	var scaleText = "1 m"
-	var scaleDistance = ((1 / floorPlanImageScale)) * floorPlanImageToWebPageScale;
-	/*
-	var temp = 1;
-	while (scaleDistance < 50) {
-		temp++;
-		scaleText = temp + " m"
-		scaleDistance = ((100*temp / floorPlanImageScale)) * floorPlanImageToWebPageScale;		
-	}
-	while (scaleDistance > 300) {
-		temp = temp/2;
-		scaleText = temp + " m"
-		scaleDistance = ((100*temp / floorPlanImageScale)) * floorPlanImageToWebPageScale;		
-	}
-	*/
-
-	ctx2.beginPath();
-	ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 10);
-	ctx2.lineTo(originScaleCanvas.width-20, 10);
-	ctx2.stroke();	
-	ctx2.beginPath();	
-	ctx2.moveTo(originScaleCanvas.width-20, 0);
-	ctx2.lineTo(originScaleCanvas.width-20, 10);
-	ctx2.stroke();	
-	ctx2.beginPath();	
-	ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 0);
-	ctx2.lineTo(originScaleCanvas.width-20-scaleDistance, 10);
-	ctx2.stroke();	
-	ctx2.font = "12px";
-	ctx2.fillStyle = "#000000";			
-	ctx2.fillText(scaleText, originScaleCanvas.width-20-scaleDistance-20, 10);	
-    
-	/*
-	ctx2.beginPath();
-	ctx2.moveTo(32, 10);
-	ctx2.lineTo(32 + scaleDistance, 10);
-	ctx2.stroke();	
-	ctx2.beginPath();	
-	ctx2.moveTo(32, 10);
-	ctx2.lineTo(32, 4);
-	ctx2.stroke();	
-	ctx2.beginPath();	
-	ctx2.moveTo(32 + scaleDistance, 10);
-	ctx2.lineTo(32 + scaleDistance, 4);
-	ctx2.stroke();	
-	ctx2.font = "12px";
-	ctx2.fillStyle = "#000000";			
-	ctx2.fillText(scaleText, 10, 10);		
-	*/
-	
-	var xOrigin = floorPlanImageXOffset * floorPlanImageToWebPageScale;
-	var yOrigin = (img.height - floorPlanImageYOffset) * floorPlanImageToWebPageScale;			
-	ctx.lineWidth = 1;
-	
-	if (xOrigin <= canvas.width / 2 && yOrigin <= canvas.height / 2) {  // top left corner -> draw zero point information below on the right side
-		ctx.fillStyle = "blue";	
-		ctx.strokeStyle = "blue";
-		ctx.beginPath();
-		ctx.moveTo(xOrigin+1, yOrigin+1);
-		ctx.lineTo(xOrigin+1, yOrigin+8);
-		ctx.stroke();	
-		ctx.beginPath();
-		ctx.moveTo(xOrigin+1, yOrigin+1);
-		ctx.lineTo(xOrigin+8, yOrigin+1);
-		ctx.stroke();		
-		ctx.font = "12px";	
-		ctx.textBaseline = "top"; 
-		ctx.fillText("0,0", xOrigin+5, yOrigin+5);
-	} else if (xOrigin <= canvas.width / 2 && yOrigin >= canvas.height / 2) {
-		ctx.fillStyle = "blue";	
-		ctx.strokeStyle = "blue";
-		ctx.beginPath();
-		ctx.moveTo(xOrigin+1, yOrigin-1);
-		ctx.lineTo(xOrigin+1, yOrigin-8);
-		ctx.stroke();	
-		ctx.beginPath();
-		ctx.moveTo(xOrigin+1, yOrigin-1);
-		ctx.lineTo(xOrigin+8, yOrigin-1);
-		ctx.stroke();		
-		ctx.font = "12px";
-		ctx.textBaseline = "bottom"; 
-		ctx.fillText("0,0", xOrigin+5, yOrigin-5);
-	} else if (xOrigin >= canvas.width / 2 && yOrigin <= canvas.height / 2) {  // top right corner -> draw zero point information below on the left side
-		ctx.fillStyle = "blue";	
-		ctx.strokeStyle = "blue";
-		ctx.beginPath();
-		ctx.moveTo(xOrigin-1, yOrigin+1);
-		ctx.lineTo(xOrigin-1, yOrigin+8);
-		ctx.stroke();	
-		ctx.beginPath();
-		ctx.moveTo(xOrigin-1, yOrigin+1);
-		ctx.lineTo(xOrigin-8, yOrigin+1);
-		ctx.stroke();		
-		ctx.font = "12px";	
-		ctx.textBaseline = "top"; 
-		ctx.fillText("0,0", xOrigin-20, yOrigin+5);
-	} else if (xOrigin >= canvas.width / 2 && yOrigin >= canvas.height / 2) {
-		ctx.fillStyle = "blue";	
-		ctx.strokeStyle = "blue";
-		ctx.beginPath();
-		ctx.moveTo(xOrigin-1, yOrigin-1);
-		ctx.lineTo(xOrigin-1, yOrigin-8);
-		ctx.stroke();	
-		ctx.beginPath();
-		ctx.moveTo(xOrigin-1, yOrigin-1);
-		ctx.lineTo(xOrigin-8, yOrigin-1);
-		ctx.stroke();		
-		ctx.font = "12px";
-		ctx.textBaseline = "bottom"; 
-		ctx.fillText("0,0", xOrigin-20, yOrigin-5);
-	}	 
- 
- }
-
-function linepointNearestMouse(line, x, y) {    
-    lerp = function(a, b, x) {
-      return (a + x * (b - a));
-    };
-    var dx = line.x1 - line.x0;
-    var dy = line.y1 - line.y0;
-    var t = ((x - line.x0) * dx + (y - line.y0) * dy) / (dx * dx + dy * dy);
-    var lineX = lerp(line.x0, line.x1, t);
-    var lineY = lerp(line.y0, line.y1, t);
-    return ({
-		x: lineX,
-		y: lineY
+    $.each(sensingAndPerceptionEdges, function (i, edge) {
+      var xSrc = ((edge.value.uuid_src.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+      var ySrc = (floorPlanImage.height - ((edge.value.uuid_src.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+      var xDest = ((edge.value.uuid_dest.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+      var yDest = (floorPlanImage.height - ((edge.value.uuid_dest.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.beginPath();
+      ctx.moveTo(xSrc, ySrc);
+      ctx.lineTo(xDest, yDest);
+      ctx.stroke();
+      sensingAndPerceptionEdgesTooltips.push({
+        xSrc: xSrc,
+        ySrc: ySrc,
+        xDest: xDest,
+        yDest: yDest,
+        tip: "Edge: " + edge.value.name.value + " (UUID: " + edge.value.uuid.value + ")"
+      });
     });
-};
 
-/*
-function drawArrow(ctx,fx,fy,tx,ty){ //ctx is the context
-    var angle=Math.atan2(ty-fy,tx-fx);
-    ctx.moveTo(fx,fy); ctx.lineTo(tx,ty);
-    var w=3.5; //width of arrow to one side. 7 pixels wide arrow is pretty
-    ctx.strokeStyle="#4d4d4d"; ctx.fillStyle="#4d4d4d";
-    angle=angle+Math.PI/2; tx=tx+w*Math.cos(angle); ty=ty+w*Math.sin(angle);
-    ctx.lineTo(tx,ty);
-  //Drawing an isosceles triangle of sides proportional to 2:7:2
-    angle=angle-1.849096; tx=tx+w*3.5*Math.cos(angle); ty=ty+w*3.5*Math.sin(angle);
-    ctx.lineTo(tx,ty);
-    angle=angle-2.584993; tx=tx+w*3.5*Math.cos(angle); ty=ty+w*3.5*Math.sin(angle);
-    ctx.lineTo(tx,ty);
-    angle=angle-1.849096; tx=tx+w*Math.cos(angle); ty=ty+w*Math.sin(angle);
-    ctx.lineTo(tx,ty);
-    ctx.stroke(); ctx.fill();
+    $.each(sensingAndPerceptionVertices, function (i, vertex) {
+      var x = ((vertex.value.x.value - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+      var y = (floorPlanImage.height - ((vertex.value.y.value - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(x-3, y-3, 6, 6);
+      sensingAndPerceptionVerticesTooltips.push({
+        x: x-3,
+        y: y-3,
+        tip: "Vertex: " + vertex.value.name.value + " (UUID: " + vertex.value.uuid.value + ")"
+      });
+    });
+
+    $.each(sensingAndPerceptionAnnotations, function (i, annotation) {
+      var uuid = annotation.value.uuid.value;
+      var name = annotation.value.name.value;
+      var theta = annotation.value.theta.value;
+      var distance = annotation.value.distance.value;
+      var headXMeters = annotation.value.x.value;
+      var headYMeters = annotation.value.y.value;
+      var tailXMeters = headXMeters-distance*Math.cos(theta*Math.PI/180);
+      var tailYMeters = headYMeters-distance*Math.sin(theta*Math.PI/180);
+      var tailX = ((tailXMeters - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+      var tailY = (floorPlanImage.height - ((tailYMeters - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+      var headX = ((headXMeters - xOriginMeters) / floorPlanImageScale) * floorPlanImageToWebPageScale;
+      var headY = (floorPlanImage.height - ((headYMeters - yOriginMeters) / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+      if (distance > 0.1) {
+        drawArrow(ctx, {x: tailX, y: tailY}, {x: headX, y: headY}, 10);
+        sensingAndPerceptionAnnotationsTooltips.push({
+          xSrc: tailX,
+          ySrc: tailY,
+          xDest: headX,
+          yDest: headY,
+          tip: "Annotation: " + name + " (UUID: " + uuid + ")"
+        });
+      }
+    });
+
+    $(targetCanvas).mousemove(function(e) {
+      var canvasOffset = $(targetCanvas).offset();
+      var offsetX = canvasOffset.left;
+      var offsetY = canvasOffset.top - $(window).scrollTop();
+      mouseX = parseInt(e.clientX-offsetX);
+      mouseY = parseInt(e.clientY-offsetY);
+      var hit = false;
+      // check if mouse cursor on a vertex
+      for (var i = 0; i < sensingAndPerceptionVerticesTooltips.length; i++) {
+        var tooltip = sensingAndPerceptionVerticesTooltips[i];
+        var tolerance = 4;
+        var dx = mouseX - tooltip.x;
+        var dy = mouseY - tooltip.y;
+        if (dx * dx + dy * dy < tolerance*tolerance) {
+          $("#spTooltip").html(tooltip.tip);
+          hit = true;
+        }
+      }
+      if (!hit) {
+        // check if mouse cursor on an edge
+        for (var i = 0; i < sensingAndPerceptionEdgesTooltips.length; i++) {
+          var tooltip = sensingAndPerceptionEdgesTooltips[i];
+          var line = { x0: tooltip.xSrc, y0: tooltip.ySrc, x1: tooltip.xDest, y1: tooltip.yDest };
+          var tolerance = 3;
+          if ((line.x0 < line.x1 && mouseX >= line.x0 && mouseX <= line.x1) ||
+              (line.x1 < line.x0 && mouseX >= line.x1 && mouseX <= line.x0) ||
+              (line.x0 == line.x1 && line.y0 < line.y1 && mouseY >= line.y0 && mouseY <= line.y1) ||
+              (line.x0 == line.x1 && line.y1 < line.y0 && mouseY >= line.y1 && mouseY <= line.y0)) {
+            var linepoint = linepointNearestMouse(line, mouseX, mouseY);
+            var dx = mouseX - linepoint.x;
+            var dy = mouseY - linepoint.y;
+            var distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
+            if (distance < tolerance) {
+              $("#spTooltip").html(tooltip.tip);
+              hit = true;
+            }
+          }
+        }
+      }
+      if (!hit) {
+        // check if mouse cursor on an annotation
+        for (var i = 0; i < sensingAndPerceptionAnnotationsTooltips.length; i++) {
+          var tooltip = sensingAndPerceptionAnnotationsTooltips[i];
+          var line = { x0: tooltip.xSrc, y0: tooltip.ySrc, x1: tooltip.xDest, y1: tooltip.yDest };
+          var tolerance = 10;
+          if ((line.x0 < line.x1 && mouseX >= line.x0 && mouseX <= line.x1) ||
+              (line.x1 < line.x0 && mouseX >= line.x1 && mouseX <= line.x0) ||
+              (line.x0 == line.x1 && line.y0 < line.y1 && mouseY >= line.y0 && mouseY <= line.y1) ||
+              (line.x0 == line.x1 && line.y1 < line.y0 && mouseY >= line.y1 && mouseY <= line.y0)) {
+            var linepoint = linepointNearestMouse(line, mouseX, mouseY);
+            var dx = mouseX - linepoint.x;
+            var dy = mouseY - linepoint.y;
+            var distance = Math.abs(Math.sqrt(dx * dx + dy * dy));
+            if (distance < tolerance) {
+              $("#spTooltip").html(tooltip.tip);
+              hit = true;
+            }
+          }
+        }
+      }
+      // mouse cursor not on a vertex or and edge
+      if (!hit) {
+        $("#spTooltip").html("");
+      }
+    });
+  } else {
+    $(targetCanvas).off('mousemove');
+  }
+
+  var originScaleCanvas = $("#overviewFloorplanOriginScale")[0];
+  var ctx2 = originScaleCanvas.getContext("2d");
+  $("#overviewFloorplanOriginScale").attr('width', parentWidth-30);
+  $("#overviewFloorplanOriginScale").attr('height', 12);
+  var scaleText = "1 m";
+  var scaleDistance = ((1 / floorPlanImageScale)) * floorPlanImageToWebPageScale;
+
+  ctx2.beginPath();
+  ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 10);
+  ctx2.lineTo(originScaleCanvas.width-20, 10);
+  ctx2.stroke();
+  ctx2.beginPath();
+  ctx2.moveTo(originScaleCanvas.width-20, 0);
+  ctx2.lineTo(originScaleCanvas.width-20, 10);
+  ctx2.stroke();
+  ctx2.beginPath();
+  ctx2.moveTo(originScaleCanvas.width-20-scaleDistance, 0);
+  ctx2.lineTo(originScaleCanvas.width-20-scaleDistance, 10);
+  ctx2.stroke();
+  ctx2.font = "12px";
+  ctx2.fillStyle = "#000000";
+  ctx2.fillText(scaleText, originScaleCanvas.width-20-scaleDistance-20, 10);
+
+  var xOrigin = floorPlanImageXOffset * floorPlanImageToWebPageScale;
+  var yOrigin = (img.height - floorPlanImageYOffset) * floorPlanImageToWebPageScale;
+  ctx.lineWidth = 1;
+
+  if (xOrigin <= canvas.width / 2 && yOrigin <= canvas.height / 2) {  // top left corner -> draw zero point information below on the right side
+    ctx.fillStyle = "blue";
+    ctx.strokeStyle = "blue";
+    ctx.beginPath();
+    ctx.moveTo(xOrigin+1, yOrigin+1);
+    ctx.lineTo(xOrigin+1, yOrigin+8);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(xOrigin+1, yOrigin+1);
+    ctx.lineTo(xOrigin+8, yOrigin+1);
+    ctx.stroke();
+    ctx.font = "12px";
+    ctx.textBaseline = "top";
+    ctx.fillText("0,0", xOrigin+5, yOrigin+5);
+  }
+  else if (xOrigin <= canvas.width / 2 && yOrigin >= canvas.height / 2) {
+    ctx.fillStyle = "blue";
+    ctx.strokeStyle = "blue";
+    ctx.beginPath();
+    ctx.moveTo(xOrigin+1, yOrigin-1);
+    ctx.lineTo(xOrigin+1, yOrigin-8);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(xOrigin+1, yOrigin-1);
+    ctx.lineTo(xOrigin+8, yOrigin-1);
+    ctx.stroke();
+    ctx.font = "12px";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("0,0", xOrigin+5, yOrigin-5);
+  }
+  else if (xOrigin >= canvas.width / 2 && yOrigin <= canvas.height / 2) {  // top right corner -> draw zero point information below on the left side
+    ctx.fillStyle = "blue";
+    ctx.strokeStyle = "blue";
+    ctx.beginPath();
+    ctx.moveTo(xOrigin-1, yOrigin+1);
+    ctx.lineTo(xOrigin-1, yOrigin+8);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(xOrigin-1, yOrigin+1);
+    ctx.lineTo(xOrigin-8, yOrigin+1);
+    ctx.stroke();
+    ctx.font = "12px";
+    ctx.textBaseline = "top";
+    ctx.fillText("0,0", xOrigin-20, yOrigin+5);
+  }
+  else if (xOrigin >= canvas.width / 2 && yOrigin >= canvas.height / 2) {
+    ctx.fillStyle = "blue";
+    ctx.strokeStyle = "blue";
+    ctx.beginPath();
+    ctx.moveTo(xOrigin-1, yOrigin-1);
+    ctx.lineTo(xOrigin-1, yOrigin-8);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(xOrigin-1, yOrigin-1);
+    ctx.lineTo(xOrigin-8, yOrigin-1);
+    ctx.stroke();
+    ctx.font = "12px";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("0,0", xOrigin-20, yOrigin-5);
+  }
 }
-*/
+
+function linepointNearestMouse(line, x, y) {
+  lerp = function(a, b, x) {
+    return (a + x * (b - a));
+  };
+  var dx = line.x1 - line.x0;
+  var dy = line.y1 - line.y0;
+  var t = ((x - line.x0) * dx + (y - line.y0) * dy) / (dx * dx + dy * dy);
+  var lineX = lerp(line.x0, line.x1, t);
+  var lineY = lerp(line.y0, line.y1, t);
+  return ({
+    x: lineX,
+    y: lineY
+  });
+};
 
 function drawArrow(ctx, p1, p2, size) {
   var angle = Math.atan2((p2.y - p1.y) , (p2.x - p1.x));
@@ -321,7 +267,7 @@ function drawArrow(ctx, p1, p2, size) {
   ctx.rotate(angle);
 
   // line
-  ctx.beginPath();	
+  ctx.beginPath();
   ctx.moveTo(0, 0);
   ctx.lineTo(hyp - size, 0);
   ctx.strokeStyle = "#FFDC00";
@@ -340,219 +286,176 @@ function drawArrow(ctx, p1, p2, size) {
   ctx.restore();
 }
 
-/*
-function drawArrow(ctx, fromx, fromy, tox, toy) {
-	var headlen = 10;
-
-	var angle = Math.atan2(toy-fromy, tox-fromx);
-
-	//starting path of the arrow from the start square to the end square and drawing the stroke
-	ctx.beginPath();
-	ctx.moveTo(fromx, fromy);
-	ctx.lineTo(tox, toy);
-	ctx.strokeStyle = "yellow";
-	ctx.lineWidth = 10;
-	ctx.stroke();
-
-	//starting a new path from the head of the arrow to one of the sides of the point
-	ctx.beginPath();
-	ctx.moveTo(tox, toy);
-	ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
-
-	//path from the side point of the arrow, to the other side point
-	ctx.lineTo(tox-headlen*Math.cos(angle+Math.PI/7),toy-headlen*Math.sin(angle+Math.PI/7));
-
-	//path from the side point back to the tip of the arrow, and then again to the opposite side point
-	ctx.lineTo(tox, toy);
-	ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
-
-	//draws the paths created above
-	//ctx.strokeStyle = "yellow";
-	//ctx.lineWidth = 10;
-	ctx.stroke();
-	ctx.fillStyle = "yellow";
-	ctx.fill();
-}
-*/
-
 function drawRobotsOnCanvas() {
-	var canvas = $("#overviewFloorplan")[0];
-	var ctx = canvas.getContext("2d");	
-	$.each(robotsOnOverview, function(key, value) {					
-		var pointSize = 10;			
-		ctx.fillStyle = "blue";
-		ctx.beginPath();	
-		var x = ((value.x / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
-		var y = (floorPlanImage.height - ((value.y / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;			
-		ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
-		ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';		
-		ctx.fill();	
-
-		var label = value.index.toString();
-		ctx.font = "12px";
-		ctx.fillStyle = "#ffffff";
-		var xLabelLocation = -3;
-		var yLabelLocation = 3;
-		if (label.length > 1) {
-			xLabelLocation = -6;
-		}			
-		ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);		
-	});	
+  var canvas = $("#overviewFloorplan")[0];
+  var ctx = canvas.getContext("2d");
+  $.each(robotsOnOverview, function(key, value) {
+    var pointSize = 10;
+    ctx.fillStyle = "blue";
+    ctx.beginPath();
+    var x = ((value.x / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
+    var y = (floorPlanImage.height - ((value.y / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;
+    ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
+    ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+    ctx.fill();
+    var label = value.index.toString();
+    ctx.font = "12px";
+    ctx.fillStyle = "#ffffff";
+    var xLabelLocation = -3;
+    var yLabelLocation = 3;
+    if (label.length > 1) {
+      xLabelLocation = -6;
+    }
+    ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);
+  });
 }
 
 function drawSensorsOnCanvas() {
-	var canvas = $("#overviewFloorplan")[0];
-	var ctx = canvas.getContext("2d");	
-	$.each(sensorsOnOverview, function(key, value) {
-		if (value.x > 0 && value.y > 0) {
-		
-			var pointSize = 10;			
-			ctx.fillStyle = "green";
-			ctx.beginPath();
-			var x = ((value.x / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
-			var y = (floorPlanImage.height - ((value.y / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;			
-			ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
-			ctx.fillStyle = 'rgba(0, 100, 0, 0.5)';		
-			ctx.fill();
-
-			var label = value.index.toString();
-			ctx.font = "12px";
-			ctx.fillStyle = "#ffffff";
-			var xLabelLocation = -3;
-			var yLabelLocation = 3;
-			if (label.length > 1) {
-				xLabelLocation = -6;
-			}			
-			ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);		
-		}
-	});
+  var canvas = $("#overviewFloorplan")[0];
+  var ctx = canvas.getContext("2d");
+  $.each(sensorsOnOverview, function(key, value) {
+    if (value.x > 0 && value.y > 0) {
+      var pointSize = 10;
+      ctx.fillStyle = "green";
+      ctx.beginPath();
+      var x = ((value.x / floorPlanImageScale) + floorPlanImageXOffset) * floorPlanImageToWebPageScale;
+      var y = (floorPlanImage.height - ((value.y / floorPlanImageScale) + floorPlanImageYOffset)) * floorPlanImageToWebPageScale;
+      ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
+      ctx.fillStyle = 'rgba(0, 100, 0, 0.5)';
+      ctx.fill();
+      var label = value.index.toString();
+      ctx.font = "12px";
+      ctx.fillStyle = "#ffffff";
+      var xLabelLocation = -3;
+      var yLabelLocation = 3;
+      if (label.length > 1) {
+        xLabelLocation = -6;
+      }
+      ctx.fillText(label, x+xLabelLocation, y+yLabelLocation);
+    }
+  });
 }
 
 function updateSPGraphOnCanvas() {
-	if (typeof floorPlanImage !== "undefined") {
-		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
-		drawRobotsOnCanvas();
-		drawSensorsOnCanvas();
-	}
+  if (typeof floorPlanImage !== "undefined") {
+    drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");
+    drawRobotsOnCanvas();
+    drawSensorsOnCanvas();
+  }
 }
 
 function updateRobotsOnOverview(notification) {
-        //console.log("Received Robot notif: " + JSON.stringify(notification));
-	if (typeof floorPlanImage !== "undefined") {
-
-		/*var temp = 1;*/
-		$.each(notification.data, function () {		
-			var dObj = this.current_motion.value;
-                        //console.log("DOBJ: "+ dObj);
-			//console.log("stringify DOBJ: "+ JSON.stringify(dObj));
-			var ran_status = "unknown";
-			//if (dObj.ran_status.value == 0) ran_status = "waiting";
-			//else if (dObj.ran_status.value == 1) ran_status = "moving";
-			//else if (dObj.ran_status.value == 2) ran_status = "acting";
-			var quaternion_x = dObj.current_position.value.pose.value.orientation.value.x.value;
-			var quaternion_y = dObj.current_position.value.pose.value.orientation.value.y.value;
-			var quaternion_z = dObj.current_position.value.pose.value.orientation.value.z.value;
-			var quaternion_w = dObj.current_position.value.pose.value.orientation.value.w.value;
-			var quaternion = new THREE.Quaternion().set(quaternion_x, quaternion_y, quaternion_z, quaternion_w);
-			var euler = new THREE.Euler().setFromQuaternion(quaternion);
-			var theta = euler.z;
-			var objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
-			if (objIndex == -1) {
-				var robotIndex = robotsOnOverview.length + 1;
-				robotsOnOverview.push({index: robotIndex, id: this.id, ran_status: ran_status, x: dObj.current_position.value.pose.value.position.value.x.value, y: dObj.current_position.value.pose.value.position.value.y.value, theta: theta});
-			} else {	
-				/*robotsOnOverview[objIndex].index = temp;*/
-				robotsOnOverview[objIndex].ran_status = ran_status;			
-				robotsOnOverview[objIndex].x = dObj.current_position.value.pose.value.position.value.x.value;		
-				robotsOnOverview[objIndex].y = dObj.current_position.value.pose.value.position.value.y.value;		
-				robotsOnOverview[objIndex].theta = theta;						
-			}
-			/*temp++;*/
-		});
-
-		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
-		drawRobotsOnCanvas();
-		drawSensorsOnCanvas();
-		$("#robotsOverviewTbody").empty();
-		$.each(robotsOnOverview, function(key, value) {		
-			$("#robotsOverviewTbody").append("<tr bgcolor=\"white\"><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.ran_status + "</td><td>" + (value.x).toFixed(3) + " m</td><td>" + (value.y).toFixed(3) + " m</td><td>" + Math.round(value.theta * (180/Math.PI) * 100) / 100 + "&#176;</td></tr>");
-		});	
-	}
+  //console.log("Received Robot notif: " + JSON.stringify(notification));
+  if (typeof floorPlanImage !== "undefined") {
+    $.each(notification.data, function () {
+      var dObj = this.current_motion.value;
+      //console.log("DOBJ: "+ dObj);
+      //console.log("stringify DOBJ: "+ JSON.stringify(dObj));
+      var ran_status = "unknown";
+      //if (dObj.ran_status.value == 0) ran_status = "waiting";
+      //else if (dObj.ran_status.value == 1) ran_status = "moving";
+      //else if (dObj.ran_status.value == 2) ran_status = "acting";
+      var quaternion_x = dObj.current_position.value.pose.value.orientation.value.x.value;
+      var quaternion_y = dObj.current_position.value.pose.value.orientation.value.y.value;
+      var quaternion_z = dObj.current_position.value.pose.value.orientation.value.z.value;
+      var quaternion_w = dObj.current_position.value.pose.value.orientation.value.w.value;
+      var quaternion = new THREE.Quaternion().set(quaternion_x, quaternion_y, quaternion_z, quaternion_w);
+      var euler = new THREE.Euler().setFromQuaternion(quaternion);
+      var theta = euler.z;
+      var objIndex = robotsOnOverview.findIndex((obj => obj.id == this.id));
+      if (objIndex == -1) {
+        var robotIndex = robotsOnOverview.length + 1;
+        robotsOnOverview.push({index: robotIndex, id: this.id, ran_status: ran_status, x: dObj.current_position.value.pose.value.position.value.x.value, y: dObj.current_position.value.pose.value.position.value.y.value, theta: theta});
+      }
+      else {
+        robotsOnOverview[objIndex].ran_status = ran_status;
+        robotsOnOverview[objIndex].x = dObj.current_position.value.pose.value.position.value.x.value;
+        robotsOnOverview[objIndex].y = dObj.current_position.value.pose.value.position.value.y.value;
+        robotsOnOverview[objIndex].theta = theta;
+      }
+    });
+    drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");
+    drawRobotsOnCanvas();
+    drawSensorsOnCanvas();
+    $("#robotsOverviewTbody").empty();
+    $.each(robotsOnOverview, function(key, value) {
+      $("#robotsOverviewTbody").append("<tr bgcolor=\"white\"><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.ran_status + "</td><td>" + (value.x).toFixed(3) + " m</td><td>" + (value.y).toFixed(3) + " m</td><td>" + Math.round(value.theta * (180/Math.PI) * 100) / 100 + "&#176;</td></tr>");
+    });
+  }
 }
 
-function updateSensorsOnOverview(notification) {										   
-	
-	if (typeof floorPlanImage !== "undefined") {
-	
-		$.each(notification.data, function (i, entity) {	
-			var sensorValue = "";
-			if (entity.readings !== undefined && entity.readings.value !== undefined && entity.readings.value[0].value !== undefined && entity.readings.value[0].value.reading !== undefined && entity.readings.value[0].value.reading.value !== undefined) {
-				sensorValue = entity.readings.value[0].value.reading.value;
-			}
-			if (entity.sensorType.value == ON_OFF_SENSOR) {
-				$.ajax({
-					type: "GET",
-					url: "./api/hmibutton",
-					dataType: "json",
-					success: function (data) {			
-						$(data).each(function(i, item) {
-							if (item.ocb_id == entity.sensorID.value) {					
-								var objIndex = sensorsOnOverview.findIndex((obj => obj.id == item.text));
-								if (objIndex == -1) {
-									sensorsOnOverview.push({index: sensorsOnOverview.length+1, id: item.text, type: entity.sensorType.value, value: sensorValue, x: -1, y: -1});
-								} else {
-									sensorsOnOverview[objIndex].id = item.text;			
-									sensorsOnOverview[objIndex].type = entity.sensorType.value;	
-									sensorsOnOverview[objIndex].value = sensorValue;	
-								}							
-							}
-						});
-					    updateSensorsTable();
-					}
-				});
-			} else {	
-				var objIndex = sensorsOnOverview.findIndex((obj => obj.id == entity.sensorID.value));
-				if (objIndex == -1) {
-					sensorsOnOverview.push({index: sensorsOnOverview.length+1, id: entity.sensorID.value, type: entity.sensorType.value, value: sensorValue, x: -1, y: -1});
-				} else {
-					sensorsOnOverview[objIndex].id = entity.sensorID.value;			
-					sensorsOnOverview[objIndex].type = entity.sensorType.value;	
-					sensorsOnOverview[objIndex].value = sensorValue;						
-				}
-			    updateSensorsTable();
-			}
-		});
-		
-		drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
-		drawRobotsOnCanvas();
-		drawSensorsOnCanvas();
-	}
+function updateSensorsOnOverview(notification) {
+  if (typeof floorPlanImage !== "undefined") {
+    $.each(notification.data, function (i, entity) {
+      var sensorValue = "";
+      if (entity.readings !== undefined && entity.readings.value !== undefined && entity.readings.value[0].value !== undefined && entity.readings.value[0].value.reading !== undefined && entity.readings.value[0].value.reading.value !== undefined) {
+        sensorValue = entity.readings.value[0].value.reading.value;
+      }
+      if (entity.sensorType.value == ON_OFF_SENSOR) {
+        $.ajax({
+          type: "GET",
+          url: "./api/hmibutton",
+          dataType: "json",
+          success: function (data) {
+            $(data).each(function(i, item) {
+              if (item.ocb_id == entity.sensorID.value) {
+                var objIndex = sensorsOnOverview.findIndex((obj => obj.id == item.text));
+                if (objIndex == -1) {
+                  sensorsOnOverview.push({index: sensorsOnOverview.length+1, id: item.text, type: entity.sensorType.value, value: sensorValue, x: -1, y: -1});
+                }
+                else {
+                  sensorsOnOverview[objIndex].id = item.text;
+                  sensorsOnOverview[objIndex].type = entity.sensorType.value;
+                  sensorsOnOverview[objIndex].value = sensorValue;
+                }
+              }
+            });
+            updateSensorsTable();
+          }
+        });
+      }
+      else {
+        var objIndex = sensorsOnOverview.findIndex((obj => obj.id == entity.sensorID.value));
+        if (objIndex == -1) {
+          sensorsOnOverview.push({index: sensorsOnOverview.length+1, id: entity.sensorID.value, type: entity.sensorType.value, value: sensorValue, x: -1, y: -1});
+        }
+        else {
+          sensorsOnOverview[objIndex].id = entity.sensorID.value;
+          sensorsOnOverview[objIndex].type = entity.sensorType.value;
+          sensorsOnOverview[objIndex].value = sensorValue;
+        }
+        updateSensorsTable();
+      }
+    });
+    drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");
+    drawRobotsOnCanvas();
+    drawSensorsOnCanvas();
+  }
 }
 
 function updateSensorsTable() {
-	$("#sensorsOverviewTbody").empty();
-	$.each(sensorsOnOverview, function(key, value) {		
-		$("#sensorsOverviewTbody").append("<tr bgcolor=\"white\"><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.type + "</td><td>" + value.value + "</td><!--<td>" + value.x + " m</td><td>" + value.y + " m</td><td style=\"text-align:center\"><input type=\"radio\" name=\"sensorLocation\" id=\"selectedSensor_" + value.id + "\" value=\"selectedSensor_" + value.id + "\"></td>--></tr>");			
-	});
+  $("#sensorsOverviewTbody").empty();
+  $.each(sensorsOnOverview, function(key, value) {
+    $("#sensorsOverviewTbody").append("<tr bgcolor=\"white\"><td>" + value.index + "</td><td>" + value.id + "</td><td>" + value.type + "</td><td>" + value.value + "</td><!--<td>" + value.x + " m</td><td>" + value.y + " m</td><td style=\"text-align:center\"><input type=\"radio\" name=\"sensorLocation\" id=\"selectedSensor_" + value.id + "\" value=\"selectedSensor_" + value.id + "\"></td>--></tr>");
+  });
 }
 
-function setSensorLocation(event) {	
-	if ($("input[name=\"sensorLocation\"]:checked").val()) {
-		var canvas = $("#overviewFloorplan")[0];
-		var ctx = canvas.getContext("2d");	
-		var rect = canvas.getBoundingClientRect();
-		var sensorId = $("input[type=radio][name=sensorLocation]:checked").attr("id").replace("selectedSensor_", "");	
-		var x = ((event.clientX - rect.left) / floorPlanImageToWebPageScale - floorPlanImageXOffset) * floorPlanImageScale;
-		var y = (floorPlanImageYOffset + floorPlanImage.height - (event.clientY - rect.top) / floorPlanImageToWebPageScale) * floorPlanImageScale;
-		var objIndex = sensorsOnOverview.findIndex((obj => obj.id == sensorId));
-		if (objIndex != -1) {
-			sensorsOnOverview[objIndex].x = Math.round(x);
-			sensorsOnOverview[objIndex].y = Math.round(y);	
-			drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");	
-			drawRobotsOnCanvas();	
-			drawSensorsOnCanvas();
-			updateSensorsTable();			
-		}
-	}
-		
+function setSensorLocation(event) {
+  if ($("input[name=\"sensorLocation\"]:checked").val()) {
+    var canvas = $("#overviewFloorplan")[0];
+    var ctx = canvas.getContext("2d");
+    var rect = canvas.getBoundingClientRect();
+    var sensorId = $("input[type=radio][name=sensorLocation]:checked").attr("id").replace("selectedSensor_", "");
+    var x = ((event.clientX - rect.left) / floorPlanImageToWebPageScale - floorPlanImageXOffset) * floorPlanImageScale;
+    var y = (floorPlanImageYOffset + floorPlanImage.height - (event.clientY - rect.top) / floorPlanImageToWebPageScale) * floorPlanImageScale;
+    var objIndex = sensorsOnOverview.findIndex((obj => obj.id == sensorId));
+    if (objIndex != -1) {
+      sensorsOnOverview[objIndex].x = Math.round(x);
+      sensorsOnOverview[objIndex].y = Math.round(y);
+      drawImageOnCanvas(floorPlanImage, "#overviewFloorplan");
+      drawRobotsOnCanvas();
+      drawSensorsOnCanvas();
+      updateSensorsTable();
+    }
+  }
 }
