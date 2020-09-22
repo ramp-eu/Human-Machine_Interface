@@ -8,105 +8,217 @@ function initSensorData(ngsiConnection) {
       if (entity.sensorType.value == ON_OFF_SENSOR) {
         steppedLine = true;
       }
-      $.each(entity.readings.value, function(i, sensorValue) {
+      $.each(entity.readings.value, function(sensorIndex, sensorValue) {
         if (sensorValue.value.reading.type == "Boolean" || sensorValue.value.reading.type == "boolean") {
           steppedLine = true;
         }
-      });
-      var chart = null;
-      var sensorCurrentValue = "";
-      if (entity.readings !== undefined && entity.readings.value !== undefined && entity.readings.value[0].value !== undefined && entity.readings.value[0].value.reading !== undefined && entity.readings.value[0].value.reading.value !== undefined) {
-        sensorCurrentValue = entity.readings.value[0].value.reading.value;
-      }
-      if (entity.sensorType.value == ON_OFF_SENSOR) {
-        $.ajax({
-          type: "GET",
-          url: "./api/hmibutton",
-          dataType: "json",
-          success: function (data) {
-            $(data).each(function(i, item) {
-              if (item.ocb_id == entity.sensorID.value) {
-                $("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + item.text + " | Type: " + entity.sensorType.value + " | <span id=\"\currentValue_" + entity.sensorID.value + "\">Current value: " + sensorCurrentValue + "</span></div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
-                var chartCanvas = document.getElementById(entity.sensorID.value + "_Chart");
-                var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
-                var chartOptions = {
-                  legend: {
-                    display: false
-                  },
-                  scales: {
-                    yAxes: [
-                      {
-                        ticks: {
-                          stepSize: 1
-                        }
-                      }
-                    ],
-                    xAxes: [
-                      {
-                        type: 'realtime',
-                        time: {
-                          unit: 'minute',
-                          unitStepSize: 1,
-                          displayFormats: { 'minute': 'HH:mm' }
-                        },
-                        realtime: {
-                          duration: 20000,    // data in the past 20000 ms will be displayed
-                          refresh: 1000,      // onRefresh callback will be called every 1000 ms
-                          delay: 1000,        // delay of 1000 ms, so upcoming values are known before plotting a line
-                          pause: false,       // chart is not paused
-                          ttl: 60000,     // data will be automatically deleted as it disappears off the chart
-                          // a callback to update datasets
-                          onRefresh: function(chart) {}
-                        }
-                      }
-                    ]
-                  },
-                  plugins: {
-                    streaming: {            // per-chart option
-                      frameRate: 30       // chart is drawn 30 times every second
-                    }
-                  },
-                  pan: {
-                    enabled: true,    // Enable panning
-                    mode: 'x',        // Allow panning in the x direction
-                    rangeMin: {
-                      x: null       // Min value of the delay option
+        var sensorID = "";
+        if ((entity.readings.value).length > 1) {
+          sensorID = entity.sensorID.value + "_" + sensorIndex.toString();
+        }
+        else {
+          sensorID = entity.sensorID.value;
+        }
+        var chart = null;
+        var sensorCurrentValue = "";
+        if (entity.readings !== undefined && entity.readings.value !== undefined &&
+            entity.readings.value[sensorIndex].value !== undefined &&
+            entity.readings.value[sensorIndex].value.reading !== undefined &&
+            entity.readings.value[sensorIndex].value.reading.value !== undefined) {
+          sensorCurrentValue = entity.readings.value[sensorIndex].value.reading.value;
+        }
+        var units = entity.units.value;
+
+        if (entity.sensorType.value == ON_OFF_SENSOR) {
+          $.ajax({
+            type: "GET",
+            url: "./api/hmibutton",
+            dataType: "json",
+            success: function (data) {
+              $(data).each(function(i, item) {
+                if (item.ocb_id == entity.sensorID.value) {
+                  $("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + sensorID + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + item.text + " | Type: " + entity.sensorType.value + " | <span id=\"\currentValue_" + sensorID + "\">Current value: " + sensorCurrentValue + " (" + units + ")</span></div><div class=\"panel-body\"><canvas id=\"" + sensorID + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+                  var chartCanvas = document.getElementById(sensorID + "_Chart");
+                  var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
+                  var chartOptions = {
+                    legend: {
+                      display: false
                     },
-                    rangeMax: {
-                      x: null       // Max value of the delay option
-                    }
-                  },
-                  zoom: {
-                    enabled: true,    // Enable zooming
-                    mode: 'x',        // Allow zooming in the x direction
-                    rangeMin: {
-                      x: null       // Min value of the duration option
+                    scales: {
+                      yAxes: [
+                        {
+                          ticks: {
+                            stepSize: 1
+                          }
+                        }
+                      ],
+                      xAxes: [
+                        {
+                          type: 'realtime',
+                          time: {
+                            unit: 'minute',
+                            unitStepSize: 1,
+                            displayFormats: { 'minute': 'HH:mm' }
+                          },
+                          realtime: {
+                            duration: 20000,    // data in the past 20000 ms will be displayed
+                            refresh: 1000,      // onRefresh callback will be called every 1000 ms
+                            delay: 1000,        // delay of 1000 ms, so upcoming values are known before plotting a line
+                            pause: false,       // chart is not paused
+                            ttl: 60000,     // data will be automatically deleted as it disappears off the chart
+                            // a callback to update datasets
+                            onRefresh: function(chart) {}
+                          }
+                        }
+                      ]
                     },
-                    rangeMax: {
-                      x: null       // Max value of the duration option
+                    plugins: {
+                      streaming: {            // per-chart option
+                        frameRate: 30       // chart is drawn 30 times every second
+                      }
+                    },
+                    pan: {
+                      enabled: true,    // Enable panning
+                      mode: 'x',        // Allow panning in the x direction
+                      rangeMin: {
+                        x: null       // Min value of the delay option
+                      },
+                      rangeMax: {
+                        x: null       // Max value of the delay option
+                      }
+                    },
+                    zoom: {
+                      enabled: true,    // Enable zooming
+                      mode: 'x',        // Allow zooming in the x direction
+                      rangeMin: {
+                        x: null       // Min value of the duration option
+                      },
+                      rangeMax: {
+                        x: null       // Max value of the duration option
+                      }
                     }
-                  }
-                };
-                chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
-                sensorDataCharts.set(entity.sensorID.value, chart);
-                if (typeof entity.modifiedTime !== "undefined") {
-                  var modifiedTime = entity.modifiedTime.value;
-                  $.each(entity.readings.value, function () {
-                    chart.data.labels.push(modifiedTime);
-                    chart.data.datasets.forEach((dataset) => {
-                      dataset.data.push(this.value.reading.value); // add new value
-                    });
-                    //chart.update();
+                  };
+                  chart = new Chart(chartCanvas, { type: 'line', data: chartInputData, options: chartOptions });
+                  sensorDataCharts.set(sensorID, chart);
+                  if (typeof entity.modifiedTime !== "undefined") {
+                    chart.data.labels.push(entity.modifiedTime.value);
+                    chart.data.datasets[0].data.push(sensorCurrentValue); // add new value
                     chart.update({preservation: true});
-                  });
+                  }
                 }
+              })
+            }
+          });
+        } else {
+          $("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + sensorID + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + sensorID + " | Type: " + entity.sensorType.value + " | <span id=\"\currentValue_" + sensorID + "\">Current value: " + sensorCurrentValue + " (" + units + ")</span></div><div class=\"panel-body\"><canvas id=\"" + sensorID + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+          var chartCanvas = document.getElementById(sensorID + "_Chart");
+          var chartInputData = {labels: [], datasets: [{data: [], steppedLine: steppedLine, fill: false, borderColor: "#0000ff", pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
+          var chartOptions = {
+            legend: {
+              display: false
+            },
+            scales: {
+              yAxes: [
+                {
+                  ticks: {
+                    stepSize: 1
+                  }
+                }
+              ],
+              xAxes: [
+                {
+                  type: 'realtime',
+                  time: {
+                    unit: 'minute',
+                    unitStepSize: 1,
+                    displayFormats: { 'minute': 'HH:mm' }
+                  },
+                  realtime: {
+                    duration: 20000,    // data in the past 20000 ms will be displayed
+                    refresh: 1000,      // onRefresh callback will be called every 1000 ms
+                    delay: 1000,        // delay of 1000 ms, so upcoming values are known before plotting a line
+                    pause: false,       // chart is not paused
+                    ttl: 60000,     // data will be automatically deleted as it disappears off the chart
+                    // a callback to update datasets
+                    onRefresh: function(chart) {}
+                  }
+                }
+              ]
+            },
+            plugins: {
+              streaming: {            // per-chart option
+                frameRate: 30       // chart is drawn 30 times every second
               }
-            })
+            },
+            pan: {
+              enabled: true,    // Enable panning
+              mode: 'x',        // Allow panning in the x direction
+              rangeMin: {
+                x: null       // Min value of the delay option
+              },
+              rangeMax: {
+                x: null       // Max value of the delay option
+              }
+            },
+            zoom: {
+              enabled: true,    // Enable zooming
+              mode: 'x',        // Allow zooming in the x direction
+              rangeMin: {
+                x: null       // Min value of the duration option
+              },
+              rangeMax: {
+                x: null       // Max value of the duration option
+              }
+            }
+          };
+          chart = new Chart(chartCanvas, { type: 'line', data: chartInputData, options: chartOptions });
+          sensorDataCharts.set(sensorID, chart);
+          if (typeof entity.modifiedTime !== "undefined") {
+            chart.data.labels.push(entity.modifiedTime.value);
+            chart.data.datasets[0].data.push(sensorCurrentValue); // add new value
+            chart.update({preservation: true});
           }
-        });
-      } else {
-        $("#sensorDataTab").append("<div id=\"SensorDataGraphContainer_" + entity.sensorID.value + "\" class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + entity.sensorID.value + " | Type: " + entity.sensorType.value + " | <span id=\"\currentValue_" + entity.sensorID.value + "\">Current value: " + sensorCurrentValue + "</span></div><div class=\"panel-body\"><canvas id=\"" + entity.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
-        var chartCanvas = document.getElementById(entity.sensorID.value + "_Chart");
+        }
+      });
+    });
+  });
+}
+
+function updateSensorData(notification) {
+  //console.log("Received notification: " + JSON.stringify(notification));
+  $.each(notification.data, function () {
+
+
+    var modifiedTime = this.modifiedTime.value;
+    var entitySensorID = this.sensorID.value;
+    var sensorsLength = (this.readings.value).length;
+    var steppedLine = false;
+    var sensorType = this.sensorType.value;
+    if (sensorType == ON_OFF_SENSOR) {
+      steppedLine = true;
+    }
+    var units = this.units.value;
+
+    $.each(this.readings.value, function(sensorIndex, sensorValue) {
+      if (sensorsLength > 1) {
+        sensorID = entitySensorID + "_" + sensorIndex.toString();
+      }
+      else {
+        sensorID = entitySensorID;
+      }
+      var chart = sensorDataCharts.get(sensorID);
+      var sensorCurrentValue = "";
+      if (sensorValue.value !== undefined &&
+          sensorValue.value.reading !== undefined &&
+          sensorValue.value.reading.value !== undefined) {
+        sensorCurrentValue = sensorValue.value.reading.value;
+      }
+      if (typeof chart === "undefined") {
+        if (sensorValue.value.reading.type == "Boolean" || sensorValue.value.reading.type == "boolean") {
+          steppedLine = true;
+        }
+        $("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + sensorID + " | Type: " + sensorType + " | <span id=\"\currentValue_" + sensorID + "\">Current value: " + sensorCurrentValue + " (" + units + ")</span></div><div class=\"panel-body\"><canvas id=\"" + sensorID + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
+        var chartCanvas = document.getElementById(sensorID + "_Chart");
         var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
         var chartOptions = {
           legend: {
@@ -126,7 +238,9 @@ function initSensorData(ngsiConnection) {
                 time: {
                   unit: 'minute',
                   unitStepSize: 1,
-                  displayFormats: { 'minute': 'HH:mm' }
+                  displayFormats: {
+                    'minute': 'HH:mm'
+                  }
                 },
                 realtime: {
                   duration: 20000,    // data in the past 20000 ms will be displayed
@@ -167,118 +281,12 @@ function initSensorData(ngsiConnection) {
           }
         };
         chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
-        sensorDataCharts.set(entity.sensorID.value, chart);
-        if (typeof entity.modifiedTime !== "undefined") {
-          var modifiedTime = entity.modifiedTime.value;
-          $.each(entity.readings.value, function () {
-            chart.data.labels.push(modifiedTime);
-            chart.data.datasets.forEach((dataset) => {
-              dataset.data.push(this.value.reading.value); // add new value
-            });
-            //chart.update();
-            chart.update({preservation: true});
-          });
-        }
+        sensorDataCharts.set(sensorID, chart);
       }
+      chart.data.labels.push(modifiedTime);
+      chart.data.datasets[0].data.push(sensorCurrentValue); // add new value
+      chart.update({preservation: true});
+      $("#currentValue_" + sensorID).html("Current value: " + sensorCurrentValue + " (" + units + ")");
     });
-  });
-}
-
-function updateSensorData(notification) {
-  //console.log("Received notification: " + JSON.stringify(notification));
-  $.each(notification.data, function () {
-    var chart = sensorDataCharts.get(this.sensorID.value);
-    var sensorCurrentValue = "";
-    if (this.readings !== undefined && this.readings.value !== undefined && this.readings.value[0].value !== undefined && this.readings.value[0].value.reading !== undefined && this.readings.value[0].value.reading.value !== undefined) {
-      sensorCurrentValue = this.readings.value[0].value.reading.value;
-    }
-    if (typeof chart === "undefined") {
-      var steppedLine = false;
-      if (this.sensorType.value == ON_OFF_SENSOR) {
-        steppedLine = true;
-      }
-      $.each(this.readings.value, function() {
-        if (this.value.reading.type == "Boolean" || this.value.reading.type == "boolean") {
-          steppedLine = true;
-        }
-      });
-      $("#sensorDataTab").append("<div class=\"panel panel-default\"><div class=\"panel-heading\">Name: " + this.sensorID.value + " | Type: " + this.sensorType.value + " | <span id=\"\currentValue_" + this.sensorID.value + "\">Current value: " + sensorCurrentValue + "</span></div><div class=\"panel-body\"><canvas id=\"" + this.sensorID.value + "_Chart\" width=\"400\" height=\"100\"></canvas></div></div>");
-      var chartCanvas = document.getElementById(this.sensorID.value + "_Chart");
-      var chartInputData = {labels: [], datasets: [{data: [],	steppedLine: steppedLine, fill: false,	borderColor: "#0000ff",	pointBorderColor: "#0000ff", pointBackgroundColor: "#ffffff"}]};
-      var chartOptions = {
-        legend: {
-          display: false
-        },
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                stepSize: 1
-              }
-            }
-          ],
-          xAxes: [
-            {
-              type: 'realtime',
-              time: {
-                unit: 'minute',
-                unitStepSize: 1,
-                displayFormats: {
-                  'minute': 'HH:mm'
-                }
-              },
-              realtime: {
-                duration: 20000,    // data in the past 20000 ms will be displayed
-                refresh: 1000,      // onRefresh callback will be called every 1000 ms
-                delay: 1000,        // delay of 1000 ms, so upcoming values are known before plotting a line
-                pause: false,       // chart is not paused
-                ttl: 60000,     // data will be automatically deleted as it disappears off the chart
-                // a callback to update datasets
-                onRefresh: function(chart) {}
-              }
-            }
-          ]
-        },
-        plugins: {
-          streaming: {            // per-chart option
-            frameRate: 30       // chart is drawn 30 times every second
-          }
-        },
-        pan: {
-          enabled: true,    // Enable panning
-          mode: 'x',        // Allow panning in the x direction
-          rangeMin: {
-            x: null       // Min value of the delay option
-          },
-          rangeMax: {
-            x: null       // Max value of the delay option
-          }
-        },
-        zoom: {
-          enabled: true,    // Enable zooming
-          mode: 'x',        // Allow zooming in the x direction
-          rangeMin: {
-            x: null       // Min value of the duration option
-          },
-          rangeMax: {
-            x: null       // Max value of the duration option
-          }
-        }
-      };
-      chart = new Chart(chartCanvas, { type: 'line',	data: chartInputData, options: chartOptions });
-      sensorDataCharts.set(this.sensorID.value, chart);
-    }
-    if (typeof this.modifiedTime !== "undefined") {
-      var modifiedTime = this.modifiedTime.value;
-      $.each(this.readings.value, function () {
-        chart.data.labels.push(modifiedTime);
-        chart.data.datasets.forEach((dataset) => {
-          dataset.data.push(this.value.reading.value); // add new value
-        });
-        //chart.update();
-        chart.update({preservation: true});
-      });
-    }
-    $("#currentValue_" + this.sensorID.value).html("Current value: " + sensorCurrentValue);
   });
 }
