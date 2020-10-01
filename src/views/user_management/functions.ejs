@@ -43,7 +43,8 @@ function addNewUser() {
             }
           })
           showAndDismissAlert("success", "New user added!", "usersAlert");
-          initSensors(ngsiConnection);
+          //update Control tab's user list
+          updateAssignList();
         }
       });
     }).fail(function(xhr, status, err) {
@@ -62,7 +63,8 @@ function deleteUser(id) {
         success: function(result) {
           $("#updateUser_" + id).remove();
           showAndDismissAlert("success", "User deleted succesfully!", "usersAlert");
-          initSensors(ngsiConnection);
+          //update Control tab's user list
+          updateAssignList();
         },
         error: function(xhr, status, error) {
           var err = eval("(" + xhr.responseText + ")");

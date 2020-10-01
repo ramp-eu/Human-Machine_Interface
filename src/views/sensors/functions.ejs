@@ -102,7 +102,7 @@ function createNewSensor() {
   }
 }
 
-function initSensors(ngsiConnection) {
+function updateAssignList() {
   $.ajax({
     type: "GET",
     url: "./api/user",
@@ -117,6 +117,10 @@ function initSensors(ngsiConnection) {
       })
     }
   });
+}
+
+function initSensors(ngsiConnection) {
+  updateAssignList();
   ngsiConnection.v2.listEntities({type: "SensorAgent"}).then((response) => {
     var entities = response.results;
     $.each(entities, function(i, entity) {
