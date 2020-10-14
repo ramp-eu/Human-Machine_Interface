@@ -26,7 +26,7 @@ function initSensingAndPerception(ngsiConnection) {
         sensingAndPerceptionEdges = edges;
         sensingAndPerceptionVertices = vertices;
       }
-      if (entity.annotations) {
+      if (entity.annotations && entity.annotations.value.annotations.value != "undefined") {
         sensingAndPerceptionAnnotations = entity.annotations.value.annotations.value;
       }
     });
@@ -55,7 +55,7 @@ function updateSensingAndPerception(notification) {
       sensingAndPerceptionEdges = edges;
       sensingAndPerceptionVertices = vertices;
     }
-    if (this.annotations) {
+    if (this.annotations && this.annotations.value.annotations.value != "undefined") {
       sensingAndPerceptionAnnotations = this.annotations.value.annotations.value;
     }
   });

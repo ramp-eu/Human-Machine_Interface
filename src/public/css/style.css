@@ -1,66 +1,63 @@
 /* bootstrap hack: fix content width inside hidden tabs */
 .tab-content > .tab-pane:not(.active),
 .pill-content > .pill-pane:not(.active) {
-    display: block;
-    height: 0;
-    overflow-y: hidden;
-} 
+  display: block;
+  height: 0;
+  overflow-y: hidden;
+}
 /* bootstrap hack end */
 
 h1 {
-	font-family: "Open Sans";
-	font-style: bold;
-	font-size: 30px;
-	font-weight: bold;
+  font-family: "Open Sans";
+  font-style: bold;
+  font-size: 30px;
+  font-weight: bold;
 }
 
 h2 {
-	font-family: "Open Sans";
-	font-style: bold;
-	font-size: 24px;
-	font-weight: bold;
+  font-family: "Open Sans";
+  font-style: bold;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 h3 {
-	font-family: "Open Sans";
-	font-style: bold;
-	font-size: 18px;	
-	margin-top:20px;
-	font-weight: bold;
+  font-family: "Open Sans";
+  font-style: bold;
+  font-size: 18px;
+  margin-top:20px;
+  font-weight: bold;
 }
 
 table {
-	/*
-	border-collapse: collapse;
-    border-spacing: 10px;
-	*/
+/*
+  border-collapse: collapse;
+  border-spacing: 10px;
+*/
 }
 
-th
-{
+th {
   font-family: "Open Sans";
   font-style: normal;
   font-size: 15px;
-  text-transform: uppercase;    
+  text-transform: uppercase;
   padding-left:10px;
   border-bottom: 0;
-  border-color: #f3f3f3;  
+  border-color: #f3f3f3;
 }
 
- .panel-heading
-{
+.panel-heading {
   font-family: "Open Sans";
   font-style: normal;
   font-style: bold;
   font-size: 15px;
-  text-transform: uppercase;      
+  text-transform: uppercase;
 }
 
-td
-{
+td {
   font-family: "Open Sans";
   font-style: normal;
-  font-size: 15px;
+  font-size: 14px;
   padding: 10px;
   text-align:left;
   border-top: 0;
@@ -68,89 +65,90 @@ td
   border-color: #f3f3f3;
 }
 
-a.hmi-button{
-	font-family: "Open Sans SemiBold";
-	font-style: normal;
-	font-size: 15px;	
-    display: inline-block;
-    padding: 0.5em 1em;
-    text-decoration: none;
-    background: #da1f4d;/*Button Color*/
-    color: #FFF;
-	border-radius: 0px;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;	
-	/*
-    border-bottom: solid 4px #627295;
-    border-radius: 3px;
-	*/
+a.hmi-button {
+  font-family: "Open Sans SemiBold";
+  font-style: normal;
+  font-size: 15px;	
+  display: inline-block;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  background: #da1f4d;/*Button Color*/
+  color: #FFF;
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;	
+/*
+  border-bottom: solid 4px #627295;
+  border-radius: 3px;
+*/
 }
 a.hmi-button:active {/*on Click*/
-	font-family: "Open Sans SemiBold";
-	font-style: normal;
-	font-size: 15px;
-	background-color: #ba1a42;
-	/*
-    -ms-transform: translateY(4px);
-    -webkit-transform: translateY(4px);
-    transform: translateY(4px);*//*Move down*/
-    /*border-bottom: none;*//*disappears*/
+  font-family: "Open Sans SemiBold";
+  font-style: normal;
+  font-size: 15px;
+  background-color: #ba1a42;
+/*
+  -ms-transform: translateY(4px);
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);*//*Move down*/
+  /*border-bottom: none;*//*disappears*/
 }
 
-a.hmi-button-disabled{
-	font-family: "Open Sans SemiBold";
-	font-style: normal;
-	font-size: 15px;	
-    display: inline-block;
-    padding: 0.5em 1em;
-    text-decoration: none;
-	background-color: #d4d4d4;
-    border-color: #d4d4d4;
-    color: #888888;
-	/*
-    border-bottom: solid 4px darkgray;
-    border-radius: 3px;	
-	*/
+a.hmi-button-disabled {
+  font-family: "Open Sans SemiBold";
+  font-style: normal;
+  font-size: 15px;
+  display: inline-block;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  background-color: #d4d4d4;
+  border-color: #d4d4d4;
+  color: #888888;
+/*
+  border-bottom: solid 4px darkgray;
+  border-radius: 3px;
+*/
 }
+
 a.hmi-button-disabled:active {/*on Click*/
 }
 
 .ownButton, .ownButton:focus {
-	font-family: "Open Sans SemiBold";
-	font-style: normal;
-	font-size: 15px;
-    background-color: #da1f4d;
-    border-color: #da1f4d;
-    color: #FFF;
-	border: none;
-	border-radius: 0px;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
+  font-family: "Open Sans SemiBold";
+  font-style: normal;
+  font-size: 15px;
+  background-color: #da1f4d;
+  border-color: #da1f4d;
+  color: #FFF;
+  border: none;
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
 }
 
 .ownButton:active, .ownButton:hover {
-	font-family: "Open Sans SemiBold";
-	font-style: normal;
-	font-size: 15px;
-    background-color: #ba1a42;
-    border-color: #ba1a42;
-    color: #FFF;
-	border: none;
-	border-radius: 0px;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;	
+  font-family: "Open Sans SemiBold";
+  font-style: normal;
+  font-size: 15px;
+  background-color: #ba1a42;
+  border-color: #ba1a42;
+  color: #FFF;
+  border: none;
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
 }
 
 a.disabled{
-	color: gray;
-    pointer-events: none;
-    cursor: default;
+  color: gray;
+  pointer-events: none;
+  cursor: default;
 }
 
 ul.nav-tabs {
-    padding-left:100px;
-    border-bottom: 0px;
-    background-color: #ffffff;
+  padding-left:100px;
+  border-bottom: 0px;
+  background-color: #ffffff;
 }
 
 ul.nav-tabs li a {
@@ -175,7 +173,10 @@ ul.nav-tabs li a:hover {
   font-size: 15px;
 }
 
-ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:focus, ul.nav-tabs li.active a:active{
+ul.nav-tabs li.active a,
+ul.nav-tabs li.active a:hover,
+ul.nav-tabs li.active a:focus,
+ul.nav-tabs li.active a:active {
   border-color: transparent;
   /*margin-bottom: -3px;*/
   border-bottom: 4px;
@@ -183,7 +184,7 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
   color: #111111;
   font-family: "Open Sans";
   font-style: normal;
-  font-size: 15px;  
+  font-size: 15px;
 }
 
 .aboutLink {
@@ -195,10 +196,10 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
   font-size: 15px;
 }
 
-.aboutLink:hover, 
+.aboutLink:hover,
 .aboutLink:active,
 .aboutLink:focus,
-.aboutLink:visited{
+.aboutLink:visited {
   /*margin-bottom: -3px;*/
   text-decoration: none;
   border-bottom: 4px;
@@ -222,6 +223,7 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
   font-style: normal;
   font-size: 14px;  
 }
+
 .login-stripes {
     right: 0;
     left: 0;
@@ -230,47 +232,51 @@ ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover, ul.nav-tabs li.active a:
     background: url("/img/bg-inclined-lines.png");
     background-repeat: repeat;
 }
+
 .header-text {
-    margin-top: 30px;
-    margin-left:20px;
-    margin-right:10px;
-    color: #ffffff;
-    font-family: "Open Sans";
-    font-style: normal;
-    font-size:13px;
+  margin-top: 30px;
+  margin-left:20px;
+  margin-right:10px;
+  color: #ffffff;
+  font-family: "Open Sans";
+  font-style: normal;
+  font-size:13px;
 }
+
 .header-btn {
     margin-top: 30px;
     height: 25px;
 }
+
 .header {
 }
+
 .footer {
-    margin-top:80px; margin-bottom:80px;
-   left: 0;
-   bottom: 0;
-   width: 100%;
-   background-color: #1A1737;
-   color: white;
-   text-align: center;
+  margin-top:80px; margin-bottom:80px;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #1A1737;
+  color: white;
+  text-align: center;
 }
 
-.button-link-override:hover, 
+.button-link-override:hover,
 .button-link-override:active,
 .button-link-override:focus,
 .button-link-override:visited{
-    text-decoration: none !important;
-	border-bottom: 4px !important;
-	padding-bottom: 3px !important;
-	border-bottom: 3px solid #da1f4d !important;
-	color: white !important;
-	font-family: "Open Sans" !important;
-	font-style: normal !important;
-	font-size: 15px !important;
-	/*
-    background-color: #42A5F5 !important;
-    border-color: #42A5F5 !important;
-    background-image: none !important;
-    border: 0 !important;
-	*/
+  text-decoration: none !important;
+  border-bottom: 4px !important;
+  padding-bottom: 3px !important;
+  border-bottom: 3px solid #da1f4d !important;
+  color: white !important;
+  font-family: "Open Sans" !important;
+  font-style: normal !important;
+  font-size: 15px !important;
+/*
+  background-color: #42A5F5 !important;
+  border-color: #42A5F5 !important;
+  background-image: none !important;
+  border: 0 !important;
+*/
 }
