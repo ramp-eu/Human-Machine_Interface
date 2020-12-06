@@ -86,6 +86,7 @@ function updateMaterialFlows(notification) {
 function updateTransportOrders(notification) {
   $.each(notification.data, function () {
     var id = this.id;
+    var robotId = this.robotId.value;
     var type = this.type;
     var pickupFrom = this.pickupFrom.value;
     var deliverTo = this.deliverTo.value;
@@ -109,7 +110,7 @@ function updateTransportOrders(notification) {
     }
     var updateTime = this.updateTime.value;
     var startTime = this.startTime.value;
-    var transportOrderHTML = getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfoStr, updateTime, startTime);
+    var transportOrderHTML = getTransportOrderHTML(id, robotId, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfoStr, updateTime, startTime);
     if ($("#transportOrder_" + id).length) {
       $("#transportOrder_" + id).replaceWith(transportOrderHTML);
     } else {
@@ -155,10 +156,10 @@ function changeMaterialFlowActive(t) {
   return false;
 }
 
-function getTransportOrderHTML(id, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfo, updateTime, startTime) {
+function getTransportOrderHTML(id, robotId, type, pickupFrom, deliverTo, name, refMaterialflowUpdateId, refOwnerId, taskInfo, updateTime, startTime) {
   var taskInfoClass = "TASK_INFO_" + taskInfo;
   //console.log("taskInfoClass: " + taskInfoClass);
-  return "<tr id=\"transportOrder_" + id + "\" class=\"" + taskInfoClass + "\" bgcolor=\"white\"><td>" + id + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
+  return "<tr id=\"transportOrder_" + id + "\" class=\"" + taskInfoClass + "\" bgcolor=\"white\"><td>" + id + "</td><td>" + robotId + "</td><td>" + pickupFrom + "</td><td>" + deliverTo + "</td><td>" + name + "</td><td>" + refMaterialflowUpdateId + "</td><td>" + taskInfo + "</td><td>" + updateTime + "</td><td>" + startTime + "</td></tr>";
 }
 
 function sendMaterialFlow() {
