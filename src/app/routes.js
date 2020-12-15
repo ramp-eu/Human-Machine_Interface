@@ -1,6 +1,5 @@
 const User = require('./models/user');
 const Floorplan = require('./models/floorplan');
-const Config = require('./models/config');
 const Hmibutton = require('./models/hmibutton');
 const Hmiinstance = require('./models/hmiinstance');
 const Subscription = require('./models/subscription');
@@ -211,67 +210,6 @@ module.exports = function(app, passport) {
     });
   });
 
-  // CONFIG SECTION =======================================================
-
-  app.get('/api/config', isLoggedIn, function(req, res, next) {
-    // app.get('/api/config', function(req, res, next) {
-    Config.find({}, function(err, data) {
-      if (err) return next(err);
-      if (data) res.send(data);
-      else res.status(404).send({message: 'No configs found.'});
-    });
-  });
-  app.get('/api/config/:id', isLoggedIn, function(req, res, next) {
-    // app.get('/api/config/:id', function(req, res, next) {
-    Config.findById(req.params.id, function(err, data) {
-      if (err) return next(err);
-      if (data) res.send(data);
-      else res.status(404).send({message: 'Config not found.'});
-    });
-  });
-  app.delete('/api/config/:id', isLoggedIn, function(req, res, next) {
-    // app.delete('/api/config/:id', function(req, res, next) {
-    Config.findByIdAndDelete(req.params.id, function(err, data) {
-      if (err) return next(err);
-      if (data) res.send(data);
-      else res.status(404).send({message: 'Config not found.'});
-    });
-  });
-  app.put('/api/config/:id', isLoggedIn, function(req, res, next) {
-    // app.put('/api/config/:id', function(req, res, next) {
-    Config.findByIdAndUpdate(req.params.id,
-        {'ocb_host': req.body.ocb_host,
-          'ocb_port': req.body.ocb_port,
-          'ngsi_proxy_host': req.body.ngsi_proxy_host,
-          'ngsi_proxy_port': req.body.ngsi_proxy_port,
-          'curr_floorplan_id': req.body.curr_floorplan_id,
-          'updated': new Date().toISOString(),
-        },
-        {new: true},
-        function(err, data) {
-          if (err) return next(err);
-          res.send(data);
-        },
-    );
-  });
-  app.post('/api/config', isLoggedIn, function(req, res, next) {
-    // app.post('/api/config', function(req, res, next) {
-
-    const newConfig = new Config();
-    newConfig.ocb_host = req.body.ocb_host;
-    newConfig.ocb_port = req.body.ocb_port;
-    newConfig.ngsi_proxy_host = req.body.ngsi_proxy_host;
-    newConfig.ngsi_proxy_port = req.body.ngsi_proxy_port;
-    newConfig.curr_floorplan_id = req.body.curr_floorplan_id;
-    newConfig.created = new Date().toISOString();
-    newConfig.updated = new Date().toISOString();
-
-    newConfig.save(function(err, data) {
-      if (err) return next(err);
-      res.send(data);
-    });
-  });
-
   // HMIBUTTON SECTION =======================================================
 
   app.get('/api/hmibutton', isLoggedIn, function(req, res, next) {
@@ -342,23 +280,6 @@ module.exports = function(app, passport) {
       res.send(data);
     });
   });
-  // secret for bash script: 2230670a-483f-11ea-9cf7-0242ac190004
-  app.get('/api/2230670a-483f-11ea-9cf7-0242ac190004/subscription',
-      function(req, res, next) {
-        Subscription.find({}, function(err, data) {
-          if (err) res.send(err);
-          res.send(data);
-        });
-      });
-  app.delete('/api/2230670a-483f-11ea-9cf7-0242ac190004/subscription',
-      function(req, res, next) {
-        Subscription.deleteMany({}, function(err, data) {
-          if (err) res.send(err);
-          if (data) res.send(data);
-          else res.status(404).send({message: 'Subscriptions not found.'});
-        });
-      });
-
 
   // MAIN SECTION =========================
 

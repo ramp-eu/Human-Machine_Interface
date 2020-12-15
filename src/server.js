@@ -16,7 +16,6 @@ const session = require('express-session');
 
 const configDB = require('./config/database.js');
 const inithmiinstance = require('./config/inithmiinstance.js');
-const initconfig = require('./config/initconfig.js');
 const inittestconns = require('./config/inittestconns.js');
 const inituser = require('./config/inituser.js');
 const initbuttons = require('./config/initbuttons.js');
@@ -32,8 +31,6 @@ require('./config/passport')(passport); // pass passport for configuration
 
 // HMI initiation
 inithmiinstance.init();
-initconfig.init(process.env.ocb_host, process.env.ocb_port,
-    process.env.ngsi_proxy_host, process.env.ngsi_proxy_port);
 inittestconns.test(process.env.ocb_host, process.env.ocb_port,
     process.env.ngsi_proxy_host, process.env.ngsi_proxy_port);
 inituser.init(process.env.inituser, process.env.initpw);
@@ -54,7 +51,7 @@ app.set('view engine', 'ejs'); // set up ejs for templating
 
 // required for passport
 app.use(session({
-  secret: 'S4l41n3n4v41n', // session secret
+  secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
 }));
