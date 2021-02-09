@@ -10,7 +10,8 @@ services:
   app:
     container_name: hminode
 #    build: .
-    image: docker.ramp.eu/opil/opil.sw.hmi:latest
+#    image: docker.ramp.eu/opil/opil.sw.hmi:latest
+    image: hmi:test
     environment:
       - inituser=admin
       - initpw=admin
